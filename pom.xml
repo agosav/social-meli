@@ -77,7 +77,15 @@
             <plugin>
                 <groupId>org.jacoco</groupId>
                 <artifactId>jacoco-maven-plugin</artifactId>
-                <version>0.8.7</version>
+                <version>0.8.10</version>
+                <configuration>
+                    <excludes>
+                        <exclude>**/utils/*</exclude>
+                        <exclude>com/socialmeli/socialmeli/exception/**</exclude>
+                        <exclude>com/socialmeli/socialmeli/enums/**</exclude>
+                        <exclude>com/socialmeli/socialmeli/SocialMeliApplication.class</exclude>
+                    </excludes>
+                </configuration>
                 <executions>
                     <execution>
                         <goals>
@@ -93,6 +101,7 @@
                     </execution>
                 </executions>
             </plugin>
+
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-checkstyle-plugin</artifactId>

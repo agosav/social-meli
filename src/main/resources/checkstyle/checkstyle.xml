@@ -165,4 +165,9 @@
 
     </module>
 
+    <!-- Excluir la regla MethodName en archivos de test -->
+    <module name="SuppressionFilter">
+        <property name="file" value="src/main/resources/checkstyle/checkstyle-suppressions.xml"/>
+    </module>
+
 </module>
