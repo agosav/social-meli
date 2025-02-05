@@ -69,17 +69,23 @@ public class UserControllerTest {
         String order = "name_desc";
         User user1 = new User(1, "Agostina Avalle", true);
         User user2 = new User(2, "Carolina Comba", false);
+        User user3 = new User(3, "Ciro Sánchez", true);
+        User user5 = new User(5, "Franca Pairetti", true);
 
         // Act & Assert:
-        mockMvc.perform(get("/users/{userId}/followed/list", 1)
+        mockMvc.perform(get("/users/{userId}/followed/list", user2.getId())
                         .param("order", order))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.user_id").value(user1.getId()))
-                .andExpect(jsonPath("$.user_name").value(user1.getName()))
+                .andExpect(jsonPath("$.user_id").value(user2.getId()))
+                .andExpect(jsonPath("$.user_name").value(user2.getName()))
                 .andExpect(jsonPath("$.followed").isArray())
-                .andExpect(jsonPath("$.followed[0].user_id").value(user2.getId()))
-                .andExpect(jsonPath("$.followed[0].user_name").value(user2.getName()));
+                .andExpect(jsonPath("$.followed[0].user_id").value(user5.getId())) //
+                .andExpect(jsonPath("$.followed[0].user_name").value(user5.getName()))
+                .andExpect(jsonPath("$.followed[1].user_id").value(user3.getId()))
+                .andExpect(jsonPath("$.followed[1].user_name").value(user3.getName()))
+                .andExpect(jsonPath("$.followed[2].user_id").value(user1.getId()))
+                .andExpect(jsonPath("$.followed[2].user_name").value(user1.getName()));
     }
 
     @Test
