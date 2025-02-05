@@ -20,7 +20,7 @@ public class PostRepository implements IPostRepository {
     private List<Post> posts = new ArrayList<>();
 
     @PostConstruct
-    private void loadDataBase() throws IOException {
+    public void loadDataBase() throws IOException {
         File file;
         ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.registerModule(new JavaTimeModule());

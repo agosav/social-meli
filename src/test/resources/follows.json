@@ -27,5 +27,9 @@
   {
     "userFollower": { "id": 6, "name": "Katerinne Peralta", "isSeller": false },
     "userFollowed": { "id": 1, "name": "Agostina Avalle", "isSeller": true }
+  },
+  {
+    "userFollower": { "id": 1, "name": "Agostina Avalle", "isSeller": true },
+    "userFollowed": { "id": 3, "name": "Ciro Sánchez", "isSeller": true }
   }
 ]
