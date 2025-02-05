@@ -22,8 +22,8 @@ public class UserControllerTest {
     private MockMvc mockMvc;
 
     @Test
-    @DisplayName("followToUserTest")
-    public void followToUserTest() throws Exception {
+    @DisplayName("Test to validate sorting order by 'name_asc'")
+    public void testFollowedListOrderNameAsc() throws Exception {
         // Arrange
         String order = "name_asc";
         User user1 = new User(1, "Agostina Avalle", true);
@@ -39,5 +39,37 @@ public class UserControllerTest {
                 .andExpect(jsonPath("$.followed").isArray())
                 .andExpect(jsonPath("$.followed[0].user_id").value(user2.getId()))
                 .andExpect(jsonPath("$.followed[0].user_name").value(user2.getName()));
+    }
+
+    @Test
+    @DisplayName("Test to validate sorting order by 'name_desc'")
+    public void testFollowedListOrderNameDesc() throws Exception {
+        // Arrange:
+        String order = "name_desc";
+        User user1 = new User(1, "Agostina Avalle", true);
+        User user2 = new User(2, "Carolina Comba", false);
+
+        // Act & Assert:
+        mockMvc.perform(get("/users/{userId}/followed/list", 1)
+                        .param("order", order))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.user_id").value(user1.getId()))
+                .andExpect(jsonPath("$.user_name").value(user1.getName()))
+                .andExpect(jsonPath("$.followed").isArray())
+                .andExpect(jsonPath("$.followed[0].user_id").value(user2.getId()))
+                .andExpect(jsonPath("$.followed[0].user_name").value(user2.getName()));
+    }
+
+    @Test
+    @DisplayName("Test to validate exception when invalid order is provided for followed list")
+    public void testFollowedListOrderException() throws Exception {
+        // Arrange
+        String order = "nam";
+
+        // Act & Assert:
+        mockMvc.perform(get("/users/{userId}/followed/list", 1)
+                        .param("order", order))
+                .andExpect(status().isBadRequest());
     }
 }
