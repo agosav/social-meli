@@ -2,14 +2,15 @@
   {
     "userFollower": { "id": 2, "name": "Carolina Comba", "isSeller": false },
     "userFollowed": { "id": 1, "name": "Agostina Avalle", "isSeller": true }
+
   },
   {
     "userFollower": { "id": 4, "name": "Eliana Navarro", "isSeller": false },
     "userFollowed": { "id": 3, "name": "Ciro Sánchez", "isSeller": true }
   },
   {
-    "userFollowed": { "id": 6, "name": "Katerinne Peralta", "isSeller": false },
-    "userFollower": { "id": 5, "name": "Franca Pairetti", "isSeller": true }
+    "userFollower": { "id": 6, "name": "Katerinne Peralta", "isSeller": false },
+    "userFollowed": { "id": 5, "name": "Franca Pairetti", "isSeller": true }
   },
   {
     "userFollower": { "id": 2, "name": "Carolina Comba", "isSeller": false },
@@ -20,8 +21,12 @@
     "userFollowed": { "id": 1, "name": "Agostina Avalle", "isSeller": true }
   },
   {
-    "userFollower": { "id": 6, "name": "Katerinne Peralta", "isSeller": false },
+    "userFollower": { "id": 2, "name": "Carolina Comba", "isSeller": false },
     "userFollowed": { "id": 5, "name": "Franca Pairetti", "isSeller": true }
+  },
+  {
+    "userFollower": { "id": 6, "name": "Katerinne Peralta", "isSeller": false },
+    "userFollowed": { "id": 1, "name": "Agostina Avalle", "isSeller": true }
   },
   {
     "userFollower": { "id": 1, "name": "Agostina Avalle", "isSeller": true },
