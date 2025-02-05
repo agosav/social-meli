@@ -20,7 +20,7 @@ public class UserRepository implements IUserRepository {
     private List<User> users = new ArrayList<>();
 
     @PostConstruct
-    private void loadDataBase() throws IOException {
+    public void loadDataBase() throws IOException {
         File file;
         ObjectMapper objectMapper = new ObjectMapper();
 

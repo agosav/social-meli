@@ -10,7 +10,6 @@ import com.socialmeli.socialmeli.enums.Order;
 
 import com.socialmeli.socialmeli.exception.IllegalActionException;
 import com.socialmeli.socialmeli.exception.AlreadyExistsException;
-import com.socialmeli.socialmeli.exception.BadRequestException;
 import com.socialmeli.socialmeli.exception.NotFoundException;
 import com.socialmeli.socialmeli.exception.UserNotSellerException;
 import com.socialmeli.socialmeli.models.Follow;
@@ -93,11 +92,6 @@ public class UserService implements IUserService {
     // US 0003
     @Override
     public FollowerListDto getFollowerList(Integer userId, String order) {
-        if (!order.equalsIgnoreCase(String.format("name_%s", Order.ASC.getString()))
-                && !order.equalsIgnoreCase(String.format("name_%s", Order.DESC.getString()))) {
-            throw new BadRequestException(Message.INVALID_ORDER.getStr());
-        }
-
         User user = getUserIfExists(userId);
         List<Follow> follows = getAllFollowers(user);
 
@@ -114,11 +108,6 @@ public class UserService implements IUserService {
     // US 0004
     @Override
     public FollowedListDto getFollowedList(Integer userId, String order) {
-        if (!order.equalsIgnoreCase(String.format("name_%s", Order.ASC.getString()))
-                && !order.equalsIgnoreCase(String.format("name_%s", Order.DESC.getString()))) {
-            throw new BadRequestException(Message.INVALID_ORDER.getStr());
-        }
-
         User user = getUserIfExists(userId);
 
         List<UserDto> followed = followRepository

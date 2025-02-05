@@ -21,7 +21,7 @@ public class FollowRepository implements IFollowRepository {
     private List<Follow> follows = new ArrayList<>();
 
     @PostConstruct
-    private void loadDataBase() throws IOException {
+    public void loadDataBase() throws IOException {
         File file;
         ObjectMapper objectMapper = new ObjectMapper();
 
