@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 
 class FollowRepositoryTest {
 
@@ -35,5 +36,21 @@ class FollowRepositoryTest {
 
         // Assert
         assertEquals(expected, result);
+    }
+
+    @Test
+    @DisplayName("deleteTest - should remove the follow relationship from the repository")
+    void deleteTest() {
+        // Arrange
+        User user1 = new User(1, "Emilia Mernes", false);
+        User user2 = new User(2, "Taylor Swift", true);
+        Follow follow = new Follow(user1, user2);
+        followRepository.add(follow);
+
+        // Act
+        followRepository.delete(follow);
+
+        // Assert
+        assertFalse(followRepository.exists(follow));
     }
 }

@@ -9,7 +9,6 @@ import com.socialmeli.socialmeli.models.Follow;
 import com.socialmeli.socialmeli.models.User;
 import com.socialmeli.socialmeli.repositories.IFollowRepository;
 import com.socialmeli.socialmeli.repositories.IUserRepository;
-
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -23,8 +22,6 @@ import java.util.Optional;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -118,7 +115,7 @@ public class UserServiceTest {
         Integer userId = 1;
         Integer followedId = 999;
         when(userRepository.findById(userId)).thenReturn(Optional.of(new User(userId, "Emilia Mernes", false)));
-        when(userRepository.findById(followedId)).thenReturn(Optional.empty()); // Simulamos que no existe
+        when(userRepository.findById(followedId)).thenReturn(Optional.empty());
 
         // Act & Assert
         NotFoundException exception = assertThrows(NotFoundException.class,
