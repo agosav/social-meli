@@ -1,7 +1,10 @@
 package com.socialmeli.socialmeli.services;
 
 import com.socialmeli.socialmeli.dto.response.FollowedListDto;
+import com.socialmeli.socialmeli.dto.response.MessageDto;
 import com.socialmeli.socialmeli.dto.response.UserDto;
+import com.socialmeli.socialmeli.enums.Message;
+import com.socialmeli.socialmeli.exception.NotFoundException;
 import com.socialmeli.socialmeli.models.Follow;
 import com.socialmeli.socialmeli.models.User;
 import com.socialmeli.socialmeli.repositories.IFollowRepository;
@@ -17,7 +20,11 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.util.List;
 import java.util.Optional;
 
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -88,12 +95,35 @@ public class UserServiceTest {
 
     @Test
     @DisplayName("unfollowTest - should return message ok")
-    void unfollowTest_whenUserExists_thenReturnMessageOk() {
-        User user1 = User.builder().id(1).name("Emilia Mernes").build();
-        User user2 = User.builder().id(2).name("Taylor Swift").build();
-        Follow follow = new Follow(user1, user2);
-        when(userRepository.findById(user2.getId())).thenReturn(Optional.of(user2));
-        userService.unfollow(user1.getId(), user2.getId());
+    void unfollowTest_whenFollowedExists_thenReturnMessageOk() {
+        // Arrange
+        User follower = User.builder().id(1).name("Emilia Mernes").build();
+        User followed = User.builder().id(2).name("Taylor Swift").build();
+        Follow follow = new Follow(follower, followed);
+        when(userRepository.findById(follower.getId())).thenReturn(Optional.of(follower));
+        when(userRepository.findById(followed.getId())).thenReturn(Optional.of(followed));
+        when(followRepository.exists(follow)).thenReturn(true);
 
+        // Act
+        MessageDto result = userService.unfollow(follower.getId(), followed.getId());
+
+        // Assert
+        assertEquals(Message.USER_UNFOLLOWED.format(followed.getName()), result.getMessage());
+    }
+
+    @Test
+    @DisplayName("unfollowTest - should return not found exception")
+    void unfollowTest_whenFollowedNotExists_thenReturnNotFoundException() {
+        // Arrange
+        Integer userId = 1;
+        Integer followedId = 999;
+        when(userRepository.findById(userId)).thenReturn(Optional.of(new User(userId, "Emilia Mernes", false)));
+        when(userRepository.findById(followedId)).thenReturn(Optional.empty()); // Simulamos que no existe
+
+        // Act & Assert
+        NotFoundException exception = assertThrows(NotFoundException.class,
+                () -> userService.unfollow(userId, followedId));
+
+        assertThat(exception.getMessage()).isEqualTo(Message.USER_NOT_FOUND.format(followedId));
     }
 }
