@@ -85,4 +85,15 @@ public class UserServiceTest {
         // Assert
         assertEquals(expected, result);
     }
+
+    @Test
+    @DisplayName("unfollowTest - should return message ok")
+    void unfollowTest_whenUserExists_thenReturnMessageOk() {
+        User user1 = User.builder().id(1).name("Emilia Mernes").build();
+        User user2 = User.builder().id(2).name("Taylor Swift").build();
+        Follow follow = new Follow(user1, user2);
+        when(userRepository.findById(user2.getId())).thenReturn(Optional.of(user2));
+        userService.unfollow(user1.getId(), user2.getId());
+
+    }
 }
