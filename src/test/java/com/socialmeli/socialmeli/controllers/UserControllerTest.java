@@ -27,7 +27,7 @@ public class UserControllerTest {
         // Arrange
         String order = "name_asc";
         User user1 = new User(1, "Agostina Avalle", true);
-        User user2 = new User(2, "Carolina Comba", false);
+        User user2 = new User(3, "Ciro Sánchez", true);
 
         // Act & Assert
         mockMvc.perform(get("/users/{userId}/followed/list", user1.getId())

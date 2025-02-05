@@ -27,11 +27,26 @@ class FollowRepositoryTest {
         // Arrange
         User user1 = new User(1, "Agostina Avalle", true);
         List<Follow> expected = List.of(
-                new Follow(user1, new User(2, "Carolina Comba", false))
+                new Follow(user1, new User(3, "Ciro Sánchez", true))
         );
 
         // Act
         List<Follow> result = followRepository.findAllByIdFollower(user1.getId());
+
+        // Assert
+        assertEquals(expected, result);
+    }
+    @Test
+    @DisplayName("findFollowedUsersTest - should return a list of user that one user follows")
+    void  findFollowedUsersTest_whenUserFollowsSellers_thenReturnListOfFollowedUsers() {
+        // Arrange
+        User user1 = new User(1, "Agostina Avalle", true);
+        List<User> expected = List.of(
+                new User(3, "Ciro Sánchez", true)
+        );
+
+        // Act
+        List<User> result = followRepository.findFollowedUsers(user1);
 
         // Assert
         assertEquals(expected, result);
