@@ -109,7 +109,7 @@ public class UserServiceTest {
     }
 
     @Test
-    @DisplayName("unfollowTest - should return not found exception")
+    @DisplayName("unfollowTest - should return NotFoundException")
     void unfollowTest_whenFollowedNotExists_thenReturnNotFoundException() {
         // Arrange
         Integer userId = 1;
