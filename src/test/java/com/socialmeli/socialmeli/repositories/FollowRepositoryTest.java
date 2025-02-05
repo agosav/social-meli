@@ -28,15 +28,37 @@ class FollowRepositoryTest {
     @DisplayName("findAllByIdFollowerTest - should return a list of follows by id follower")
     void findAllByIdFollowerTest_whenSuccess_thenReturnListFollow() {
         // Arrange
-        User user1 = userTestUtils.createBuyer(2, "Carolina Comba");
-        User user2 = userTestUtils.createSeller(1, "Agostina Avalle");
+        User user1 = userTestUtils.createSeller(1, "Agostina Avalle");
+        User user3 = userTestUtils.createSeller(3, "Ciro Sánchez");
+        User user4 = userTestUtils.createBuyer(4, "Eliana Navarro");
 
-        List<Follow> expected = List.of(new Follow(user1, user2));
+        List<Follow> expected = List.of(new Follow(user4, user3), new Follow(user4, user1));
 
         // Act
-        List<Follow> result = followRepository.findAllByIdFollower(user1.getId());
+        List<Follow> result = followRepository.findAllByIdFollower(user4.getId());
 
         // Assert
+        assertEquals(expected, result);
+    }
+
+    @Test
+    @DisplayName("findAllByIdFollowedTest - should return a list of follows by id follower")
+    void findAllByIdFollowedTest_thenReturnListFollows() {
+        //Arrange
+        User user1 = userTestUtils.createSeller(1, "Agostina Avalle");
+        User user2 = userTestUtils.createBuyer(2, "Carolina Comba");
+        User user4 = userTestUtils.createBuyer(4, "Eliana Navarro");
+        User user6 = userTestUtils.createBuyer(6, "Katerinne Peralta");
+        List<Follow> expected =  List.of(
+                new Follow(user2, user1),
+                new Follow(user4, user1),
+                new Follow(user6, user1)
+        );
+
+        //Act
+        List<Follow> result = followRepository.findAllByIdFollowed(user1.getId());
+
+        //Assertions
         assertEquals(expected, result);
     }
 

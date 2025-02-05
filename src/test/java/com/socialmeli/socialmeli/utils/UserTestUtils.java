@@ -27,6 +27,6 @@ public class UserTestUtils {
     }
 
     public User createBuyer(Integer id, String name) {
-        return new User(id, name, true);
+        return new User(id, name, false);
     }
 }

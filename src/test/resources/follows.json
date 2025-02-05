@@ -2,7 +2,6 @@
   {
     "userFollower": { "id": 2, "name": "Carolina Comba", "isSeller": false },
     "userFollowed": { "id": 1, "name": "Agostina Avalle", "isSeller": true }
-
   },
   {
     "userFollower": { "id": 4, "name": "Eliana Navarro", "isSeller": false },
