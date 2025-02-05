@@ -25,9 +25,9 @@ class FollowRepositoryTest {
         // Arrange
         User user2 = new User(2, "Carolina Comba", false);
         List<Follow> expected = List.of(
-                new Follow( user2 ,new User(1, "Agostina Avalle", true)),
-                new Follow( user2, new User(3, "Ciro Sánchez", true)),
-                new Follow(user2,new User(5,"Franca Pairetti",true))
+                new Follow(user2, new User(1, "Agostina Avalle", true)),
+                new Follow(user2, new User(3, "Ciro Sánchez", true)),
+                new Follow(user2, new User(5, "Franca Pairetti", true))
         );
 
         // Act
@@ -43,9 +43,9 @@ class FollowRepositoryTest {
         //Arrange
         User user1 = new User(1, "Agostina Avalle", true);
         List<Follow> expected =  List.of(
-                new Follow(new User(2, "Carolina Comba", false),user1),
-                new Follow(new User(4, "Eliana Navarro", false),user1),
-                new Follow(new User(6,"Katerinne Peralta",false),user1)
+                new Follow(new User(2, "Carolina Comba", false), user1),
+                new Follow(new User(4, "Eliana Navarro", false), user1),
+                new Follow(new User(6, "Katerinne Peralta", false), user1)
         );
 
         //Act

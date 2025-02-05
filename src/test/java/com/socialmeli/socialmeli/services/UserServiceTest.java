@@ -91,14 +91,14 @@ public class UserServiceTest {
 
     @Test
     @DisplayName("countFollowersForSeller")
-    void countFollowersForSaller_whenUserExists_thenReturnFollowersForSeller() {
+    void countFollowersForSaller_whenUserExists_thenReturnCountFollowersForSeller() {
         //Arrange
         User user1 = User.builder().id(1).name("Agostina Avalle").isSeller(true).build();
-        UserFollowerCountDto expected = new UserFollowerCountDto(user1.getId(),user1.getName(),3);
+        UserFollowerCountDto expected = new UserFollowerCountDto(user1.getId(), user1.getName(), 3);
         List<Follow> followers = List.of(
-                new Follow(new User(2,"Carolina Comba",false),user1),
-                new Follow( new User(4, "Eliana Navarro", false),user1),
-                new Follow(new User(6, "Katerinne Peralta", false),user1)
+                new Follow(new User(2, "Carolina Comba", false), user1),
+                new Follow(new User(4, "Eliana Navarro", false), user1),
+                new Follow(new User(6, "Katerinne Peralta", false), user1)
         );
 
         when(userRepository.findById(user1.getId())).thenReturn(Optional.of(user1));

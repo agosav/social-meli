@@ -30,7 +30,7 @@ public class UserControllerTest {
         User user1 = new User(1, "Agostina Avalle", true);
         User user2 = new User(2, "Carolina Comba", false);
         User user3 = new User(3, "Ciro Sánchez", true);
-        User user5 = new User(5,"Franca Pairetti",true);
+        User user5 = new User(5, "Franca Pairetti", true);
         // Act & Assert
         mockMvc.perform(get("/users/{userId}/followed/list", user2.getId())
                         .param("order", order))
