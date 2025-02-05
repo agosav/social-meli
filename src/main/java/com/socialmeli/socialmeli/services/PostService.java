@@ -7,9 +7,7 @@ import com.socialmeli.socialmeli.dto.response.PostIdDto;
 import com.socialmeli.socialmeli.dto.response.ProductListDto;
 import com.socialmeli.socialmeli.dto.response.ProductSaleCountDto;
 import com.socialmeli.socialmeli.enums.Message;
-import com.socialmeli.socialmeli.enums.Order;
 import com.socialmeli.socialmeli.exception.AlreadyExistsException;
-import com.socialmeli.socialmeli.exception.BadRequestException;
 import com.socialmeli.socialmeli.exception.NotFoundException;
 import com.socialmeli.socialmeli.exception.UserNotSellerException;
 import com.socialmeli.socialmeli.models.Post;
@@ -92,10 +90,6 @@ public class PostService implements IPostService {
     // US 0006
     @Override
     public ProductListDto getRecentPostFromUsers(String order, Integer userId) {
-        if (!order.equalsIgnoreCase(String.format("date_%s", Order.ASC.getString()))
-                && !order.equalsIgnoreCase(String.format("date_%s", Order.DESC.getString()))) {
-            throw new BadRequestException(Message.INVALID_ORDER.getStr());
-        }
         User user = getUserIfExists(userId);
         List<User> followed = followRepository.findFollowedUsers(user);
         List<Post> postsFromFollows = postRepository.postFromUsers(followed);

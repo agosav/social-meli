@@ -25,7 +25,6 @@ public enum Message {
     NO_POSTS_CURRENTLY("No promotional posts currently"),
     FILTER_ERROR("A filter value is wrong"),
     FILTER_LIST_EMPTY("No post meets the selected filters"),
-    INVALID_ORDER("Invalid order"),
     NO_SELLERS("No sellers found");
 
     private final String str;
