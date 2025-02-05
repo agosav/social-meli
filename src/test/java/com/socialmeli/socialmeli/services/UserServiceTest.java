@@ -94,7 +94,7 @@ public class UserServiceTest {
     }
 
     @Test
-    @DisplayName("unfollowTest - should return message ok")
+    @DisplayName("unfollowTest - should return Message USER_UNFOLLOWED")
     void unfollowTest_whenFollowedExists_thenReturnMessageOk() {
         // Arrange
         User follower = User.builder().id(1).name("Emilia Mernes").build();
