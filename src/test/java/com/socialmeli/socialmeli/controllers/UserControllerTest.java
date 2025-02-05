@@ -32,16 +32,16 @@ public class UserControllerTest {
     public void followToUserTest_success() throws Exception {
         // Arrange
         User user1 = userTestUtils.createSeller(1, "Agostina Avalle");
-        User user2 = userTestUtils.createSeller(3, "Ciro Sánchez");
+        User user5 = userTestUtils.createSeller(5, "Franca Pairetti");
 
         Message message = Message.USER_FOLLOWED;
 
         // Act & Assert
-        mockMvc.perform(post("/users/{userId}/follow/{userIdToFollow}", user1.getId(),
-                        user2.getId()))
+        mockMvc.perform(post("/users/{userId}/follow/{userIdToFollow}", user5.getId(),
+                        user1.getId()))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.message").value(message.format(user2.getName())));
+                .andExpect(jsonPath("$.message").value(message.format(user1.getName())));
     }
 
     @Test
@@ -75,7 +75,7 @@ public class UserControllerTest {
     @DisplayName("countFollowersForSeller")
     public void getCountFollowerForSellerTest() throws Exception {
         //Arrange
-        UserFollowerCountDto user1 = new UserFollowerCountDto(1, "Agostina Avalle", 3);
+        UserFollowerCountDto user1 = new UserFollowerCountDto(1, "Agostina Avalle", 4);
         //Act & Assertions
         mockMvc.perform(get("/users/{userId}/followers/count", user1.getId()))
                 .andExpect(status().isOk())
