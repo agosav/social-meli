@@ -8,6 +8,7 @@ import com.socialmeli.socialmeli.exception.AlreadyExistsException;
 import com.socialmeli.socialmeli.exception.IllegalActionException;
 import com.socialmeli.socialmeli.exception.NotFoundException;
 import com.socialmeli.socialmeli.exception.UserNotSellerException;
+import com.socialmeli.socialmeli.dto.response.UserFollowerCountDto;
 import com.socialmeli.socialmeli.models.Follow;
 import com.socialmeli.socialmeli.models.User;
 import com.socialmeli.socialmeli.repositories.IFollowRepository;
@@ -192,4 +193,29 @@ public class UserServiceTest {
         // Assert
         assertEquals(expected, result);
     }
+
+    //US-0002 : Obtener el resultado de la cantidad de usuarios que siguen a un determinado vendedor
+
+    @Test
+    @DisplayName("countFollowersForSeller")
+    void countFollowersForSaller_whenUserExists_thenReturnCountFollowersForSeller() {
+        //Arrange
+        User user1 = User.builder().id(1).name("Agostina Avalle").isSeller(true).build();
+        UserFollowerCountDto expected = new UserFollowerCountDto(user1.getId(), user1.getName(), 3);
+        List<Follow> followers = List.of(
+                new Follow(new User(2, "Carolina Comba", false), user1),
+                new Follow(new User(4, "Eliana Navarro", false), user1),
+                new Follow(new User(6, "Katerinne Peralta", false), user1)
+        );
+
+        when(userRepository.findById(user1.getId())).thenReturn(Optional.of(user1));
+        when(followRepository.findAllByIdFollowed(user1.getId())).thenReturn(followers);
+
+        //Act
+        UserFollowerCountDto result = userService.countFollowers(user1.getId());
+
+        //Assert
+        assertEquals(expected, result);
+    }
+
 }
