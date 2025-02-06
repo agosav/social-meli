@@ -287,6 +287,57 @@ public class UserControllerTest {
         }
     }
 
+    @Test
+    @DisplayName("getFollowerUsers - order invalid")
+    public void getFollowerUsersTest_whenOrderInvalid_thenReturn400() throws Exception {
+        // Arrange
+        String order = "asdasf";
+
+        // Act & Assert:
+        mockMvc.perform(get("/users/{userId}/followers/list", 1)
+                        .param("order", order))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @DisplayName("getFollowerUsers - user id invalid")
+    public void getFollowerUsersTest_whenUserIdInvalid_thenReturn400() throws Exception {
+        // Arrange
+        Integer userId = -1;
+
+        // Act & Assert:
+        mockMvc.perform(get("/users/{userId}/followers/list", userId))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @DisplayName("getFollowerUsers - user not found")
+    public void getFollowerUsersTest_whenUserDoesntExists_thenReturn404() throws Exception {
+        // Arrange
+        Integer userId = 999;
+        String message = Message.USER_NOT_FOUND.format(userId);
+
+        // Act & Assert
+        mockMvc.perform(get("/users/{userId}/followers/list", userId))
+                .andExpect(status().isNotFound())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.message").value(message));
+    }
+
+    @Test
+    @DisplayName("getFollowerUsers - user not seller")
+    public void getFollowerUsersTest_whenUserDoesntExists_thenReturn400() throws Exception {
+        // Arrange
+        User user = UserFactory.createBuyer(2, "Carolina Comba");
+        String message = Message.USER_NOT_SELLER.format(user.getName());
+
+        // Act & Assert
+        mockMvc.perform(get("/users/{userId}/followers/list", user.getId()))
+                .andExpect(status().isBadRequest())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.message").value(message));
+    }
+
     // US 0004 - Obtener un listado de todos los vendedores a los cuales sigue un determinado usuario (¿A quién sigo?).
     @ParameterizedTest
     @CsvSource({"name_asc", "name_desc", "DEFAULT"})

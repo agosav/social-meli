@@ -147,6 +147,18 @@ public class ProductControllerTest {
                 .andExpect(jsonPath("$.message").value(message));
     }
 
+    @Test
+    @DisplayName("T-0005: getPostsOfFollowedSellers - should return 404 when userid is not a number")
+    public void getPostsOfFollowedSellersUserIdNotANumberExceptionTests() throws Exception {
+        // Arrange
+        String order = "date_asc";
+        String userId = "numero";
+        // Act & Assert
+        mockMvc.perform(get("/products/followed/{userId}/list", userId)
+                        .param("order", order))
+                .andExpect(status().isBadRequest());
+    }
+
     @ParameterizedTest
     @ValueSource(strings = {"/products/post", "/products/promo-post"})
     @DisplayName("savePost - should return 200 OK when product does not exist and user is not seller")
@@ -227,5 +239,49 @@ public class ProductControllerTest {
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
     }
+    @Test
+    @DisplayName("US-0011 - Get the number of promotional products for a specific seller")
+    void getPromoPostCountTest() throws Exception {
 
+        mockMvc.perform(get("/products/promo-post/count")
+                        .param("user_id", "5"))
+                .andExpect(status().isOk()).andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.promo_products_count").value(1))
+                .andExpect(jsonPath("$.user_name").value("Franca Pairetti"));
+    }
+
+    @Test
+    @DisplayName("US-0011 - NotFoundException")
+    void getPromoPostCountTest_whenUserNotFound_thenThrow404() throws Exception {
+
+        mockMvc.perform(get("/products/promo-post/count")
+                        .param("user_id", "203"))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    @DisplayName("US-0011 - Invalid param")
+    void getPromoPostCountTest_when() throws Exception {
+
+        mockMvc.perform(get("/products/promo-post/count")
+                        .param("user_id", "-5"))
+                .andExpect(status().isBadRequest());
+    }
+    @Test
+    @DisplayName("US-0011 - UserIsNotSeller")
+    void getPromoPostCountTest_whenUserIsNotSeller_thenThrow() throws Exception {
+
+        mockMvc.perform(get("/products/promo-post/count")
+                        .param("user_id", "4"))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @DisplayName("US-0011 - Empty List")
+    void getPromoPostCountTest_whenListIsEmpty_thenThrow() throws Exception {
+
+        mockMvc.perform(get("/products/promo-post/count")
+                        .param("user_id", "7"))
+                .andExpect(status().isNotFound());
+    }
 }
