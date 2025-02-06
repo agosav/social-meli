@@ -140,6 +140,20 @@ public class UserServiceTest {
         assertThrows(AlreadyExistsException.class, () -> userService.follow(user1.getId(), user2.getId()));
     }
 
+    // US-0007: Poder realizar la acción de “Unfollow” (dejar de seguir) a un determinado vendedor.
+    @Test
+    @DisplayName("unfollow - user follower not found")
+    void unfollowTest_whenUserFollowerDoesntExist_thenThrowNotFoundException() {
+        // Arrange
+        Integer userFollowerId = 1;
+        Integer userFollowedId = 2;
+
+        when(userRepository.findById(userFollowerId)).thenReturn(Optional.empty());
+
+        // Act & Assert
+        assertThrows(NotFoundException.class, () -> userService.unfollow(userFollowerId, userFollowedId));
+    }
+
     // US 0002 - Obtener el resultado de la cantidad de usuarios que siguen a un determinado vendedor.
     @Test
     @DisplayName("countFollowersForSeller")
