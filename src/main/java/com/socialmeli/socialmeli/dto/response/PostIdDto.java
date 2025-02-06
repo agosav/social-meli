@@ -3,6 +3,7 @@ package com.socialmeli.socialmeli.dto.response;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.socialmeli.socialmeli.dto.ProductDto;
+import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -13,6 +14,7 @@ import java.time.LocalDate;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
+@Valid
 @JsonPropertyOrder({"user_id", "post_id"})
 public class PostIdDto {
     @JsonProperty("user_id")
