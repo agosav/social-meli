@@ -10,6 +10,8 @@ import org.junit.jupiter.api.Test;
 import java.io.IOException;
 import java.util.List;
 
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class FollowRepositoryTest {
@@ -25,7 +27,7 @@ class FollowRepositoryTest {
     }
 
     @Test
-    @DisplayName("findAllByIdFollowerTest - should return a list of follows by id follower")
+    @DisplayName("findAllByIdFollower - should return a list of follows by id follower")
     void findAllByIdFollowerTest_whenSuccess_thenReturnListFollow() {
         // Arrange
         User user1 = userTestUtils.createSeller(1, "Agostina Avalle");
@@ -57,7 +59,7 @@ class FollowRepositoryTest {
     }
 
     @Test
-    @DisplayName("findAllByIdFollowedTest - should return a list of follows by id follower")
+    @DisplayName("findAllByIdFollowed - should return a list of follows by id follower")
     void findAllByIdFollowedTest_thenReturnListFollows() {
         //Arrange
         User user1 = userTestUtils.createSeller(1, "Agostina Avalle");
@@ -89,6 +91,36 @@ class FollowRepositoryTest {
         boolean result = followRepository.exists(follow);
 
         // Assert
-        assertEquals(true, result);
+        assertTrue(result);
+    }
+
+    @Test
+    @DisplayName("exists - should return false when follow doesnt exists")
+    void existsTest_whenFollowDoesntExists_thenReturnFalse() {
+        // Arrange
+        User user1 = userTestUtils.createBuyer(2, "Carolina Comba");
+        User user2 = userTestUtils.createSeller(1, "Agostina Avalle");
+        Follow follow = new Follow(user2, user1);
+
+        // Act
+        boolean result = followRepository.exists(follow);
+
+        // Assert
+        assertFalse(result);
+    }
+
+    @Test
+    @DisplayName("add - should add a follow to the list")
+    void addTest_whenAdd_thenVoid() {
+        // Arrange
+        User user1 = userTestUtils.createSeller(1, "Agostina Avalle");
+        User user5 = userTestUtils.createSeller(5, "Franca Pairetti");
+        Follow follow = new Follow(user1, user5);
+
+        // Act
+        followRepository.add(follow);
+
+        // Assert
+        assertTrue(followRepository.getFollows().contains(follow));
     }
 }

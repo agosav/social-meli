@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.socialmeli.socialmeli.models.Follow;
 import com.socialmeli.socialmeli.models.User;
 import jakarta.annotation.PostConstruct;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.ResourceUtils;
@@ -16,6 +17,7 @@ import java.util.List;
 
 @Repository
 @RequiredArgsConstructor
+@Getter
 public class FollowRepository implements IFollowRepository {
 
     private List<Follow> follows = new ArrayList<>();
