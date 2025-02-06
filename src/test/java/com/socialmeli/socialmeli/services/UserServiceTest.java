@@ -3,6 +3,8 @@ package com.socialmeli.socialmeli.services;
 import com.socialmeli.socialmeli.dto.response.FollowedListDto;
 import com.socialmeli.socialmeli.dto.response.UserDto;
 import com.socialmeli.socialmeli.dto.response.UserFollowerCountDto;
+import com.socialmeli.socialmeli.exception.NotFoundException;
+import com.socialmeli.socialmeli.exception.UserNotSellerException;
 import com.socialmeli.socialmeli.models.Follow;
 import com.socialmeli.socialmeli.models.User;
 import com.socialmeli.socialmeli.repositories.IFollowRepository;
@@ -19,6 +21,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -111,4 +114,71 @@ public class UserServiceTest {
         assertEquals(expected, result);
     }
 
+    @Test
+    @DisplayName("Should throw NotFoundException when user is not found")
+    public void testGetFollowedList_UserNotFound() {
+        // Arrange
+        Integer userId = 999;
+        String order = "name_asc";
+
+        when(userRepository.findById(userId)).thenReturn(Optional.empty());
+
+        // Act
+        NotFoundException exception = assertThrows(NotFoundException.class, () -> {
+            userService.getFollowedList(userId, order);
+        });
+
+        // Assert
+        assertEquals("User with ID 999 not found", exception.getMessage());
+    }
+
+    @Test
+    @DisplayName("Test for 'User Not Found'")
+    public void testGetFollowerList_UserNotFound() {
+        // Arrange
+        Integer userId = 800;
+        String order = "name_asc";
+
+        when(userRepository.findById(userId)).thenReturn(Optional.empty());
+
+        // Act
+
+        NotFoundException exception = assertThrows(NotFoundException.class, () -> {
+            userService.getFollowerList(userId, order);
+        });
+
+        // Assert
+        assertEquals("User with ID 800 not found", exception.getMessage());
+    }
+
+    @Test
+    @DisplayName("Test for 'User is not seller'")
+    public void testGetFollowerList_UserNotSeller() {
+        // Arrange
+        Integer userId = 1;
+        String order = "name_asc";
+
+
+        User user = new User(userId, "Carolina Comba", false);
+
+        when(userRepository.findById(userId)).thenReturn(Optional.of(user));
+
+        // Act
+        UserNotSellerException exception = assertThrows(UserNotSellerException.class, () -> {
+            userService.getFollowerList(userId, order);
+        });
+
+        // Assert
+        assertEquals("Carolina Comba is not a seller", exception.getMessage());
+    }
 }
+
+
+
+
+
+
+
+
+
+

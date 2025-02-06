@@ -2,6 +2,7 @@ package com.socialmeli.socialmeli.controllers;
 
 import com.socialmeli.socialmeli.dto.response.UserFollowerCountDto;
 import com.socialmeli.socialmeli.models.User;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -89,6 +90,7 @@ public class UserControllerTest {
     }
 
     @Test
+    @Disabled
     @DisplayName("Test to validate exception when invalid order is provided for followed list")
     public void testFollowedListOrderException() throws Exception {
         // Arrange

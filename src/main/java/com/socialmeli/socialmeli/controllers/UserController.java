@@ -14,9 +14,13 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 
+
+
+
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/users")
+
 public class UserController {
 
     private final IUserService userService;
@@ -44,7 +48,7 @@ public class UserController {
     // US 0004 - Obtener un listado de todos los vendedores a los cuales sigue un determinado usuario (¿A quién sigo?).
     @GetMapping("/{userId}/followed/list")
     public ResponseEntity<FollowedListDto> getFollowedUsers(
-            @PathVariable Integer userId,
+            @PathVariable  Integer userId,
             @RequestParam(defaultValue = "name_asc") String order) {
         return ResponseEntity.ok(userService.getFollowedList(userId, order));
     }
