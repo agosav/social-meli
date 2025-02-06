@@ -50,7 +50,7 @@ public class ProductController {
 
     // US 0011 - Obtener la cantidad de productos en promoción de un determinado vendedor.
     @GetMapping("promo-post/count")
-    public ResponseEntity<ProductSaleCountDto> getPromoPostCount(@RequestParam("user_id") Integer userId) {
+    public ResponseEntity<ProductSaleCountDto> getPromoPostCount(@Positive @RequestParam("user_id") Integer userId) {
         return ResponseEntity.ok(postService.getProductSaleCountByUser(userId));
     }
 }
