@@ -151,6 +151,7 @@ public class UserControllerTest {
 
     @Test
     @DisplayName("unfollowToUserTest")
+    @DirtiesContext(methodMode = DirtiesContext.MethodMode.AFTER_METHOD)
     public void unfollowUserTest() throws Exception {
         // Arrange
         User follower = new User(2, "Carolina Comba", false);
