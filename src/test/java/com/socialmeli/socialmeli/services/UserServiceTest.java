@@ -204,7 +204,7 @@ public class UserServiceTest {
 
     @Test
     @DisplayName("countFollowersForSeller - user not found")
-    void countFollowersForSeller_whenUserDoesntExists_thenReturnThrowNotFoundException() {
+    void countFollowersForSeller_whenUserNotFound_thenReturnThrowNotFoundException() {
         // Arrange
         Integer userId = 7;
 
@@ -216,7 +216,7 @@ public class UserServiceTest {
 
     @Test
     @DisplayName("countFollowersForSeller - user not seller")
-    void countFollowersForSeller_whenUserDoesntSeller_thenReturnThrowNotSellerException() {
+    void countFollowersForSeller_whenUserNotSeller_thenReturnThrowNotSellerException() {
         // Arrange
         User user2 = UserFactory.createBuyer(2, "Carolina Comba");
         List<Follow> followers = List.of();
