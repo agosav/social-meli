@@ -4,16 +4,15 @@ import com.socialmeli.socialmeli.dto.response.FollowedListDto;
 import com.socialmeli.socialmeli.dto.response.MessageDto;
 import com.socialmeli.socialmeli.dto.response.UserDto;
 import com.socialmeli.socialmeli.enums.Message;
+import com.socialmeli.socialmeli.exception.NotFoundException;
 import com.socialmeli.socialmeli.exception.AlreadyExistsException;
 import com.socialmeli.socialmeli.exception.IllegalActionException;
-import com.socialmeli.socialmeli.exception.NotFoundException;
 import com.socialmeli.socialmeli.exception.UserNotSellerException;
 import com.socialmeli.socialmeli.dto.response.UserFollowerCountDto;
 import com.socialmeli.socialmeli.models.Follow;
 import com.socialmeli.socialmeli.models.User;
 import com.socialmeli.socialmeli.repositories.IFollowRepository;
 import com.socialmeli.socialmeli.repositories.IUserRepository;
-
 import com.socialmeli.socialmeli.utils.UserFactory;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -27,6 +26,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.util.List;
 import java.util.Optional;
 
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.verify;
@@ -83,6 +83,40 @@ public class UserServiceTest {
     }
 
     @Test
+    @DisplayName("unfollowTest - should return Message USER_UNFOLLOWED")
+    void unfollowTest_whenFollowedExists_thenReturnMessageOk() {
+        // Arrange
+        User follower = User.builder().id(1).name("Emilia Mernes").build();
+        User followed = User.builder().id(2).name("Taylor Swift").build();
+        Follow follow = new Follow(follower, followed);
+        when(userRepository.findById(follower.getId())).thenReturn(Optional.of(follower));
+        when(userRepository.findById(followed.getId())).thenReturn(Optional.of(followed));
+        when(followRepository.exists(follow)).thenReturn(true);
+
+        // Act
+        MessageDto result = userService.unfollow(follower.getId(), followed.getId());
+
+        // Assert
+        assertEquals(Message.USER_UNFOLLOWED.format(followed.getName()), result.getMessage());
+    }
+
+    @Test
+    @DisplayName("unfollowTest - should return NotFoundException")
+    void unfollowTest_whenFollowedNotExists_thenReturnNotFoundException() {
+        // Arrange
+        Integer userId = 1;
+        Integer followedId = 999;
+        when(userRepository.findById(userId)).thenReturn(Optional.of(new User(userId, "Emilia Mernes", false)));
+        when(userRepository.findById(followedId)).thenReturn(Optional.empty());
+
+        // Act & Assert
+        NotFoundException exception = assertThrows(NotFoundException.class,
+                () -> userService.unfollow(userId, followedId));
+
+        assertThat(exception.getMessage()).isEqualTo(Message.USER_NOT_FOUND.format(followedId));
+    }
+
+    //US-0002 : Obtener el resultado de la cantidad de usuarios que siguen a un determinado vendedor
     @DisplayName("follow - user followed not found")
     void followTest_whenUserFollowedDoesntExists_thenThrowNotFoundException() {
         // Arrange
