@@ -144,10 +144,42 @@ public class UserControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.message").value(expectedMessage));
-                ;
-            }
+        ;
+    }
 
-                // US 0004 - Obtener un listado de todos los vendedores a los cuales sigue un determinado usuario (¿A quién sigo?).
+    @Test
+    @DisplayName("unfollowToUserTest - user followed not found")
+    public void unfollowUserTest_whenUserFollowedDoesntExists() throws Exception {
+        // Arrange
+        User follower = new User(2, "Carolina Comba", false);
+        User followed = new User(999, "Agostina Avalle", true);
+
+        String expectedMessage = Message.USER_NOT_FOUND.format(followed.getId());
+
+        // Act & Assert
+        mockMvc.perform(post("/users/{userId}/unfollow/{userIdToFollow}", follower.getId(), followed.getId()))
+                .andExpect(status().isNotFound())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.message").value(expectedMessage));
+    }
+
+    @Test
+    @DisplayName("unfollowToUserTest - follower try to unfollow to followed but is not following")
+    public void unfollowUserTest_whenFollowDoesntExists() throws Exception {
+        // Arrange
+        User follower = new User(2, "Carolina Comba", false);
+        User followed = new User(6, "Katerinne Peralta", false);
+
+        String expectedMessage = Message.USER_NOT_FOLLOWED.format(followed.getName(), follower.getName());
+
+        // Act & Assert
+        mockMvc.perform(post("/users/{userId}/unfollow/{userIdToFollow}", follower.getId(), followed.getId()))
+                .andExpect(status().isConflict())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.message").value(expectedMessage));
+    }
+
+    // US 0004 - Obtener un listado de todos los vendedores a los cuales sigue un determinado usuario (¿A quién sigo?).
     @ParameterizedTest
     @CsvSource({"name_asc", "name_desc", "DEFAULT"})
     @DisplayName("getFollowedUsers - successful with different order or default")
