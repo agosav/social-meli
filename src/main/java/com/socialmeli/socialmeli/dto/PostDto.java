@@ -22,7 +22,6 @@ public class PostDto {
     @NotNull(message = "User id is required")
     private Integer userId;
 
-    @Pattern(regexp = "\\d{2}-\\d{2}-\\d{4}", message = "Format must be dd-MM-yyyy")
     private LocalDate date;
 
     @Valid
