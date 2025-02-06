@@ -1,5 +1,6 @@
 package com.socialmeli.socialmeli.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import jakarta.validation.Valid;
@@ -25,6 +26,7 @@ public class PostDto {
     @NotNull(message = "User id is required")
     private Integer userId;
 
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy")
     private LocalDate date;
 
     @Valid

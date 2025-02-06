@@ -33,3 +33,5 @@
 
 - [Trello](https://trello.com/invite/b/678fbbfb30a5a696fb590ac0/ATTIc2cf4176f47e241c9e4e462efe2a66419F89596B/socialmeli)
 
+- [Excel de tests](src/main/resources/static/Tests%20-%20Sprint%202.xlsx)
+
