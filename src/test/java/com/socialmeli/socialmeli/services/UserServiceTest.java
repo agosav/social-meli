@@ -305,8 +305,9 @@ public class UserServiceTest {
     @DisplayName("unfollowTest - should return Message USER_UNFOLLOWED")
     void unfollowTest_whenFollowedExists_thenReturnMessageOk() {
         // Arrange
-        User follower = User.builder().id(1).name("Emilia Mernes").build();
-        User followed = User.builder().id(2).name("Taylor Swift").build();
+        User follower = UserFactory.createBuyer(1, "Emilia Mernes");
+        User followed = UserFactory.createBuyer(2, "Taylor Swift");
+
         Follow follow = new Follow(follower, followed);
         when(userRepository.findById(follower.getId())).thenReturn(Optional.of(follower));
         when(userRepository.findById(followed.getId())).thenReturn(Optional.of(followed));
@@ -352,23 +353,22 @@ public class UserServiceTest {
     }
 
     @Test
-    @DisplayName("unfollowTest - should return NotFoundException")
+    @DisplayName("unfollowTest - should return AlreadyExistException")
     void unfollowTest_whenFollowDoesntExists_thenThrowNotFoundException() {
         // Arrange
-        Integer followerId = 1;
-        Integer followedId = 2;
         User user1 = UserFactory.createSeller(1, "Emilia Mernes");
-        User user2 = UserFactory.createSeller(2, "Taylor Swift");
+        User user2 = UserFactory.createBuyer(2, "TaylorSwift");
+        when(userRepository.findById(user1.getId())).thenReturn(Optional.of(user1));
+        when(userRepository.findById(user2.getId())).thenReturn(Optional.of(user2));
+
         Follow follow = new Follow(user1, user2);
-        when(userRepository.findById(user1.getId())).thenReturn(Optional.of(new User(followerId, "Emilia Mernes", false)));
-        when(userRepository.findById(followedId)).thenReturn(Optional.of(new User(followedId, "Taylor Swift", false)));
         when(followRepository.exists(follow)).thenReturn(false);
 
-        // Act & Assert
-        NotFoundException exception = assertThrows(NotFoundException.class,
+        //Act & Assert
+        AlreadyExistsException exception = assertThrows(AlreadyExistsException.class,
                 () -> userService.unfollow(user1.getId(), user2.getId()));
 
-        assertThat(exception.getMessage()).isEqualTo(Message.USER_NOT_FOLLOWED.format(user1.getName(), user2.getName()));
+        assertThat(exception.getMessage()).isEqualTo(Message.USER_NOT_FOLLOWED.format(user2.getName(), user1.getName()));
     }
 }
 
