@@ -5,6 +5,7 @@ import com.socialmeli.socialmeli.dto.response.UserFollowerCountDto;
 import com.socialmeli.socialmeli.dto.response.FollowerListDto;
 import com.socialmeli.socialmeli.dto.response.FollowedListDto;
 import com.socialmeli.socialmeli.services.IUserService;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
@@ -27,7 +28,9 @@ public class UserController {
 
     // US 0001 - Poder realizar la acción de “Follow” (seguir) a un determinado vendedor.
     @PostMapping("/{userId}/follow/{userIdToFollow}")
-    public ResponseEntity<MessageDto> followToUser(@PathVariable Integer userId, @PathVariable Integer userIdToFollow) {
+    public ResponseEntity<MessageDto> followToUser(
+            @Valid @Positive @PathVariable Integer userId,
+            @Valid @Positive @PathVariable Integer userIdToFollow) {
         return ResponseEntity.ok(userService.follow(userId, userIdToFollow));
     }
 
@@ -40,8 +43,9 @@ public class UserController {
     // US 0003 - Obtener un listado de todos los usuarios que siguen a un determinado vendedor (¿Quién me sigue?).
     @GetMapping("/{userId}/followers/list")
     public ResponseEntity<FollowerListDto> getFollowerList(
-            @PathVariable Integer userId,
-            @RequestParam(defaultValue = "name_asc") String order) {
+            @PathVariable @Positive Integer userId,
+            @RequestParam(defaultValue = "name_asc") @Pattern(regexp = "^(name_asc|name_desc)$",
+                    message = "Invalid order. Allowed values are 'name_asc' or 'name_desc'.") String order) {
         return ResponseEntity.ok(userService.getFollowerList(userId, order));
     }
 
@@ -50,8 +54,7 @@ public class UserController {
     public ResponseEntity<FollowedListDto> getFollowedUsers(
             @PathVariable @Positive Integer userId,
             @RequestParam(defaultValue = "name_asc") @Pattern(regexp = "^(name_asc|name_desc)$",
-                    message = "Invalid 'order' parameter. Allowed values are 'name_asc' or 'name_desc'.")
-            String order) {
+                    message = "Invalid order. Allowed values are 'name_asc' or 'name_desc'.") String order) {
         return ResponseEntity.ok(userService.getFollowedList(userId, order));
     }
 

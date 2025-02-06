@@ -9,12 +9,22 @@ import java.time.LocalDate;
 public class PostFactory {
 
     public static ProductDto createProductDto(Integer id) {
-        return ProductDto.builder().id(id).build();
+        return ProductDto.builder()
+                .id(id)
+                .name("Product")
+                .brand("Brand")
+                .color("Color")
+                .type("Type")
+                .notes("Notes")
+                .build();
     }
 
     public static PostDto createPostDto(Integer userId, Integer productId) {
         return PostDto.builder()
                 .userId(userId)
+                .date(LocalDate.now())
+                .category(1)
+                .price(100.0)
                 .product(createProductDto(productId))
                 .build();
     }
@@ -22,8 +32,12 @@ public class PostFactory {
     public static PostSaleDto createPostSaleDto(Integer userId, Integer productId) {
         return PostSaleDto.builder()
                 .idUser(userId)
+                .date(LocalDate.now())
+                .category(1)
+                .price(100.0)
                 .product(createProductDto(productId))
-                .discount(1.0)
+                .hasPromo(true)
+                .discount(10.0)
                 .build();
     }
 

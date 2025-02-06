@@ -1,14 +1,15 @@
 package com.socialmeli.socialmeli.services;
 
+import com.socialmeli.socialmeli.dto.response.UserDto;
+import com.socialmeli.socialmeli.dto.response.FollowerListDto;
 import com.socialmeli.socialmeli.dto.response.FollowedListDto;
 import com.socialmeli.socialmeli.dto.response.MessageDto;
-import com.socialmeli.socialmeli.dto.response.UserDto;
+import com.socialmeli.socialmeli.dto.response.UserFollowerCountDto;
 import com.socialmeli.socialmeli.enums.Message;
 import com.socialmeli.socialmeli.exception.NotFoundException;
 import com.socialmeli.socialmeli.exception.AlreadyExistsException;
 import com.socialmeli.socialmeli.exception.IllegalActionException;
 import com.socialmeli.socialmeli.exception.UserNotSellerException;
-import com.socialmeli.socialmeli.dto.response.UserFollowerCountDto;
 import com.socialmeli.socialmeli.models.Follow;
 import com.socialmeli.socialmeli.models.User;
 import com.socialmeli.socialmeli.repositories.IFollowRepository;
@@ -18,7 +19,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -226,11 +227,76 @@ public class UserServiceTest {
         assertThrows(UserNotSellerException.class, () -> userService.countFollowers(user2.getId()));
     }
 
+    // US 0003 - Obtener un listado de todos los usuarios que siguen a un determinado vendedor (¿Quién me sigue?).
+    @ParameterizedTest
+    @DisplayName("getFollowersList - should return followers list ordered by name")
+    @ValueSource(strings = {"name_asc", "name_desc"})
+    void getFollowersListTest_whenUserExists_thenReturnFollowersList(String order) {
+        // Arrange
+        User user1 = UserFactory.createSeller(1, "Emilia Mernes");
+        User user2 = UserFactory.createSeller(2, "Taylor Swift");
+        User user3 = UserFactory.createBuyer(3, "Tini Stoessel");
+
+        List<UserDto> expectedList = (order.equals("name_asc"))
+                ? List.of(new UserDto(user2.getId(), user2.getName()), new UserDto(user3.getId(), user3.getName()))
+                : List.of(new UserDto(user3.getId(), user3.getName()), new UserDto(user2.getId(), user2.getName()));
+
+        FollowerListDto expected = new FollowerListDto(user1.getId(), user1.getName(), expectedList);
+
+        List<Follow> follows = List.of(
+                new Follow(user2, user1),
+                new Follow(user3, user1)
+        );
+
+        when(userRepository.findById(user1.getId())).thenReturn(Optional.of(user1));
+        when(followRepository.findAllByIdFollowed(user1.getId())).thenReturn(follows);
+
+        // Act
+        FollowerListDto result = userService.getFollowerList(user1.getId(), order);
+
+        // Assert
+        assertEquals(expected, result);
+    }
+
+    @Test
+    @DisplayName("Test for 'User Not Found'")
+    public void testGetFollowerList_UserNotFound() {
+        // Arrange
+        Integer userId = 800;
+        String order = "name_asc";
+
+        when(userRepository.findById(userId)).thenReturn(Optional.empty());
+
+        // Act
+
+        NotFoundException exception = assertThrows(NotFoundException.class, () -> {
+            userService.getFollowerList(userId, order);
+        });
+
+        // Assert
+        assertEquals("User with ID 800 not found", exception.getMessage());
+    }
+
+    @Test
+    @DisplayName("Test for 'User is not seller'")
+    public void testGetFollowerList_UserNotSeller() {
+        // Arrange
+        String order = "name_asc";
+
+        User user = UserFactory.createBuyer(1);
+
+        when(userRepository.findById(user.getId())).thenReturn(Optional.of(user));
+
+        // Act & Assert
+        assertThrows(UserNotSellerException.class, () -> {
+            userService.getFollowerList(user.getId(), order);
+        });
+    }
 
     // US 0004 - Obtener un listado de todos los vendedores a los cuales sigue un determinado usuario (¿A quién sigo?).
     @ParameterizedTest
     @DisplayName("getFollowedList - should return followers list ordered by name")
-    @CsvSource({"name_asc", "name_desc"})
+    @ValueSource(strings = {"name_asc", "name_desc"})
     void getFollowedListTest_whenUserExists_thenReturnFollowedList(String order) {
         // Arrange
         User user1 = UserFactory.createSeller(1, "Emilia Mernes");
@@ -268,47 +334,4 @@ public class UserServiceTest {
         // Act & Assert
         assertThrows(NotFoundException.class, () -> userService.getFollowedList(userId, order));
     }
-
-    @Test
-    @DisplayName("Test for 'User Not Found'")
-    public void testGetFollowerList_UserNotFound() {
-        // Arrange
-        Integer userId = 800;
-        String order = "name_asc";
-
-        when(userRepository.findById(userId)).thenReturn(Optional.empty());
-
-        // Act
-
-        NotFoundException exception = assertThrows(NotFoundException.class, () -> {
-            userService.getFollowerList(userId, order);
-        });
-
-        // Assert
-        assertEquals("User with ID 800 not found", exception.getMessage());
-    }
-
-    @Test
-    @DisplayName("Test for 'User is not seller'")
-    public void testGetFollowerList_UserNotSeller() {
-        // Arrange
-        Integer userId = 1;
-        String order = "name_asc";
-
-
-        User user = new User(userId, "Carolina Comba", false);
-
-        when(userRepository.findById(userId)).thenReturn(Optional.of(user));
-
-        // Act
-        UserNotSellerException exception = assertThrows(UserNotSellerException.class, () -> {
-            userService.getFollowerList(userId, order);
-        });
-
-        // Assert
-        assertEquals("Carolina Comba is not a seller", exception.getMessage());
-    }
-
-
-
 }

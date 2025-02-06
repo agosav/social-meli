@@ -44,7 +44,7 @@ public class ProductController {
 
     // US 0010 - Llevar a cabo la publicación de un nuevo producto en promoción.
     @PostMapping("/promo-post")
-    public ResponseEntity<MessageDto> addPostSale(@RequestBody PostSaleDto postSaleDto) {
+    public ResponseEntity<MessageDto> addPostSale(@RequestBody @Valid PostSaleDto postSaleDto) {
         return ResponseEntity.ok(postService.savePostSale(postSaleDto));
     }
 
