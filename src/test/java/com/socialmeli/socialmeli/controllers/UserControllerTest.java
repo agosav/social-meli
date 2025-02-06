@@ -198,6 +198,30 @@ public class UserControllerTest {
     }
 
     @Test
+    @DisplayName("unfollow - invalid user follower id")
+    void unfollowTest_whenUserFollowerIdInvalid_thenReturn400() throws Exception {
+        // Arrange
+        Integer userFollowerId = -1;
+        Integer userFollowedId = 1;
+
+        // Act & Assert
+        mockMvc.perform(post("/users/{userId}/unfollow/{userIdToFollow}", userFollowerId, userFollowedId))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @DisplayName("unfollow - invalid user followed id")
+    void unfollowTest_whenUserFollowedIdInvalid_thenReturn400() throws Exception {
+        // Arrange
+        Integer userFollowerId = 1;
+        Integer userFollowedId = -1;
+
+        // Act & Assert
+        mockMvc.perform(post("/users/{userId}/unfollow/{userIdToFollow}", userFollowerId, userFollowedId))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
     @DisplayName("unfollowToUserTest - follower try to unfollow to user that is not following")
     public void unfollowUserTest_whenFollowDoesntExists_thenReturn404() throws Exception {
         // Arrange
