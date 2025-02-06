@@ -2,6 +2,7 @@ package com.socialmeli.socialmeli.controllers;
 
 import com.socialmeli.socialmeli.dto.PostDto;
 import com.socialmeli.socialmeli.models.User;
+import com.socialmeli.socialmeli.utils.UserFactory;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,6 +29,7 @@ import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.web.servlet.ResultActions;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 
@@ -55,31 +57,30 @@ public class ProductControllerTest {
     public void getPostsOfFollowedSellersOrderByDateAscTest() throws Exception {
         // Arrange
         String order = "date_asc";
-        User user = new User(2, "Carolina Comba", false);
-        List<PostDto> posts = List.of(
-                PostFactory.createPostIdDateDto(1, LocalDate.of(2025, 2, 2)),
-                PostFactory.createPostIdDateDto(2, LocalDate.of(2025, 1, 31)),
-                PostFactory.createPostIdDateDto(3, LocalDate.of(2025, 1, 30)),
+        User user = UserFactory.createBuyer(2);
+        List<PostDto> postsExpected = List.of(
                 PostFactory.createPostIdDateDto(4, LocalDate.of(2025, 1, 25)),
-                PostFactory.createPostIdDateDto(5, LocalDate.of(2025, 1, 27))
+                PostFactory.createPostIdDateDto(5, LocalDate.of(2025, 1, 27)),
+                PostFactory.createPostIdDateDto(3, LocalDate.of(2025, 1, 30)),
+                PostFactory.createPostIdDateDto(2, LocalDate.of(2025, 1, 31)),
+                PostFactory.createPostIdDateDto(1, LocalDate.of(2025, 2, 2))
         );
 
         // Act & Assert
-        mockMvc.perform(get("/products/followed/{userId}/list", user.getId())
+        ResultActions result = mockMvc.perform(get("/products/followed/{userId}/list", user.getId())
                         .param("order", order))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.user_id").value(user.getId()))
-                .andExpect(jsonPath("$.posts[0].post_id").value(posts.get(3).getUserId()))
-                .andExpect(jsonPath("$.posts[0].date").value(posts.get(3).getDate().toString()))
-                .andExpect(jsonPath("$.posts[1].post_id").value(posts.get(4).getUserId()))
-                .andExpect(jsonPath("$.posts[1].date").value(posts.get(4).getDate().toString()))
-                .andExpect(jsonPath("$.posts[2].post_id").value(posts.get(2).getUserId()))
-                .andExpect(jsonPath("$.posts[2].date").value(posts.get(2).getDate().toString()))
-                .andExpect(jsonPath("$.posts[3].post_id").value(posts.get(1).getUserId()))
-                .andExpect(jsonPath("$.posts[3].date").value(posts.get(1).getDate().toString()))
-                .andExpect(jsonPath("$.posts[4].post_id").value(posts.get(0).getUserId()))
-                .andExpect(jsonPath("$.posts[4].date").value(posts.get(0).getDate().toString()));
+                .andExpect(jsonPath("$.posts").isArray())
+                .andExpect(jsonPath("$.posts.length()").value(postsExpected.size()));
+
+        for (int i = 0; i < postsExpected.size(); i++) {
+            Integer expectedId = postsExpected.get(i).getUserId();
+            String expectedDate = postsExpected.get(i).getDate().toString();
+            result.andExpect(jsonPath("$.posts[" + i + "].post_id").value(expectedId))
+                    .andExpect(jsonPath("$.posts[" + i + "].date").value(expectedDate));
+        }
     }
 
     @Test
@@ -87,32 +88,31 @@ public class ProductControllerTest {
     public void getPostsOfFollowedSellersOrderByDateDescTest() throws Exception {
         // Arrange
         String order = "date_desc";
-        User user = new User(2, "Carolina Comba", false);
+        User user = UserFactory.createBuyer(2);
 
-        List<PostDto> posts = List.of(
+        List<PostDto> postsExpected = List.of(
                 PostFactory.createPostIdDateDto(1, LocalDate.of(2025, 2, 2)),
                 PostFactory.createPostIdDateDto(2, LocalDate.of(2025, 1, 31)),
                 PostFactory.createPostIdDateDto(3, LocalDate.of(2025, 1, 30)),
-                PostFactory.createPostIdDateDto(4, LocalDate.of(2025, 1, 25)),
-                PostFactory.createPostIdDateDto(5, LocalDate.of(2025, 1, 27))
+                PostFactory.createPostIdDateDto(5, LocalDate.of(2025, 1, 27)),
+                PostFactory.createPostIdDateDto(4, LocalDate.of(2025, 1, 25))
         );
 
         // Act & Assert
-        mockMvc.perform(get("/products/followed/{userId}/list", user.getId())
+        ResultActions result = mockMvc.perform(get("/products/followed/{userId}/list", user.getId())
                         .param("order", order))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.user_id").value(user.getId()))
-                .andExpect(jsonPath("$.posts[0].post_id").value(posts.get(0).getUserId()))
-                .andExpect(jsonPath("$.posts[0].date").value(posts.get(0).getDate().toString()))
-                .andExpect(jsonPath("$.posts[1].post_id").value(posts.get(1).getUserId()))
-                .andExpect(jsonPath("$.posts[1].date").value(posts.get(1).getDate().toString()))
-                .andExpect(jsonPath("$.posts[2].post_id").value(posts.get(2).getUserId()))
-                .andExpect(jsonPath("$.posts[2].date").value(posts.get(2).getDate().toString()))
-                .andExpect(jsonPath("$.posts[3].post_id").value(posts.get(4).getUserId()))
-                .andExpect(jsonPath("$.posts[3].date").value(posts.get(4).getDate().toString()))
-                .andExpect(jsonPath("$.posts[4].post_id").value(posts.get(3).getUserId()))
-                .andExpect(jsonPath("$.posts[4].date").value(posts.get(3).getDate().toString()));
+                .andExpect(jsonPath("$.posts").isArray())
+                .andExpect(jsonPath("$.posts.length()").value(postsExpected.size()));
+
+        for (int i = 0; i < postsExpected.size(); i++) {
+            Integer expectedId = postsExpected.get(i).getUserId();
+            String expectedDate = postsExpected.get(i).getDate().toString();
+            result.andExpect(jsonPath("$.posts[" + i + "].post_id").value(expectedId))
+                    .andExpect(jsonPath("$.posts[" + i + "].date").value(expectedDate));
+        }
     }
 
     @Test
@@ -120,7 +120,7 @@ public class ProductControllerTest {
     public void getPostsOfFollowedSellersOrderNotValidExceptionTests() throws Exception {
         // Arrange
         String order = "word";
-        User user = new User(2, "Carolina Comba", false);
+        User user = UserFactory.createBuyer(2);
 
         // Act & Assert
         mockMvc.perform(get("/products/followed/{userId}/list", user.getId())
@@ -147,11 +147,14 @@ public class ProductControllerTest {
         // Arrange
         String order = "date_asc";
         Integer userId = 999;
+        String message = Message.USER_NOT_FOUND.format(userId);
 
         // Act & Assert
         mockMvc.perform(get("/products/followed/{userId}/list", userId)
                         .param("order", order))
-                .andExpect(status().isNotFound());
+                .andExpect(status().isNotFound())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.message").value(message));
     }
 
     @ParameterizedTest
