@@ -1,13 +1,18 @@
 package com.socialmeli.socialmeli.controllers;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.socialmeli.socialmeli.dto.ProductDto;
+import com.socialmeli.socialmeli.dto.response.PostIdDto;
+import com.socialmeli.socialmeli.dto.response.ProductListDto;
 import com.socialmeli.socialmeli.enums.Message;
 import com.socialmeli.socialmeli.repositories.IPostRepository;
 import com.socialmeli.socialmeli.repositories.IUserRepository;
 import com.socialmeli.socialmeli.services.PostService;
 import com.socialmeli.socialmeli.utils.PostFactory;
+import com.socialmeli.socialmeli.utils.UserFactory;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,10 +21,19 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
+import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -128,4 +142,32 @@ public class ProductControllerTest {
     void savePost_whenBodyIsInvalid_thenReturn400(String url) {
         // TODO: Implementar este test cuando estén hechas las validaciones
     }
+
+    @Test
+    @DisplayName("getPostsOfFollowedSellersTest - should return 200")
+    void getPostsOfFollowedSellersTest() throws Exception {
+        Integer userId = 3;
+        String order = "date_desc";
+
+        ProductDto productDto = PostFactory.createProductDto(201);
+        PostIdDto postIdDto = PostFactory.createPostIdDto(3, 1, LocalDate.parse("2025-01-19"), productDto, 1, 1200.00);
+        List<PostIdDto> postIdDtos = List.of(postIdDto);
+        ProductListDto productListDto = PostFactory.createProductListDto(userId, postIdDtos);
+
+        when(service.getRecentPostFromUsers(order, userId)).thenReturn(productListDto);
+
+        mockMvc.perform(MockMvcRequestBuilders.get("/products/followed/{userId}/list", userId)
+                        .param("order", order)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.user_id").value(userId))
+                .andExpect(jsonPath("$.posts").isArray())
+                .andExpect(jsonPath("$.posts[0].id").value(1))
+                .andExpect(jsonPath("$.posts[0].user.id").value(3))
+                .andExpect(jsonPath("$.posts[0].user.name").value("Ciro Sánchez"))
+                .andExpect(jsonPath("$.posts[0].product.id").value(201))
+                .andExpect(jsonPath("$.posts[0].product.name").value("headphones"))
+                .andExpect(jsonPath("$.posts[0].price").value(1200.00));
+    }
+
 }
