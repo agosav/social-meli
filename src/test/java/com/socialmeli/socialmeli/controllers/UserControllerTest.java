@@ -3,10 +3,10 @@ package com.socialmeli.socialmeli.controllers;
 import com.socialmeli.socialmeli.enums.Message;
 import com.socialmeli.socialmeli.dto.response.UserFollowerCountDto;
 import com.socialmeli.socialmeli.models.User;
-import com.socialmeli.socialmeli.utils.UserFactory;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import com.socialmeli.socialmeli.utils.UserFactory;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -150,6 +150,69 @@ public class UserControllerTest {
     }
 
     @Test
+    @DisplayName("unfollowToUserTest - successful")
+    @DirtiesContext(methodMode = DirtiesContext.MethodMode.AFTER_METHOD)
+    public void unfollowUserTest_whenSuccessfull_thenReturn200() throws Exception {
+        // Arrange
+        User follower = UserFactory.createBuyer(2, "Carolina Comba");
+        User followed = UserFactory.createSeller(1, "Agostina Avalle");
+
+        String expectedMessage = Message.USER_UNFOLLOWED.format(followed.getName());
+
+        // Act & Assert
+        mockMvc.perform(post("/users/{userId}/unfollow/{userIdToFollow}", follower.getId(), followed.getId()))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.message").value(expectedMessage));
+    }
+
+    @Test
+    @DisplayName("unfollowToUserTest - user followed not found")
+    public void unfollowUserTest_whenUserFollowedDoesntExists_thenReturn404() throws Exception {
+        // Arrange
+        User follower = UserFactory.createBuyer(2, "Carolina Comba");
+        User followed = UserFactory.createSeller(999, "Agostina Avalle");
+
+        String expectedMessage = Message.USER_NOT_FOUND.format(followed.getId());
+
+        // Act & Assert
+        mockMvc.perform(post("/users/{userId}/unfollow/{userIdToFollow}", follower.getId(), followed.getId()))
+                .andExpect(status().isNotFound())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.message").value(expectedMessage));
+    }
+
+    @Test
+    @DisplayName("unfollowToUserTest - follower try to unfollow to user that is not following")
+    public void unfollowUserTest_whenFollowDoesntExists_thenReturn404() throws Exception {
+        // Arrange
+        User follower = UserFactory.createBuyer(2, "Carolina Comba");
+        User followed = UserFactory.createSeller(6, "Katerinne Peralta");
+
+        String expectedMessage = Message.USER_NOT_FOLLOWED.format(followed.getName(), follower.getName());
+
+        // Act & Assert
+        mockMvc.perform(post("/users/{userId}/unfollow/{userIdToFollow}", follower.getId(), followed.getId()))
+                .andExpect(status().isConflict())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.message").value(expectedMessage));
+    }
+
+    @Test
+    @DisplayName("unfollowToUserTest - follower try to unfollow yourself")
+    public void unfollowUserTest_whenFollowerTryToUnfollowYourself_thenReturn400() throws Exception {
+        // Arrange
+        User follower = UserFactory.createBuyer(2, "Carolina Comba");
+
+        String expectedMessage = Message.CANNOT_UNFOLLOW_SELF.getStr();
+
+        // Act & Assert
+        mockMvc.perform(post("/users/{userId}/unfollow/{userIdToFollow}", follower.getId(), follower.getId()))
+                .andExpect(status().isBadRequest())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.message").value(expectedMessage));
+    }
+
     @DisplayName("countFollowersForSeller - user not found")
     public void getCountFollowerForSellerTest_wheUserDoesntExists_thenReturn404() throws Exception {
         //Arrange
@@ -174,6 +237,7 @@ public class UserControllerTest {
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.message").value(message));
     }
+
     // US 0004 - Obtener un listado de todos los vendedores a los cuales sigue un determinado usuario (¿A quién sigo?).
     @ParameterizedTest
     @CsvSource({"name_asc", "name_desc", "DEFAULT"})
@@ -248,7 +312,7 @@ public class UserControllerTest {
         String message = Message.USER_NOT_FOUND.format(userId);
 
         // Act & Assert
-        ResultActions result = mockMvc.perform(get("/users/{userId}/followed/list", userId)
+        mockMvc.perform(get("/users/{userId}/followed/list", userId)
                         .param("order", order))
                 .andExpect(status().isNotFound())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
