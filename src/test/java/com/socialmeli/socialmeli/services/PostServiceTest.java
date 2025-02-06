@@ -1,6 +1,7 @@
 package com.socialmeli.socialmeli.services;
 
 import com.socialmeli.socialmeli.dto.PostDto;
+import com.socialmeli.socialmeli.dto.PostSaleDto;
 import com.socialmeli.socialmeli.dto.ProductDto;
 import com.socialmeli.socialmeli.dto.response.MessageDto;
 import com.socialmeli.socialmeli.dto.response.PostIdDto;
@@ -19,6 +20,8 @@ import com.socialmeli.socialmeli.utils.UserFactory;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -156,61 +159,71 @@ class PostServiceTest {
    */
 
     // US 0005 - Dar de alta una nueva publicación.
-    @Test
+    @ParameterizedTest
+    @ValueSource(strings = {"/products/post", "/products/promo-post"})
     @DisplayName("savePost - should save the post when product does not exist and user is not seller")
     @DirtiesContext(methodMode = DirtiesContext.MethodMode.AFTER_METHOD)
-    void savePost_whenProductDoesNotExistAndUserIsNotSeller_thenSavePost() {
-        // Arrange
-        User user = UserFactory.createBuyer(1);
-        PostDto postDto = PostFactory.createPostDto(user, 1);
-
-        String message = Message.POST_PUBLISHED.getStr();
-
-        when(userRepository.findById(user.getId())).thenReturn(Optional.of(user));
-        when(postRepository.existsProductById(postDto.getProduct().getId())).thenReturn(false);
-
-        // Act
-        MessageDto result = service.savePost(postDto);
-
-        // Assert
-        verify(userRepository).update(user);
-        verify(postRepository).save(any(Post.class));
-        assertEquals(message, result.getMessage());
+    void savePost_whenProductDoesNotExistAndUserIsNotSeller_thenSavePost(String url) {
+        savePostTest(url, 1, 300, false, false);
     }
 
-    @Test
+    @ParameterizedTest
+    @ValueSource(strings = {"/products/post", "/products/promo-post"})
     @DisplayName("savePost - should save the post when product does not exist and user is seller")
     @DirtiesContext(methodMode = DirtiesContext.MethodMode.AFTER_METHOD)
-    void savePost_whenProductDoesNotExistAndUserIsSeller_thenSavePost() {
+    void savePost_whenProductDoesNotExistAndUserIsSeller_thenSavePost(String url) {
+        savePostTest(url, 2, 300, false, true);
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"/products/post", "/products/promo-post"})
+    @DisplayName("savePost - should throw AlreadyExistsException when product already exists")
+    void savePost_whenProductAlreadyExists_thenThrowAlreadyExistsException(String url) {
+        savePostTest(url, 1, 201, true, false);
+    }
+
+    private void savePostTest(String url, Integer userId, Integer productId, boolean productExists, boolean isSeller) {
         // Arrange
-        User user = UserFactory.createSeller(1);
-        PostDto postDto = PostFactory.createPostDto(user, 1);
+        User user = isSeller ? UserFactory.createSeller(userId) : UserFactory.createBuyer(userId);
+        Object post = createPostDto(url, userId, productId);
 
         String message = Message.POST_PUBLISHED.getStr();
 
         when(userRepository.findById(user.getId())).thenReturn(Optional.of(user));
-        when(postRepository.existsProductById(postDto.getProduct().getId())).thenReturn(false);
-
-        // Act
-        MessageDto result = service.savePost(postDto);
-
-        // Assert
-        verify(userRepository, never()).update(user);
-        verify(postRepository).save(any(Post.class));
-        assertEquals(message, result.getMessage());
-    }
-
-    @Test
-    @DisplayName("savePost - should throw AlreadyExistsException when product already exists")
-    void savePost_whenProductAlreadyExists_thenThrowAlreadyExistsException() {
-        // Arrange
-        User user = UserFactory.createBuyer(1);
-        PostDto postDto = PostFactory.createPostDto(user, 201);
-
-        when(userRepository.findById(user.getId())).thenReturn(Optional.of(user));
-        when(postRepository.existsProductById(postDto.getProduct().getId())).thenReturn(true);
+        when(postRepository.existsProductById(productId)).thenReturn(productExists);
 
         // Act & Assert
-        assertThrows(AlreadyExistsException.class, () -> service.savePost(postDto));
+        if (productExists) {
+            assertThrows(AlreadyExistsException.class, () -> {
+                executeSavePost(url, post);
+            });
+        } else {
+            MessageDto result = executeSavePost(url, post);
+
+            if (isSeller) {
+                verify(userRepository, never()).update(user);
+            } else {
+                verify(userRepository).update(user);
+            }
+
+            verify(postRepository).save(any(Post.class));
+            assertEquals(message, result.getMessage());
+        }
+    }
+
+    private Object createPostDto(String url, Integer userId, Integer productId) {
+        if (url.equals("/products/post")) {
+            return PostFactory.createPostDto(userId, productId);
+        } else {
+            return PostFactory.createPostSaleDto(userId, productId);
+        }
+    }
+
+    private MessageDto executeSavePost(String url, Object post) {
+        if (url.equals("/products/post")) {
+            return service.savePost((PostDto) post);
+        } else {
+            return service.savePostSale((PostSaleDto) post);
+        }
     }
 }

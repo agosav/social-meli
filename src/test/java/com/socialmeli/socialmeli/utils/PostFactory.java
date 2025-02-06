@@ -1,25 +1,27 @@
 package com.socialmeli.socialmeli.utils;
 
 import com.socialmeli.socialmeli.dto.PostDto;
+import com.socialmeli.socialmeli.dto.PostSaleDto;
 import com.socialmeli.socialmeli.dto.ProductDto;
-import com.socialmeli.socialmeli.models.User;
 
 public class PostFactory {
 
-    public static PostDto createPostDtoBySeller(Integer productId) {
-        User user = UserFactory.createSeller(1);
-        ProductDto productDto = ProductDto.builder().id(productId).build();
-        return PostDto.builder().userId(user.getId()).product(productDto).build();
+    public static ProductDto createProductDto(Integer id) {
+        return ProductDto.builder().id(id).build();
     }
 
-    public static PostDto createPostDtoByBuyer(Integer productId) {
-        User user = UserFactory.createBuyer(1);
-        ProductDto productDto = ProductDto.builder().id(productId).build();
-        return PostDto.builder().userId(user.getId()).product(productDto).build();
+    public static PostDto createPostDto(Integer userId, Integer productId) {
+        return PostDto.builder()
+                .userId(userId)
+                .product(createProductDto(productId))
+                .build();
     }
 
-    public static PostDto createPostDto(User user, Integer productId) {
-        ProductDto productDto = ProductDto.builder().id(productId).build();
-        return PostDto.builder().userId(user.getId()).product(productDto).build();
+    public static PostSaleDto createPostSaleDto(Integer userId, Integer productId) {
+        return PostSaleDto.builder()
+                .idUser(userId)
+                .product(createProductDto(productId))
+                .discount(1.0)
+                .build();
     }
 }
