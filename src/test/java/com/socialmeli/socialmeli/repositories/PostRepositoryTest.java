@@ -5,7 +5,6 @@ import com.socialmeli.socialmeli.models.Product;
 import com.socialmeli.socialmeli.models.User;
 import com.socialmeli.socialmeli.utils.UserFactory;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -27,7 +26,6 @@ class PostRepositoryTest {
     }
     @Test
     @DisplayName("postFromUsers - should return a list of post form followed users")
-    @Disabled
     void  postFromUsersTest_whenSellersFollowedPost_thenReturnListOfPostFromUsersFollowed() {
         // Arrange
         User follower = new User(2, "Carolina Comba", false);
@@ -102,7 +100,7 @@ class PostRepositoryTest {
                         .build())
                 .category(1)
                 .price(999.99)
-                .hasPromo(false)
+                .hasPromo(true)
                 .discount(null)
                 .build());
 
