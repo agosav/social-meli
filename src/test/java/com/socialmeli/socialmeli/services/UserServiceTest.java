@@ -368,7 +368,8 @@ public class UserServiceTest {
         AlreadyExistsException exception = assertThrows(AlreadyExistsException.class,
                 () -> userService.unfollow(user1.getId(), user2.getId()));
 
-        assertThat(exception.getMessage()).isEqualTo(Message.USER_NOT_FOLLOWED.format(user2.getName(), user1.getName()));
+        assertThat(exception.getMessage()).isEqualTo(Message.USER_NOT_FOLLOWED.format(user2.getName(),
+                user1.getName()));
     }
 
     @Test
