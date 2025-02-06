@@ -26,6 +26,7 @@ jobs:
           charts: true
           disableLinks: true
           stats: 'totalComments,openedPullRequests,totalReviews'
+          sortBy: 'totalReviews'
 
   coverage:
     runs-on: ubuntu-latest
