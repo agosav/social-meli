@@ -156,7 +156,8 @@ class PostRepositoryTest {
                         .id(4)
                         .user(new User(3, "Ciro Sánchez", true))
                         .date(LocalDate.of(2025, 1, 25))
-                        .product(new Product(204, "Smartphone", "Electronics", "Apple", "Black", "128GB storage, unlocked"))
+                        .product(new Product(204, "Smartphone", "Electronics", "Apple",
+                                "Black", "128GB storage, unlocked"))
                         .category(1)
                         .price(999.99)
                         .hasPromo(true)
