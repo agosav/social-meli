@@ -33,7 +33,7 @@ public class UserController {
 
     // US 0002 - Obtener el resultado de la cantidad de usuarios que siguen a un determinado vendedor.
     @GetMapping("/{userId}/followers/count")
-    public ResponseEntity<UserFollowerCountDto> getCountFollowerForSeller(@PathVariable @Valid @Positive Integer userId) {
+    public ResponseEntity<UserFollowerCountDto> getCountFollowerForSeller(@PathVariable @Positive Integer userId) {
         return ResponseEntity.ok(userService.countFollowers(userId));
     }
 
