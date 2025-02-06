@@ -16,10 +16,10 @@ import org.springframework.web.bind.annotation.RequestParam;
 import com.socialmeli.socialmeli.dto.PostSaleDto;
 import lombok.RequiredArgsConstructor;
 
+import javax.validation.Valid;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Positive;
 
-@Validated
 @RestController
 @RequestMapping("/products")
 @RequiredArgsConstructor
@@ -37,8 +37,8 @@ public class ProductController {
     // por los vendedores que un usuario sigue
     @GetMapping("/followed/{userId}/list")
     public ResponseEntity<ProductListDto> getPostsOfFollowedSellers(
-            @PathVariable @Positive Integer userId,
-            @RequestParam(defaultValue = "date_desc") @Pattern(regexp = "date_desc|date_asc") String order) {
+            @Valid @Positive @PathVariable  Integer userId,
+            @Pattern(regexp = "date_desc|date_asc") @RequestParam(defaultValue = "date_desc") String order) {
         return ResponseEntity.ok(postService.getRecentPostFromUsers(order, userId));
     }
 

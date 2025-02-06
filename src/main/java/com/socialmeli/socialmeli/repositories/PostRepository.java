@@ -6,6 +6,7 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.socialmeli.socialmeli.models.Post;
 import com.socialmeli.socialmeli.models.User;
 import jakarta.annotation.PostConstruct;
+import lombok.Getter;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.ResourceUtils;
 import java.io.File;
@@ -15,12 +16,13 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Repository
+@Getter
 public class PostRepository implements IPostRepository {
 
     private List<Post> posts = new ArrayList<>();
 
     @PostConstruct
-    private void loadDataBase() throws IOException {
+    public void loadDataBase() throws IOException {
         File file;
         ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.registerModule(new JavaTimeModule());
