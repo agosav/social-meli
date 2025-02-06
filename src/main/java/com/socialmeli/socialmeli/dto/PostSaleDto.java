@@ -3,10 +3,7 @@ package com.socialmeli.socialmeli.dto;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.DecimalMax;
-import jakarta.validation.constraints.DecimalMin;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Positive;
+import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -25,6 +22,7 @@ public class PostSaleDto {
     @NotNull(message = "User id is required")
     private Integer idUser;
 
+    @Pattern(regexp = "\\d{2}-\\d{2}-\\d{4}", message = "Format must be dd-MM-yyyy")
     private LocalDate date;
 
     @Valid
