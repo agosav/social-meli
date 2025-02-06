@@ -52,7 +52,7 @@ class UserRepositoryTest {
     @DisplayName("update - should update the user details correctly")
     void updateTest_whenUserExists_thenUpdateUser() {
         // Arrange
-        User user = userTestUtils.createBuyer(2, "Carolina Comba");
+        User user = UserFactory.createBuyer(2, "Carolina Comba");
         user.setIsSeller(true);
         user.setName("Caro");
 

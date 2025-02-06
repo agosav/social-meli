@@ -6,7 +6,7 @@ import com.socialmeli.socialmeli.enums.Message;
 import com.socialmeli.socialmeli.repositories.IPostRepository;
 import com.socialmeli.socialmeli.repositories.IUserRepository;
 import com.socialmeli.socialmeli.services.PostService;
-import com.socialmeli.socialmeli.utils.PostTestUtils;
+import com.socialmeli.socialmeli.utils.PostFactory;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -40,15 +40,13 @@ public class ProductControllerTest {
     @Autowired
     private ObjectMapper objectMapper;
 
-    private final PostTestUtils postTestUtils = new PostTestUtils();
-
     // US 0005 - Dar de alta una nueva publicación.
     @Test
     @DisplayName("savePost - should return 200 OK when product does not exist and user is not seller")
     @DirtiesContext(methodMode = DirtiesContext.MethodMode.AFTER_METHOD)
     void savePost_whenProductDoesNotExistAndUserIsNotSeller_thenSavePost() throws Exception {
         // Arrange
-        PostDto postDto = postTestUtils.createPostDtoByBuyer(1);
+        PostDto postDto = PostFactory.createPostDtoByBuyer(1);
 
         String message = Message.POST_PUBLISHED.getStr();
 
@@ -65,7 +63,7 @@ public class ProductControllerTest {
     @DirtiesContext(methodMode = DirtiesContext.MethodMode.AFTER_METHOD)
     void savePost_whenProductDoesNotExistAndUserIsSeller_thenSavePost() throws Exception {
         // Arrange
-        PostDto postDto = postTestUtils.createPostDtoBySeller(1);
+        PostDto postDto = PostFactory.createPostDtoBySeller(1);
 
         String message = Message.POST_PUBLISHED.getStr();
 
@@ -81,7 +79,7 @@ public class ProductControllerTest {
     @DisplayName("savePost - should return 409 when product already exists")
     void savePost_whenProductAlreadyExists_thenReturn400() throws Exception {
         // Arrange
-        PostDto postDto = postTestUtils.createPostDtoByBuyer(201);
+        PostDto postDto = PostFactory.createPostDtoByBuyer(201);
 
         String message = Message.PRODUCT_ALREADY_EXISTS.getStr();
 
@@ -106,6 +104,6 @@ public class ProductControllerTest {
     @Disabled
     @DisplayName("savePost - when body is invalid should return 400")
     void savePost_whenBodyIsInvalid_thenReturn400() {
-        // TODO
+        // TODO: Implementar este test cuando estén hechas las validaciones
     }
 }

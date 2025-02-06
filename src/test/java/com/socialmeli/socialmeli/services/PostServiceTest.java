@@ -14,8 +14,8 @@ import com.socialmeli.socialmeli.repositories.IFollowRepository;
 import com.socialmeli.socialmeli.repositories.IPostRepository;
 import com.socialmeli.socialmeli.repositories.IUserRepository;
 import com.socialmeli.socialmeli.util.EntityCreator;
-import com.socialmeli.socialmeli.utils.PostTestUtils;
-import com.socialmeli.socialmeli.utils.UserTestUtils;
+import com.socialmeli.socialmeli.utils.PostFactory;
+import com.socialmeli.socialmeli.utils.UserFactory;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -47,11 +47,6 @@ class PostServiceTest {
     private  IFollowRepository followRepository;
     @InjectMocks
     private PostService service;
-
-    private final UserTestUtils userTestUtils = new UserTestUtils();
-
-    private final PostTestUtils postTestUtils = new PostTestUtils();
-
 
     @Test
     @DisplayName("getRecentPostFromUsersAscTest - should retrun a list of post ordered Asc")
@@ -166,8 +161,8 @@ class PostServiceTest {
     @DirtiesContext(methodMode = DirtiesContext.MethodMode.AFTER_METHOD)
     void savePost_whenProductDoesNotExistAndUserIsNotSeller_thenSavePost() {
         // Arrange
-        User user = userTestUtils.createBuyer();
-        PostDto postDto = postTestUtils.createPostDto(user);
+        User user = UserFactory.createBuyer(1);
+        PostDto postDto = PostFactory.createPostDto(user, 1);
 
         String message = Message.POST_PUBLISHED.getStr();
 
@@ -188,8 +183,8 @@ class PostServiceTest {
     @DirtiesContext(methodMode = DirtiesContext.MethodMode.AFTER_METHOD)
     void savePost_whenProductDoesNotExistAndUserIsSeller_thenSavePost() {
         // Arrange
-        User user = userTestUtils.createSeller();
-        PostDto postDto = postTestUtils.createPostDto(user);
+        User user = UserFactory.createSeller(1);
+        PostDto postDto = PostFactory.createPostDto(user, 1);
 
         String message = Message.POST_PUBLISHED.getStr();
 
@@ -209,8 +204,8 @@ class PostServiceTest {
     @DisplayName("savePost - should throw AlreadyExistsException when product already exists")
     void savePost_whenProductAlreadyExists_thenThrowAlreadyExistsException() {
         // Arrange
-        User user = userTestUtils.createBuyer();
-        PostDto postDto = postTestUtils.createPostDto(user);
+        User user = UserFactory.createBuyer(1);
+        PostDto postDto = PostFactory.createPostDto(user, 201);
 
         when(userRepository.findById(user.getId())).thenReturn(Optional.of(user));
         when(postRepository.existsProductById(postDto.getProduct().getId())).thenReturn(true);
