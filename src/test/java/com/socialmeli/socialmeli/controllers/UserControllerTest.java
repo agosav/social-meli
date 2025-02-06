@@ -377,6 +377,17 @@ public class UserControllerTest {
                 .andExpect(status().isBadRequest());
     }
 
+    @Test
+    @DisplayName("getFollowedUsers - invalid user id")
+    public void getFollowedUsersTest_whenUserIdInvalid_thenReturn400() throws Exception {
+        // Arrange
+        Integer userId = -1;
+
+        // Act & Assert:
+        mockMvc.perform(get("/users/{userId}/followed/list", userId))
+                .andExpect(status().isBadRequest());
+    }
+
     // Métodos privados
 
     private void performFollow(Integer followerId, Integer followedId, String expectedMessage, int expectedStatus)
