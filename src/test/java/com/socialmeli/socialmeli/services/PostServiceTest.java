@@ -160,6 +160,24 @@ class PostServiceTest {
 
    */
 
+    @Test
+    @DisplayName("Test for 'User Not Found' exception in getRecentPostFromUsers")
+    public void testGetRecentPostFromUsers_UserNotFound() {
+        // Arrange
+        Integer userId = 800;
+        String order = "date_asc";
+
+        when(userRepository.findById(userId)).thenReturn(Optional.empty());
+
+        // Act
+        NotFoundException exception = assertThrows(NotFoundException.class, () -> {
+            service.getRecentPostFromUsers(order, userId);
+        });
+
+        // Assert
+        assertEquals("User with ID 800 not found", exception.getMessage());
+    }
+
     // US 0005 - Dar de alta una nueva publicación.
     @ParameterizedTest
     @ValueSource(strings = {"/products/post", "/products/promo-post"})
