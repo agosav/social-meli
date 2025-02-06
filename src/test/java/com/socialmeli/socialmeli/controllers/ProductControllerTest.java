@@ -8,7 +8,9 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+
 import java.time.LocalDate;
+
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -21,9 +23,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.socialmeli.socialmeli.enums.Message;
-import com.socialmeli.socialmeli.repositories.IPostRepository;
-import com.socialmeli.socialmeli.repositories.IUserRepository;
-import com.socialmeli.socialmeli.services.PostService;
 import com.socialmeli.socialmeli.utils.PostFactory;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
@@ -32,21 +31,13 @@ import org.springframework.test.web.servlet.ResultActions;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 
+
 @SpringBootTest
 @AutoConfigureMockMvc
 public class ProductControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
-
-    @Autowired
-    private PostService service;
-
-    @Autowired
-    private IUserRepository userRepository;
-
-    @Autowired
-    private IPostRepository postRepository;
 
     @Autowired
     private ObjectMapper objectMapper;
@@ -236,4 +227,5 @@ public class ProductControllerTest {
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
     }
+
 }

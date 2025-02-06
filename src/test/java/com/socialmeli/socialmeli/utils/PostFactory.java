@@ -1,10 +1,10 @@
 package com.socialmeli.socialmeli.utils;
 
+import java.time.LocalDate;
+
 import com.socialmeli.socialmeli.dto.PostDto;
 import com.socialmeli.socialmeli.dto.PostSaleDto;
 import com.socialmeli.socialmeli.dto.ProductDto;
-
-import java.time.LocalDate;
 
 public class PostFactory {
 

@@ -37,8 +37,8 @@ public class ProductController {
     // por los vendedores que un usuario sigue
     @GetMapping("/followed/{userId}/list")
     public ResponseEntity<ProductListDto> getPostsOfFollowedSellers(
-            @Valid @Positive @PathVariable  Integer userId,
-            @Valid @Pattern(regexp = "date_desc|date_asc") @RequestParam(defaultValue = "date_desc") String order) {
+            @Positive @PathVariable  Integer userId,
+            @Pattern(regexp = "date_desc|date_asc") @RequestParam(defaultValue = "date_desc") String order) {
         return ResponseEntity.ok(postService.getRecentPostFromUsers(order, userId));
     }
 
