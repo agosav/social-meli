@@ -76,18 +76,15 @@ public class UserControllerTest {
     @DisplayName("unfollowToUserTest")
     public void unfollowUserTest() throws Exception {
         // Arrange
-        User user1 = new User(1, "Agostina Avalle", false);
-        User user2 = new User(2, "Carolina Comba", true);
-        Integer userId = 1;
-        Integer userIdToUnfollow = 2;
-        String expectedMessage = Message.USER_UNFOLLOWED.format(user2.getName());
+        User follower = new User(2, "Carolina Comba", false);
+        User followed = new User(1, "Agostina Avalle", true);
 
-        when(userService.unfollow(userId, userIdToUnfollow)).thenReturn(new MessageDto(expectedMessage));
+        String expectedMessage = Message.USER_UNFOLLOWED.format(followed.getName());
 
         // Act & Assert
-        mockMvc.perform(post("/" + userId + "/unfollow/" + userIdToUnfollow)
-                .contentType(MediaType.APPLICATION_JSON))
+        mockMvc.perform(post("/users/{userId}/unfollow/{userIdToFollow}", follower.getId(), followed.getId()))
                 .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.message").value(expectedMessage));
     }
 }
