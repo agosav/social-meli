@@ -137,7 +137,7 @@ public class UserControllerTest {
     //US-0002: Obtener el resultado de la cantidad de usuarios que siguen a un determinado vendedor
     @Test
     @DisplayName("countFollowersForSeller")
-    public void getCountFollowerForSellerTest() throws Exception {
+    public void getCountFollowerForSellerTest_wheUserExists_thenReturnUserFollowerCountDto() throws Exception {
         //Arrange
         UserFollowerCountDto user1 = new UserFollowerCountDto(1, "Agostina Avalle", 3);
         //Act & Assertions
@@ -149,6 +149,31 @@ public class UserControllerTest {
                 .andExpect(jsonPath("$.followers_count").value(user1.getFollowersCount()));
     }
 
+    @Test
+    @DisplayName("countFollowersForSeller - user not found")
+    public void getCountFollowerForSellerTest_wheUserDoesntExists_thenReturn404() throws Exception {
+        //Arrange
+        Integer userId = 999;
+        String message = Message.USER_NOT_FOUND.format(userId);
+        //Act & Assertions
+        mockMvc.perform(get("/users/{userId}/followers/count", userId))
+                .andExpect(status().isNotFound())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.message").value(message));
+    }
+
+    @Test
+    @DisplayName("countFollowersForSeller - user not seller")
+    public void getCountFollowerForSellerTest_wheUserNotSeller_thenReturn400() throws Exception {
+        //Arrange
+        User userNotSeller = new User(2, "Carolina Comba", false);
+        String message = Message.USER_NOT_SELLER.format(userNotSeller.getName());
+        //Act & Assertions
+        mockMvc.perform(get("/users/{userId}/followers/count", userNotSeller.getId()))
+                .andExpect(status().isBadRequest())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.message").value(message));
+    }
     // US 0004 - Obtener un listado de todos los vendedores a los cuales sigue un determinado usuario (¿A quién sigo?).
     @ParameterizedTest
     @CsvSource({"name_asc", "name_desc", "DEFAULT"})
