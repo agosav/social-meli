@@ -4,6 +4,9 @@ import com.socialmeli.socialmeli.dto.response.ProductListDto;
 import com.socialmeli.socialmeli.dto.response.ProductSaleCountDto;
 import com.socialmeli.socialmeli.dto.response.MessageDto;
 import com.socialmeli.socialmeli.services.IPostService;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Positive;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -16,20 +19,17 @@ import org.springframework.web.bind.annotation.RequestParam;
 import com.socialmeli.socialmeli.dto.PostSaleDto;
 import lombok.RequiredArgsConstructor;
 
-import javax.validation.Valid;
-import javax.validation.constraints.Pattern;
-import javax.validation.constraints.Positive;
-
 @RestController
 @RequestMapping("/products")
 @RequiredArgsConstructor
+@Validated
 public class ProductController {
 
     private final IPostService postService;
 
     // US 0005 - Dar de alta una nueva publicación.
     @PostMapping("/post")
-    public ResponseEntity<MessageDto> addPost(@RequestBody PostDto postDto) {
+    public ResponseEntity<MessageDto> addPost(@RequestBody @Valid PostDto postDto) {
         return ResponseEntity.ok(postService.savePost(postDto));
     }
 
@@ -38,7 +38,7 @@ public class ProductController {
     @GetMapping("/followed/{userId}/list")
     public ResponseEntity<ProductListDto> getPostsOfFollowedSellers(
             @Valid @Positive @PathVariable  Integer userId,
-            @Pattern(regexp = "date_desc|date_asc") @RequestParam(defaultValue = "date_desc") String order) {
+            @Valid @Pattern(regexp = "date_desc|date_asc") @RequestParam(defaultValue = "date_desc") String order) {
         return ResponseEntity.ok(postService.getRecentPostFromUsers(order, userId));
     }
 
