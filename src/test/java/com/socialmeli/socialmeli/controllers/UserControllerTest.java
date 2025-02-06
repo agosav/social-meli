@@ -3,10 +3,8 @@ package com.socialmeli.socialmeli.controllers;
 import com.socialmeli.socialmeli.enums.Message;
 import com.socialmeli.socialmeli.dto.response.UserFollowerCountDto;
 import com.socialmeli.socialmeli.models.User;
-import com.socialmeli.socialmeli.services.IUserService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mock;
 import com.socialmeli.socialmeli.utils.UserFactory;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -33,9 +31,6 @@ public class UserControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
-
-    @Mock
-    private IUserService userService;
 
     // US 0001 - Poder realizar la acción de “Follow” (seguir) a un determinado vendedor.
     @Test
@@ -168,7 +163,6 @@ public class UserControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.message").value(expectedMessage));
-        ;
     }
 
     @Test
@@ -293,7 +287,7 @@ public class UserControllerTest {
         String message = Message.USER_NOT_FOUND.format(userId);
 
         // Act & Assert
-        ResultActions result = mockMvc.perform(get("/users/{userId}/followed/list", userId)
+        mockMvc.perform(get("/users/{userId}/followed/list", userId)
                         .param("order", order))
                 .andExpect(status().isNotFound())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
