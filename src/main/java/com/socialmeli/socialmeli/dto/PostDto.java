@@ -3,6 +3,8 @@ package com.socialmeli.socialmeli.dto;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.socialmeli.socialmeli.utils.LocalDateDeserializer;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.DecimalMax;
 import jakarta.validation.constraints.NotNull;
@@ -26,6 +28,7 @@ public class PostDto {
     private Integer userId;
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy")
+    @JsonDeserialize(using = LocalDateDeserializer.class)
     private LocalDate date;
 
     @Valid
