@@ -40,4 +40,11 @@ public class PostFactory {
                 .discount(10.0)
                 .build();
     }
+
+    public static PostDto createPostIdDateDto(Integer userId, LocalDate date) {
+        return PostDto.builder()
+                .userId(userId)
+                .date(date)
+                .build();
+    }
 }
