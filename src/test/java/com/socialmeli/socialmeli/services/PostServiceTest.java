@@ -29,8 +29,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.annotation.DirtiesContext;
-
-import java.nio.file.attribute.UserPrincipalNotFoundException;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -243,7 +241,8 @@ class PostServiceTest {
                         .id(1)
                         .user(user)
                         .date(LocalDate.of(2025, 1, 19))
-                        .product(new Product(201, "headphones", "Electronics", "Dell", "Silver", "Includes charger and carrying case"))
+                        .product(new Product(201, "headphones", "Electronics", "Dell",
+                                "Silver", "Includes charger and carrying case"))
                         .category(1)
                         .price(1200.00)
                         .hasPromo(true)
@@ -254,7 +253,8 @@ class PostServiceTest {
                         .id(2)
                         .user(user)
                         .date(LocalDate.of(2025, 1, 20))
-                        .product(new Product(202, "Laptop", "Electronics", "Dell", "Silver", "Includes charger and carrying case"))
+                        .product(new Product(202, "Laptop", "Electronics", "Dell", "Silver",
+                                "Includes charger and carrying case"))
                         .category(2)
                         .price(1200.00)
                         .hasPromo(true)
@@ -265,7 +265,8 @@ class PostServiceTest {
                         .id(3)
                         .user(user)
                         .date(LocalDate.of(2025, 1, 21))
-                        .product(new Product(203, "chair", "Furniture", "Dell", "Silver", "Includes charger and carrying case"))
+                        .product(new Product(203, "chair", "Furniture", "Dell", "Silver",
+                                "Includes charger and carrying case"))
                         .category(2)
                         .price(1200.00)
                         .hasPromo(true)
@@ -292,19 +293,19 @@ class PostServiceTest {
         when(userRepository.findById(user.getId())).thenReturn(Optional.of(user));
 
         //Act & Assertions
-        assertThrows(UserNotSellerException.class, () -> {service.getProductSaleCountByUser(user.getId());});
+        assertThrows(UserNotSellerException.class, () -> service.getProductSaleCountByUser(user.getId()));
     }
 
     @Test
     @DisplayName("countProductSaleByUser - user not found")
     public void getProductSaleCountByUser_whenUserNotFound_thenThrowUserNotFoundException() {
         //Arrange
-        Integer id =90;
+        Integer id = 90;
 
         when(userRepository.findById(id)).thenReturn(Optional.empty());
 
         //Act & Assertions
-        assertThrows(NotFoundException.class, () -> {service.getProductSaleCountByUser(id);});
+        assertThrows(NotFoundException.class, () -> service.getProductSaleCountByUser(id));
     }
 
     @Test
@@ -317,6 +318,6 @@ class PostServiceTest {
         when(postRepository.findPostsWithPromoByUser(user.getId())).thenReturn(List.of());
 
         //Act & Assertions
-        assertThrows(UserNotSellerException.class, () -> {service.getProductSaleCountByUser(user.getId());});
+        assertThrows(UserNotSellerException.class, () -> service.getProductSaleCountByUser(user.getId()));
     }
 }

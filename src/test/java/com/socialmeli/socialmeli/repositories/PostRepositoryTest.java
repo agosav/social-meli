@@ -154,7 +154,8 @@ class PostRepositoryTest {
                         .id(1)
                         .user(user)
                         .date(LocalDate.of(2025, 1, 19))
-                        .product(new Product(201, "headphones", "Electronics", "Dell", "Silver", "Includes charger and carrying case"))
+                        .product(new Product(201, "headphones", "Electronics", "Dell",
+                                "Silver", "Includes charger and carrying case"))
                         .category(1)
                         .price(1200.00)
                         .hasPromo(true)
@@ -165,7 +166,8 @@ class PostRepositoryTest {
                         .id(2)
                         .user(user)
                         .date(LocalDate.of(2025, 1, 20))
-                        .product(new Product(202, "Laptop", "Electronics", "Dell", "Silver", "Includes charger and carrying case"))
+                        .product(new Product(202, "Laptop", "Electronics", "Dell", "Silver",
+                                "Includes charger and carrying case"))
                         .category(2)
                         .price(1200.00)
                         .hasPromo(true)
@@ -176,7 +178,8 @@ class PostRepositoryTest {
                         .id(3)
                         .user(user)
                         .date(LocalDate.of(2025, 1, 21))
-                        .product(new Product(203, "chair", "Furniture", "Dell", "Silver", "Includes charger and carrying case"))
+                        .product(new Product(203, "chair", "Furniture", "Dell", "Silver",
+                                "Includes charger and carrying case"))
                         .category(2)
                         .price(1200.00)
                         .hasPromo(true)
