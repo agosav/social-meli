@@ -5,7 +5,7 @@ import com.socialmeli.socialmeli.dto.response.UserFollowerCountDto;
 import com.socialmeli.socialmeli.dto.response.FollowerListDto;
 import com.socialmeli.socialmeli.dto.response.FollowedListDto;
 import com.socialmeli.socialmeli.services.IUserService;
-import jakarta.validation.Valid;
+import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
+@Validated
 @RequestMapping("/users")
 @Validated
 public class UserController {
@@ -48,8 +49,10 @@ public class UserController {
     // US 0004 - Obtener un listado de todos los vendedores a los cuales sigue un determinado usuario (¿A quién sigo?).
     @GetMapping("/{userId}/followed/list")
     public ResponseEntity<FollowedListDto> getFollowedUsers(
-            @PathVariable Integer userId,
-            @RequestParam(defaultValue = "name_asc") String order) {
+            @PathVariable @Positive Integer userId,
+            @RequestParam(defaultValue = "name_asc") @Pattern(regexp = "^(name_asc|name_desc)$",
+                    message = "Invalid 'order' parameter. Allowed values are 'name_asc' or 'name_desc'.")
+            String order) {
         return ResponseEntity.ok(userService.getFollowedList(userId, order));
     }
 
