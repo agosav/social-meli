@@ -237,13 +237,5 @@ public class ProductControllerTest {
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
     }
-
-    @ParameterizedTest
-    @ValueSource(strings = {"/products/post", "/products/promo-post"})
-    @DisplayName("savePost - when body is invalid should return 400")
-    @Disabled
-    void savePost_whenBodyIsInvalid_thenReturn400(String url) {
-        // TODO: Implementar este test cuando estén hechas las validaciones
-    }
-
+    
 }
