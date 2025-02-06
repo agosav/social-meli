@@ -1,8 +1,12 @@
 package com.socialmeli.socialmeli.services;
 
+import com.socialmeli.socialmeli.dto.PostDto;
 import com.socialmeli.socialmeli.dto.ProductDto;
+import com.socialmeli.socialmeli.dto.response.MessageDto;
 import com.socialmeli.socialmeli.dto.response.PostIdDto;
 import com.socialmeli.socialmeli.dto.response.ProductListDto;
+import com.socialmeli.socialmeli.enums.Message;
+import com.socialmeli.socialmeli.exception.AlreadyExistsException;
 import com.socialmeli.socialmeli.exception.NotFoundException;
 import com.socialmeli.socialmeli.models.Post;
 import com.socialmeli.socialmeli.models.User;
@@ -10,11 +14,15 @@ import com.socialmeli.socialmeli.repositories.IFollowRepository;
 import com.socialmeli.socialmeli.repositories.IPostRepository;
 import com.socialmeli.socialmeli.repositories.IUserRepository;
 import com.socialmeli.socialmeli.util.EntityCreator;
+import com.socialmeli.socialmeli.utils.PostTestUtils;
+import com.socialmeli.socialmeli.utils.UserTestUtils;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.test.annotation.DirtiesContext;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -23,10 +31,13 @@ import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-@SpringBootTest
+
+@ExtendWith(MockitoExtension.class)
 class PostServiceTest {
     @Mock
     private  IPostRepository postRepository;
@@ -36,6 +47,10 @@ class PostServiceTest {
     private  IFollowRepository followRepository;
     @InjectMocks
     private PostService service;
+
+    private final UserTestUtils userTestUtils = new UserTestUtils();
+
+    private final PostTestUtils postTestUtils = new PostTestUtils();
 
 
     @Test
@@ -144,4 +159,63 @@ class PostServiceTest {
     }
 
    */
+
+    // US 0005 - Dar de alta una nueva publicación.
+    @Test
+    @DisplayName("savePost - should save the post when product does not exist and user is not seller")
+    @DirtiesContext(methodMode = DirtiesContext.MethodMode.AFTER_METHOD)
+    void savePost_whenProductDoesNotExistAndUserIsNotSeller_thenSavePost() {
+        // Arrange
+        User user = userTestUtils.createBuyer();
+        PostDto postDto = postTestUtils.createPostDto(user);
+
+        String message = Message.POST_PUBLISHED.getStr();
+
+        when(userRepository.findById(user.getId())).thenReturn(Optional.of(user));
+        when(postRepository.existsProductById(postDto.getProduct().getId())).thenReturn(false);
+
+        // Act
+        MessageDto result = service.savePost(postDto);
+
+        // Assert
+        verify(userRepository).update(user);
+        verify(postRepository).save(any(Post.class));
+        assertEquals(message, result.getMessage());
+    }
+
+    @Test
+    @DisplayName("savePost - should save the post when product does not exist and user is seller")
+    @DirtiesContext(methodMode = DirtiesContext.MethodMode.AFTER_METHOD)
+    void savePost_whenProductDoesNotExistAndUserIsSeller_thenSavePost() {
+        // Arrange
+        User user = userTestUtils.createSeller();
+        PostDto postDto = postTestUtils.createPostDto(user);
+
+        String message = Message.POST_PUBLISHED.getStr();
+
+        when(userRepository.findById(user.getId())).thenReturn(Optional.of(user));
+        when(postRepository.existsProductById(postDto.getProduct().getId())).thenReturn(false);
+
+        // Act
+        MessageDto result = service.savePost(postDto);
+
+        // Assert
+        verify(userRepository, never()).update(user);
+        verify(postRepository).save(any(Post.class));
+        assertEquals(message, result.getMessage());
+    }
+
+    @Test
+    @DisplayName("savePost - should throw AlreadyExistsException when product already exists")
+    void savePost_whenProductAlreadyExists_thenThrowAlreadyExistsException() {
+        // Arrange
+        User user = userTestUtils.createBuyer();
+        PostDto postDto = postTestUtils.createPostDto(user);
+
+        when(userRepository.findById(user.getId())).thenReturn(Optional.of(user));
+        when(postRepository.existsProductById(postDto.getProduct().getId())).thenReturn(true);
+
+        // Act & Assert
+        assertThrows(AlreadyExistsException.class, () -> service.savePost(postDto));
+    }
 }

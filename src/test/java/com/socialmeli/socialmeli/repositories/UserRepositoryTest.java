@@ -8,8 +8,10 @@ import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class UserRepositoryTest {
 
@@ -46,5 +48,27 @@ class UserRepositoryTest {
         assertThrows(RuntimeException.class, () -> {
             userRepository.findById(userId).orElseThrow();
         });
+    }
+
+    @Test
+    @DisplayName("update - should update the user details correctly")
+    void updateTest_whenUserExists_thenUpdateUser() {
+        // Arrange
+        User user = userTestUtils.createBuyer(2, "Carolina Comba");
+        user.setIsSeller(true);
+        user.setName("Caro");
+
+        // Act
+        userRepository.update(user);
+
+        // Assert
+        User updated = userRepository.getUsers()
+                .stream()
+                .filter(u -> u.getId().equals(user.getId())).findFirst()
+                .orElse(null);
+
+        assertNotNull(updated);
+        assertTrue(updated.getIsSeller());
+        assertEquals("Caro", updated.getName());
     }
 }
