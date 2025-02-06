@@ -4,8 +4,11 @@ import com.socialmeli.socialmeli.enums.Message;
 import com.socialmeli.socialmeli.dto.response.UserFollowerCountDto;
 import com.socialmeli.socialmeli.models.User;
 import com.socialmeli.socialmeli.utils.UserTestUtils;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -125,36 +128,58 @@ public class UserControllerTest {
     }
 
     // US 0004 - Obtener un listado de todos los vendedores a los cuales sigue un determinado usuario (¿A quién sigo?).
-    @Test
-    @DisplayName("getFollowedUsers - successful")
-    public void getFollowedUsersTest_whenSucccessful_thenReturn200() throws Exception {
+    @ParameterizedTest
+    @CsvSource({"name_asc", "name_desc", "DEFAULT"})
+    @DisplayName("getFollowedUsers - successful with different order or default")
+    public void getFollowedUsersTest_whenOrderIsParametrizedOrNotProvided_thenReturnOrderedList(String order) throws Exception {
         // Arrange
-        String order = "name_asc";
         User user1 = userTestUtils.createSeller(1, "Agostina Avalle");
         User user2 = userTestUtils.createBuyer(2, "Carolina Comba");
         User user3 = userTestUtils.createSeller(3, "Ciro Sánchez");
         User user5 = userTestUtils.createSeller(5, "Franca Pairetti");
-        List<User> usersExpected = List.of(user1, user3, user5);
+
+        List<User> usersExpected;
+
+        if ("name_asc".equals(order) || "DEFAULT".equals(order)) {
+            usersExpected = List.of(user1, user3, user5); // Orden ascendente
+        } else {
+            usersExpected = List.of(user5, user3, user1); // Orden descendente
+        }
 
         // Act & Assert
         ResultActions result = mockMvc.perform(get("/users/{userId}/followed/list", user2.getId())
-                        .param("order", order))
+                        .param("order", "DEFAULT".equals(order) ? "" : order))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.user_id").value(user2.getId()))
                 .andExpect(jsonPath("$.user_name").value(user2.getName()))
-                .andExpect(jsonPath("$.followed").isArray());
+                .andExpect(jsonPath("$.followed").isArray())
+                .andExpect(jsonPath("$.followed.length()").value(usersExpected.size()));
 
         for (int i = 0; i < usersExpected.size(); i++) {
             String expectedName = usersExpected.get(i).getName();
             Integer expectedId = usersExpected.get(i).getId();
-            result.andExpect(jsonPath("$.followed[" + i + "].user_id").value(expectedId));
-            result.andExpect(jsonPath("$.followed[" + i + "].user_name").value(expectedName));
+            result.andExpect(jsonPath("$.followed[" + i + "].user_id").value(expectedId))
+                    .andExpect(jsonPath("$.followed[" + i + "].user_name").value(expectedName));
         }
     }
 
     @Test
-    @DisplayName("getFollowedUsers - successful")
+    @Disabled
+    @DisplayName("getFollowedUsers - invalid order parameter")
+    public void getFollowedUsersTest_whenOrderIsInvalid_thenReturnDefaultOrderDesc() throws Exception {
+        // Arrange
+        String order = "asdasfcdxfvg";
+        Integer userId = 1;
+
+        // Act & Assert
+        mockMvc.perform(get("/users/{userId}/followed/list", userId)
+                        .param("order", order))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @DisplayName("getFollowedUsers - user not found")
     public void getFollowedUsersTest_whenUserDoesntExist_thenReturn404() throws Exception {
         // Arrange
         String order = "name_asc";
