@@ -1,4 +1,4 @@
-package com.socialmeli.socialmeli.util;
+package com.socialmeli.socialmeli.utils;
 
 import com.socialmeli.socialmeli.models.Post;
 import com.socialmeli.socialmeli.models.Product;

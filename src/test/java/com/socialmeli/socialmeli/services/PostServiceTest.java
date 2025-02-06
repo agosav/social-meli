@@ -14,7 +14,7 @@ import com.socialmeli.socialmeli.models.User;
 import com.socialmeli.socialmeli.repositories.IFollowRepository;
 import com.socialmeli.socialmeli.repositories.IPostRepository;
 import com.socialmeli.socialmeli.repositories.IUserRepository;
-import com.socialmeli.socialmeli.util.EntityCreator;
+import com.socialmeli.socialmeli.utils.EntityCreator;
 import com.socialmeli.socialmeli.utils.PostFactory;
 import com.socialmeli.socialmeli.utils.UserFactory;
 import org.junit.jupiter.api.DisplayName;
