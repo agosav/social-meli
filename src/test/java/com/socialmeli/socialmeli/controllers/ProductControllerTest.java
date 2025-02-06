@@ -44,6 +44,7 @@ public class ProductControllerTest {
     @Autowired
     private ObjectMapper objectMapper;
 
+    // US-0006: Obtener un listado de las publicaciones realizadas por los vendedores que un usuario sigue en las últimas dos semanas.
     @ParameterizedTest
     @CsvSource({"date_asc", "date_desc", "DEFAULT"})
     @DisplayName("T-0005: getPostsOfFollowedSellers by date asc")
@@ -81,6 +82,7 @@ public class ProductControllerTest {
         }
     }
 
+    // US-0006: Obtener un listado de las publicaciones realizadas por los vendedores que un usuario sigue en las últimas dos semanas.
     @Test
     @DisplayName("T-0005: getPostsOfFollowedSellers - should return 400 when order does not match")
     public void getPostsOfFollowedSellersTest_whenOrderDoesntMatch_thenThrow400() throws Exception {
@@ -94,6 +96,7 @@ public class ProductControllerTest {
                 .andExpect(status().isBadRequest());
     }
 
+    // US-0006: Obtener un listado de las publicaciones realizadas por los vendedores que un usuario sigue en las últimas dos semanas.
     @Test
     @DisplayName("T-0005: getPostsOfFollowedSellers - should return 400 when user id is negative")
     public void getPostsOfFollowedSellersTest_whenUserIdIsInvalid_thenThrow400() throws Exception {
@@ -107,6 +110,7 @@ public class ProductControllerTest {
                 .andExpect(status().isBadRequest());
     }
 
+    // US-0006: Obtener un listado de las publicaciones realizadas por los vendedores que un usuario sigue en las últimas dos semanas.
     @Test
     @DisplayName("T-0005: getPostsOfFollowedSellers - should return 404 when user is not found")
     public void getPostsOfFollowedSellersTest_whenUserIsNotFound_thenThrow404() throws Exception {
@@ -123,6 +127,7 @@ public class ProductControllerTest {
                 .andExpect(jsonPath("$.message").value(message));
     }
 
+    // US-0006: Obtener un listado de las publicaciones realizadas por los vendedores que un usuario sigue en las últimas dos semanas.
     @Test
     @DisplayName("T-0005: getPostsOfFollowedSellers - should return 404 when userid is not a number")
     public void getPostsOfFollowedSellersTest_whenUserIdIsNotANumber_thenThrow404() throws Exception {
