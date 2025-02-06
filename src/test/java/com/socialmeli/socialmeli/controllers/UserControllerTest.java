@@ -182,6 +182,22 @@ public class UserControllerTest {
     }
 
     @Test
+    @DisplayName("unfollowToUserTest - user follower not found")
+    public void unfollowUserTest_whenUserFollowerDoesntExists_thenReturn404() throws Exception {
+        // Arrange
+        User follower = UserFactory.createBuyer(999, "Carolina Comba");
+        User followed = UserFactory.createSeller(1, "Agostina Avalle");
+
+        String expectedMessage = Message.USER_NOT_FOUND.format(follower.getId());
+
+        // Act & Assert
+        mockMvc.perform(post("/users/{userId}/unfollow/{userIdToFollow}", follower.getId(), followed.getId()))
+                .andExpect(status().isNotFound())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.message").value(expectedMessage));
+    }
+
+    @Test
     @DisplayName("unfollowToUserTest - follower try to unfollow to user that is not following")
     public void unfollowUserTest_whenFollowDoesntExists_thenReturn404() throws Exception {
         // Arrange
