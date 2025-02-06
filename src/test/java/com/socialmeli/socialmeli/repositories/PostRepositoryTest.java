@@ -27,7 +27,6 @@ class PostRepositoryTest {
     }
     @Test
     @DisplayName("postFromUsers - should return a list of post form followed users")
-    @Disabled
     void  postFromUsersTest_whenSellersFollowedPost_thenReturnListOfPostFromUsersFollowed() {
         // Arrange
         User follower = new User(2, "Carolina Comba", false);
@@ -102,7 +101,7 @@ class PostRepositoryTest {
                         .build())
                 .category(1)
                 .price(999.99)
-                .hasPromo(false)
+                .hasPromo(true)
                 .discount(null)
                 .build());
 
