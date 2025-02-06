@@ -20,7 +20,6 @@ public class ProductDto {
     @JsonProperty("product_name")
     private String name;
 
-    @NotBlank
     private String type;
 
     private String brand;
