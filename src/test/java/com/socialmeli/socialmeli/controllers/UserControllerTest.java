@@ -317,7 +317,6 @@ public class UserControllerTest {
     }
 
     @Test
-    @Disabled
     @DisplayName("Test to validate exception when invalid order is provided for followed list")
     public void testFollowedListOrderException() throws Exception {
         // Arrange
