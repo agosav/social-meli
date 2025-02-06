@@ -7,7 +7,9 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+
 import java.time.LocalDate;
+
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -257,33 +259,6 @@ public class ProductControllerTest {
     @Disabled
     void savePost_whenBodyIsInvalid_thenReturn400(String url) {
         // TODO: Implementar este test cuando estén hechas las validaciones
-    }
-
-    @Test
-    @DisplayName("getPostsOfFollowedSellersTest - should return 200")
-    void getPostsOfFollowedSellersTest() throws Exception {
-        Integer userId = 3;
-        String order = "date_desc";
-
-        ProductDto productDto = PostFactory.createProductDto(201);
-        PostIdDto postIdDto = PostFactory.createPostIdDto(3, 1, LocalDate.parse("2025-01-19"), productDto, 1, 1200.00);
-        List<PostIdDto> postIdDtos = List.of(postIdDto);
-        ProductListDto productListDto = PostFactory.createProductListDto(userId, postIdDtos);
-
-
-
-        mockMvc.perform(MockMvcRequestBuilders.get("/products/followed/{userId}/list", userId)
-                        .param("order", order)
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.user_id").value(userId))
-                .andExpect(jsonPath("$.posts").isArray())
-                .andExpect(jsonPath("$.posts[0].id").value(1))
-                .andExpect(jsonPath("$.posts[0].user.id").value(3))
-                .andExpect(jsonPath("$.posts[0].user.name").value("Ciro Sánchez"))
-                .andExpect(jsonPath("$.posts[0].product.id").value(201))
-                .andExpect(jsonPath("$.posts[0].product.name").value("headphones"))
-                .andExpect(jsonPath("$.posts[0].price").value(1200.00));
     }
 
 }

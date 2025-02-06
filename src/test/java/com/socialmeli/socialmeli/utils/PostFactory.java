@@ -24,6 +24,17 @@ public class PostFactory {
                 .build();
     }
 
+    public static ProductDto createProductDtoComplete(Integer id, String name, String brand, String color, String type, String notes) {
+        return ProductDto.builder()
+                .id(id)
+                .name(name)
+                .brand(brand)
+                .color(color)
+                .type(type)
+                .notes(notes)
+                .build();
+    }
+
     public static PostDto createPostDto(Integer userId, Integer productId) {
         return PostDto.builder()
                 .userId(userId)
