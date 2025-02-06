@@ -208,4 +208,47 @@ public class UserServiceTest {
         // Act & Assert
         assertThrows(NotFoundException.class, () -> userService.getFollowedList(userId, order));
     }
+
+    @Test
+    @DisplayName("Test for 'User Not Found'")
+    public void testGetFollowerList_UserNotFound() {
+        // Arrange
+        Integer userId = 800;
+        String order = "name_asc";
+
+        when(userRepository.findById(userId)).thenReturn(Optional.empty());
+
+        // Act
+
+        NotFoundException exception = assertThrows(NotFoundException.class, () -> {
+            userService.getFollowerList(userId, order);
+        });
+
+        // Assert
+        assertEquals("User with ID 800 not found", exception.getMessage());
+    }
+
+    @Test
+    @DisplayName("Test for 'User is not seller'")
+    public void testGetFollowerList_UserNotSeller() {
+        // Arrange
+        Integer userId = 1;
+        String order = "name_asc";
+
+
+        User user = new User(userId, "Carolina Comba", false);
+
+        when(userRepository.findById(userId)).thenReturn(Optional.of(user));
+
+        // Act
+        UserNotSellerException exception = assertThrows(UserNotSellerException.class, () -> {
+            userService.getFollowerList(userId, order);
+        });
+
+        // Assert
+        assertEquals("Carolina Comba is not a seller", exception.getMessage());
+    }
+
+
+
 }
