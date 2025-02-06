@@ -12,7 +12,9 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class PostRepositoryTest {
     private PostRepository postRepository;
@@ -108,4 +110,36 @@ class PostRepositoryTest {
         assertEquals(expected, result);
     }
 
+    @Test
+    @DisplayName("save - should save post to the list")
+    void saveTest_whenSave_thenVoid() {
+        // Arrange
+        Post post = Post.builder().id(500).build();
+
+        // Act
+        postRepository.save(post);
+
+        // Assert
+        assertTrue(postRepository.getPosts().contains(post));
+    }
+
+    @Test
+    @DisplayName("existsProductById - should return true when post exists")
+    void existsProductByIdTest_whenPostExists_thenReturnTrue() {
+        // Act
+        boolean result = postRepository.existsProductById(201);
+
+        // Assert
+        assertTrue(result);
+    }
+
+    @Test
+    @DisplayName("existsProductById - should return false when post doesnt exists")
+    void existsProductByIdTest_whenPostDoesntExists_thenReturnFalse() {
+        // Act
+        boolean result = postRepository.existsProductById(999);
+
+        // Assert
+        assertFalse(result);
+    }
 }
