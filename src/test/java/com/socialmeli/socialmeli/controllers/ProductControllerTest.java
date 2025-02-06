@@ -117,7 +117,7 @@ public class ProductControllerTest {
 
     @Test
     @DisplayName("T-0005: getPostsOfFollowedSellers - should return 400 when order does not match")
-    public void getPostsOfFollowedSellersOrderExceptionTests() throws Exception {
+    public void getPostsOfFollowedSellersOrderNotValidExceptionTests() throws Exception {
         // Arrange
         String order = "word";
         User user = new User(2, "Carolina Comba", false);
@@ -130,7 +130,7 @@ public class ProductControllerTest {
 
     @Test
     @DisplayName("T-0005: getPostsOfFollowedSellers - should return 400 when user id is negative")
-    public void getPostsOfFollowedSellersUserExceptionTests() throws Exception {
+    public void getPostsOfFollowedSellersUserIdNotValidExceptionTests() throws Exception {
         // Arrange
         String order = "date_asc";
         Integer userIdNegative = -1;
