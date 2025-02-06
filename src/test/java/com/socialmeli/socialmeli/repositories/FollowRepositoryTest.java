@@ -36,6 +36,21 @@ class FollowRepositoryTest {
         // Assert
         assertEquals(expected, result);
     }
+    @Test
+    @DisplayName("findFollowedUsersTest - should return a list of user that one user follows")
+    void  findFollowedUsersTest_whenUserFollowsSellers_thenReturnListOfFollowedUsers() {
+        // Arrange
+        User user1 = new User(1, "Agostina Avalle", true);
+        List<User> expected = List.of(
+                new User(3, "Ciro Sánchez", true)
+        );
+
+        // Act
+        List<User> result = followRepository.findFollowedUsers(user1);
+
+        // Assert
+        assertEquals(expected, result);
+    }
 
     @Test
     @DisplayName("findAllByIdFollowedTest - should return a list of follows by id follower")
