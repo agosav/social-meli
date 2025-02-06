@@ -3,7 +3,7 @@ package com.socialmeli.socialmeli.controllers;
 import com.socialmeli.socialmeli.enums.Message;
 import com.socialmeli.socialmeli.dto.response.UserFollowerCountDto;
 import com.socialmeli.socialmeli.models.User;
-import com.socialmeli.socialmeli.utils.UserTestUtils;
+import com.socialmeli.socialmeli.utils.UserFactory;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -32,16 +32,14 @@ public class UserControllerTest {
     @Autowired
     private MockMvc mockMvc;
 
-    private final UserTestUtils userTestUtils = new UserTestUtils();
-
     // US 0001 - Poder realizar la acción de “Follow” (seguir) a un determinado vendedor.
     @Test
     @DisplayName("follow - successful")
     @DirtiesContext(methodMode = DirtiesContext.MethodMode.AFTER_METHOD)
     public void followTest_whenSuccessful_then200() throws Exception {
         // Arrange
-        User user1 = userTestUtils.createSeller(1, "Agostina Avalle");
-        User user5 = userTestUtils.createSeller(5, "Franca Pairetti");
+        User user1 = UserFactory.createSeller(1, "Agostina Avalle");
+        User user5 = UserFactory.createSeller(5, "Franca Pairetti");
 
         String message = Message.USER_FOLLOWED.format(user1.getName());
 
@@ -80,7 +78,7 @@ public class UserControllerTest {
     public void followTest_whenUserFollowedIsNotSeller_thenReturn400() throws Exception {
         // Arrange
         Integer userIdSeller = 1;
-        User userNotSeller = userTestUtils.createBuyer(2, "Carolina Comba");
+        User userNotSeller = UserFactory.createBuyer(2, "Carolina Comba");
 
         String message = Message.USER_NOT_SELLER.format(userNotSeller.getName());
 
@@ -103,8 +101,8 @@ public class UserControllerTest {
     @DisplayName("follow - user already followed")
     public void followTest_whenUserAlreadyFollowed_thenReturn409() throws Exception {
         // Arrange
-        User user2 = userTestUtils.createBuyer(2, "Carolina Comba");
-        User user1 = userTestUtils.createSeller(1, "Agostina Avalle");
+        User user2 = UserFactory.createBuyer(2, "Carolina Comba");
+        User user1 = UserFactory.createSeller(1, "Agostina Avalle");
 
         String message = Message.USER_ALREADY_FOLLOWED.format(user1.getName(), user2.getName());
 
@@ -158,10 +156,10 @@ public class UserControllerTest {
     public void getFollowedUsersTest_whenOrderIsParametrizedOrNotProvided_thenReturnOrderedList(String order)
             throws Exception {
         // Arrange
-        User user1 = userTestUtils.createSeller(1, "Agostina Avalle");
-        User user2 = userTestUtils.createBuyer(2, "Carolina Comba");
-        User user3 = userTestUtils.createSeller(3, "Ciro Sánchez");
-        User user5 = userTestUtils.createSeller(5, "Franca Pairetti");
+        User user1 = UserFactory.createSeller(1, "Agostina Avalle");
+        User user2 = UserFactory.createBuyer(2, "Carolina Comba");
+        User user3 = UserFactory.createSeller(3, "Ciro Sánchez");
+        User user5 = UserFactory.createSeller(5, "Franca Pairetti");
 
         List<User> usersExpected;
 

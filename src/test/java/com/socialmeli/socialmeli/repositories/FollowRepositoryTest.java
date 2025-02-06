@@ -2,7 +2,7 @@ package com.socialmeli.socialmeli.repositories;
 
 import com.socialmeli.socialmeli.models.Follow;
 import com.socialmeli.socialmeli.models.User;
-import com.socialmeli.socialmeli.utils.UserTestUtils;
+import com.socialmeli.socialmeli.utils.UserFactory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -18,8 +18,6 @@ class FollowRepositoryTest {
 
     private FollowRepository followRepository;
 
-    private final UserTestUtils userTestUtils = new UserTestUtils();
-
     @BeforeEach
     void setUp() throws IOException {
         followRepository = new FollowRepository();
@@ -30,9 +28,9 @@ class FollowRepositoryTest {
     @DisplayName("findAllByIdFollower - should return a list of follows by id follower")
     void findAllByIdFollowerTest_whenSuccess_thenReturnListFollow() {
         // Arrange
-        User user1 = userTestUtils.createSeller(1, "Agostina Avalle");
-        User user3 = userTestUtils.createSeller(3, "Ciro Sánchez");
-        User user4 = userTestUtils.createBuyer(4, "Eliana Navarro");
+        User user1 = UserFactory.createSeller(1, "Agostina Avalle");
+        User user3 = UserFactory.createSeller(3, "Ciro Sánchez");
+        User user4 = UserFactory.createBuyer(4, "Eliana Navarro");
 
         List<Follow> expected = List.of(new Follow(user4, user3), new Follow(user4, user1));
 
@@ -62,10 +60,10 @@ class FollowRepositoryTest {
     @DisplayName("findAllByIdFollowed - should return a list of follows by id follower")
     void findAllByIdFollowedTest_thenReturnListFollows() {
         //Arrange
-        User user1 = userTestUtils.createSeller(1, "Agostina Avalle");
-        User user2 = userTestUtils.createBuyer(2, "Carolina Comba");
-        User user4 = userTestUtils.createBuyer(4, "Eliana Navarro");
-        User user6 = userTestUtils.createBuyer(6, "Katerinne Peralta");
+        User user1 = UserFactory.createSeller(1, "Agostina Avalle");
+        User user2 = UserFactory.createBuyer(2, "Carolina Comba");
+        User user4 = UserFactory.createBuyer(4, "Eliana Navarro");
+        User user6 = UserFactory.createBuyer(6, "Katerinne Peralta");
         List<Follow> expected =  List.of(
                 new Follow(user2, user1),
                 new Follow(user4, user1),
@@ -83,8 +81,8 @@ class FollowRepositoryTest {
     @DisplayName("exists - should return true when follow exists")
     void existsTest_whenFollowExists_thenReturnTrue() {
         // Arrange
-        User user1 = userTestUtils.createBuyer(2, "Carolina Comba");
-        User user2 = userTestUtils.createSeller(1, "Agostina Avalle");
+        User user1 = UserFactory.createBuyer(2, "Carolina Comba");
+        User user2 = UserFactory.createSeller(1, "Agostina Avalle");
         Follow follow = new Follow(user1, user2);
 
         // Act
@@ -98,8 +96,8 @@ class FollowRepositoryTest {
     @DisplayName("exists - should return false when follow doesnt exists")
     void existsTest_whenFollowDoesntExists_thenReturnFalse() {
         // Arrange
-        User user1 = userTestUtils.createBuyer(2, "Carolina Comba");
-        User user2 = userTestUtils.createSeller(1, "Agostina Avalle");
+        User user1 = UserFactory.createBuyer(2, "Carolina Comba");
+        User user2 = UserFactory.createSeller(1, "Agostina Avalle");
         Follow follow = new Follow(user2, user1);
 
         // Act
@@ -113,8 +111,8 @@ class FollowRepositoryTest {
     @DisplayName("add - should add a follow to the list")
     void addTest_whenAdd_thenVoid() {
         // Arrange
-        User user1 = userTestUtils.createSeller(1, "Agostina Avalle");
-        User user5 = userTestUtils.createSeller(5, "Franca Pairetti");
+        User user1 = UserFactory.createSeller(1, "Agostina Avalle");
+        User user5 = UserFactory.createSeller(5, "Franca Pairetti");
         Follow follow = new Follow(user1, user5);
 
         // Act

@@ -1,7 +1,7 @@
 package com.socialmeli.socialmeli.repositories;
 
 import com.socialmeli.socialmeli.models.User;
-import com.socialmeli.socialmeli.utils.UserTestUtils;
+import com.socialmeli.socialmeli.utils.UserFactory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -17,8 +17,6 @@ class UserRepositoryTest {
 
     private UserRepository userRepository;
 
-    private final UserTestUtils userTestUtils = new UserTestUtils();
-
     @BeforeEach
     void setUp() throws IOException {
         userRepository = new UserRepository();
@@ -29,7 +27,7 @@ class UserRepositoryTest {
     @DisplayName("findByIdTest - should return user when user exists")
     void findByIdTest_whenUserExists_thenReturnUser() {
         // Arrange
-        User expected = userTestUtils.createSeller(1, "Agostina Avalle");
+        User expected = UserFactory.createSeller(1, "Agostina Avalle");
 
         // Act
         User result = userRepository.findById(expected.getId()).orElse(null);
