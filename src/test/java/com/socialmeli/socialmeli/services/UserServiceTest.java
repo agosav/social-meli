@@ -334,6 +334,31 @@ public class UserServiceTest {
         // Act & Assert
         assertThrows(NotFoundException.class, () -> userService.getFollowedList(userId, order));
     }
+
+    @Test
+    @DisplayName("Test for 'Cannot unfollow yourself' exception")
+    public void unfollowTest_whenFollowerAndFollowedAreSame_thenThrowIllegalActionException() {
+        // Arrange
+        Integer userId = 1;
+        User follower = new User();
+        follower.setId(userId);
+
+        User followed = new User();
+        followed.setId(userId);
+
+        when(userRepository.findById(userId)).thenReturn(Optional.of(follower));
+
+        // Act
+        IllegalActionException exception = assertThrows(IllegalActionException.class, () -> {
+            userService.unfollow(follower.getId(), followed.getId());
+        });
+
+        // Assert
+        assertEquals(Message.CANNOT_UNFOLLOW_SELF.getStr(), exception.getMessage());
+    }
 }
+
+
+
 
 
