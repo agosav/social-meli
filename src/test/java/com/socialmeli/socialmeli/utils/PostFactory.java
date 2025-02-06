@@ -4,6 +4,8 @@ import com.socialmeli.socialmeli.dto.PostDto;
 import com.socialmeli.socialmeli.dto.PostSaleDto;
 import com.socialmeli.socialmeli.dto.ProductDto;
 
+import java.time.LocalDate;
+
 public class PostFactory {
 
     public static ProductDto createProductDto(Integer id) {
@@ -22,6 +24,13 @@ public class PostFactory {
                 .idUser(userId)
                 .product(createProductDto(productId))
                 .discount(1.0)
+                .build();
+    }
+
+    public static PostDto createPostIdDateDto(Integer userId, LocalDate date) {
+        return PostDto.builder()
+                .userId(userId)
+                .date(date)
                 .build();
     }
 }
