@@ -44,11 +44,115 @@ public class ProductControllerTest {
     @Autowired
     private ObjectMapper objectMapper;
 
+    @ParameterizedTest
+    @ValueSource(strings = {"/products/post", "/products/promo-post"})
+    @DisplayName("#21 savePost - should return 200 OK when product does not exist and user is not seller")
+    @DirtiesContext(methodMode = DirtiesContext.MethodMode.AFTER_METHOD)
+    void savePost_whenProductDoesNotExistAndUserIsNotSeller_thenSavePost(String url) throws Exception {
+        // Arrange
+        Object post;
+
+        if (url.equals("/products/post")) {
+            post = PostFactory.createPostDto(2, 1);
+        } else {
+            post = PostFactory.createPostSaleDto(2, 1);
+        }
+
+        String message = Message.POST_PUBLISHED.getStr();
+
+        // Act & Assert
+        mockMvc.perform(post(url)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(post)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.message").value(message));
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"/products/post", "/products/promo-post"})
+    @DisplayName("#22 savePost - should return 200 when product does not exist and user is seller")
+    @DirtiesContext(methodMode = DirtiesContext.MethodMode.AFTER_METHOD)
+    void savePost_whenProductDoesNotExistAndUserIsSeller_thenSavePost(String url) throws Exception {
+        // Arrange
+        Object post;
+
+        if (url.equals("/products/post")) {
+            post = PostFactory.createPostDto(1, 1);
+        } else {
+            post = PostFactory.createPostSaleDto(1, 1);
+        }
+
+        String message = Message.POST_PUBLISHED.getStr();
+
+        // Act & Assert
+        mockMvc.perform(post(url)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(post)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.message").value(message));
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"/products/post", "/products/promo-post"})
+    @DisplayName("#23 savePost - should return 409 when product already exists")
+    void savePost_whenProductAlreadyExists_thenReturn400(String url) throws Exception {
+        // Arrange
+        Object post;
+
+        if (url.equals("/products/post")) {
+            post = PostFactory.createPostDto(1, 201);
+        } else {
+            post = PostFactory.createPostSaleDto(1, 201);
+        }
+
+        String message = Message.PRODUCT_ALREADY_EXISTS.getStr();
+
+        // Act & Assert
+        mockMvc.perform(post(url)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(post)))
+                .andExpect(status().isConflict())
+                .andExpect(jsonPath("$.message").value(message));
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"/products/post", "/products/promo-post"})
+    @DisplayName("#24 savePost - should return 400 when User Id is invalid")
+    @DirtiesContext(methodMode = DirtiesContext.MethodMode.AFTER_METHOD)
+    void savePost_whenUserIdIsInvalid_thenThrow400(String url) throws Exception {
+        // Arrange
+        Object post;
+
+        if (url.equals("/products/post")) {
+            post = PostFactory.createPostDto(-1, 1);
+        } else {
+            post = PostFactory.createPostSaleDto(-1, 1);
+        }
+
+        String message = Message.POST_PUBLISHED.getStr();
+
+        // Act & Assert
+        mockMvc.perform(post(url)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(post)))
+                .andExpect(status().isBadRequest());
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"/products/post", "/products/promo-post"})
+    @DisplayName("#25 savePost - should return 400 when no body is received")
+    void savePost_whenNoBodyReceived_thenReturn400(String url) throws Exception {
+        // Act & Assert
+        mockMvc.perform(post(url)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
+    }
+
     // US-0006: Obtener un listado de las publicaciones realizadas por los vendedores
     // que un usuario sigue en las últimas dos semanas.
     @ParameterizedTest
     @CsvSource({"date_asc", "date_desc", "DEFAULT"})
-    @DisplayName("T-0005: getPostsOfFollowedSellers by date asc")
+    @DisplayName("#26 getPostsOfFollowedSellers by date")
     public void getPostsOfFollowedSellersTest_whenOrderByDateAscOrDesc_thenReturnAList(String order) throws Exception {
         // Arrange
         User user = UserFactory.createBuyer(2);
@@ -83,10 +187,20 @@ public class ProductControllerTest {
         }
     }
 
-    // US-0006: Obtener un listado de las publicaciones realizadas por los vendedores
-    // que un usuario sigue en las últimas dos semanas.
     @Test
-    @DisplayName("T-0005: getPostsOfFollowedSellers - should return 400 when order does not match")
+    @DisplayName("#27 getPostsOfFollowedSellers - should return 404 when userid is not a number")
+    public void getPostsOfFollowedSellersTest_whenUserIdIsNotANumber_thenThrow404() throws Exception {
+        // Arrange
+        String order = "date_asc";
+        String userId = "numero";
+        // Act & Assert
+        mockMvc.perform(get("/products/followed/{userId}/list", userId)
+                        .param("order", order))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @DisplayName("#28 getPostsOfFollowedSellers - should return 400 when order does not match")
     public void getPostsOfFollowedSellersTest_whenOrderDoesntMatch_thenThrow400() throws Exception {
         // Arrange
         String order = "word";
@@ -98,10 +212,8 @@ public class ProductControllerTest {
                 .andExpect(status().isBadRequest());
     }
 
-    // US-0006: Obtener un listado de las publicaciones realizadas por los vendedores
-    // que un usuario sigue en las últimas dos semanas.
     @Test
-    @DisplayName("T-0005: getPostsOfFollowedSellers - should return 400 when user id is negative")
+    @DisplayName("#29 getPostsOfFollowedSellers - should return 400 when user id is negative")
     public void getPostsOfFollowedSellersTest_whenUserIdIsInvalid_thenThrow400() throws Exception {
         // Arrange
         String order = "date_asc";
@@ -113,10 +225,8 @@ public class ProductControllerTest {
                 .andExpect(status().isBadRequest());
     }
 
-    // US-0006: Obtener un listado de las publicaciones realizadas por los vendedores
-    // que un usuario sigue en las últimas dos semanas.
     @Test
-    @DisplayName("T-0005: getPostsOfFollowedSellers - should return 404 when user is not found")
+    @DisplayName("#30 getPostsOfFollowedSellers - should return 404 when user is not found")
     public void getPostsOfFollowedSellersTest_whenUserIsNotFound_thenThrow404() throws Exception {
         // Arrange
         String order = "date_asc";
@@ -131,126 +241,9 @@ public class ProductControllerTest {
                 .andExpect(jsonPath("$.message").value(message));
     }
 
-    // US-0006: Obtener un listado de las publicaciones realizadas por los vendedores
-    // que un usuario sigue en las últimas dos semanas.
+    // US 0011 - Obtener la cantidad de productos en promoción de un determinado vendedor.
     @Test
-    @DisplayName("T-0005: getPostsOfFollowedSellers - should return 404 when userid is not a number")
-    public void getPostsOfFollowedSellersTest_whenUserIdIsNotANumber_thenThrow404() throws Exception {
-        // Arrange
-        String order = "date_asc";
-        String userId = "numero";
-        // Act & Assert
-        mockMvc.perform(get("/products/followed/{userId}/list", userId)
-                        .param("order", order))
-                .andExpect(status().isBadRequest());
-    }
-
-    @ParameterizedTest
-    @ValueSource(strings = {"/products/post", "/products/promo-post"})
-    @DisplayName("savePost - should return 200 OK when product does not exist and user is not seller")
-    @DirtiesContext(methodMode = DirtiesContext.MethodMode.AFTER_METHOD)
-    void savePost_whenProductDoesNotExistAndUserIsNotSeller_thenSavePost(String url) throws Exception {
-        // Arrange
-        Object post;
-
-        if (url.equals("/products/post")) {
-            post = PostFactory.createPostDto(2, 1);
-        } else {
-            post = PostFactory.createPostSaleDto(2, 1);
-        }
-
-        String message = Message.POST_PUBLISHED.getStr();
-
-        // Act & Assert
-        mockMvc.perform(post(url)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(post)))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.message").value(message));
-    }
-
-    @ParameterizedTest
-    @ValueSource(strings = {"/products/post", "/products/promo-post"})
-    @DisplayName("savePost - should return 200 when product does not exist and user is seller")
-    @DirtiesContext(methodMode = DirtiesContext.MethodMode.AFTER_METHOD)
-    void savePost_whenProductDoesNotExistAndUserIsSeller_thenSavePost(String url) throws Exception {
-        // Arrange
-        Object post;
-
-        if (url.equals("/products/post")) {
-            post = PostFactory.createPostDto(1, 1);
-        } else {
-            post = PostFactory.createPostSaleDto(1, 1);
-        }
-
-        String message = Message.POST_PUBLISHED.getStr();
-
-        // Act & Assert
-        mockMvc.perform(post(url)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(post)))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.message").value(message));
-    }
-
-    @ParameterizedTest
-    @ValueSource(strings = {"/products/post", "/products/promo-post"})
-    @DisplayName("savePost - should return 409 when product already exists")
-    void savePost_whenProductAlreadyExists_thenReturn400(String url) throws Exception {
-        // Arrange
-        Object post;
-
-        if (url.equals("/products/post")) {
-            post = PostFactory.createPostDto(1, 201);
-        } else {
-            post = PostFactory.createPostSaleDto(1, 201);
-        }
-
-        String message = Message.PRODUCT_ALREADY_EXISTS.getStr();
-
-        // Act & Assert
-        mockMvc.perform(post(url)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(post)))
-                .andExpect(status().isConflict())
-                .andExpect(jsonPath("$.message").value(message));
-    }
-
-    @ParameterizedTest
-    @ValueSource(strings = {"/products/post", "/products/promo-post"})
-    @DisplayName("savePost - should return 400 when no body is received")
-    void savePost_whenNoBodyReceived_thenReturn400(String url) throws Exception {
-        // Act & Assert
-        mockMvc.perform(post(url)
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isBadRequest());
-    }
-
-    @ParameterizedTest
-    @ValueSource(strings = {"/products/post", "/products/promo-post"})
-    @DisplayName("savePost - should return 400 when User Id is invalid")
-    @DirtiesContext(methodMode = DirtiesContext.MethodMode.AFTER_METHOD)
-    void savePost_whenUserIdIsInvalid_thenThrow400(String url) throws Exception {
-        // Arrange
-        Object post;
-
-        if (url.equals("/products/post")) {
-            post = PostFactory.createPostDto(-1, 1);
-        } else {
-            post = PostFactory.createPostSaleDto(-1, 1);
-        }
-
-        String message = Message.POST_PUBLISHED.getStr();
-
-        // Act & Assert
-        mockMvc.perform(post(url)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(post)))
-                .andExpect(status().isBadRequest());
-    }
-
-    @Test
-    @DisplayName("US-0011 - Get the number of promotional products for a specific seller")
+    @DisplayName("#38 Get the number of promotional products for a specific seller")
     void getPromoPostCountTest() throws Exception {
 
         mockMvc.perform(get("/products/promo-post/count")
@@ -261,7 +254,7 @@ public class ProductControllerTest {
     }
 
     @Test
-    @DisplayName("US-0011 - NotFoundException")
+    @DisplayName("#39 NotFoundException")
     void getPromoPostCountTest_whenUserNotFound_thenThrow404() throws Exception {
 
         mockMvc.perform(get("/products/promo-post/count")
@@ -270,15 +263,7 @@ public class ProductControllerTest {
     }
 
     @Test
-    @DisplayName("US-0011 - Invalid param")
-    void getPromoPostCountTest_when() throws Exception {
-
-        mockMvc.perform(get("/products/promo-post/count")
-                        .param("user_id", "-5"))
-                .andExpect(status().isBadRequest());
-    }
-    @Test
-    @DisplayName("US-0011 - UserIsNotSeller")
+    @DisplayName("#40 UserIsNotSeller")
     void getPromoPostCountTest_whenUserIsNotSeller_thenThrow() throws Exception {
 
         mockMvc.perform(get("/products/promo-post/count")
@@ -287,7 +272,16 @@ public class ProductControllerTest {
     }
 
     @Test
-    @DisplayName("US-0011 - Empty List")
+    @DisplayName("#41 Invalid user id")
+    void getPromoPostCountTest_when() throws Exception {
+
+        mockMvc.perform(get("/products/promo-post/count")
+                        .param("user_id", "-5"))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @DisplayName("#42 Empty List")
     void getPromoPostCountTest_whenListIsEmpty_thenThrow() throws Exception {
 
         mockMvc.perform(get("/products/promo-post/count")
