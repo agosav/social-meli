@@ -140,6 +140,7 @@ public class UserServiceTest {
         assertThrows(AlreadyExistsException.class, () -> userService.follow(user1.getId(), user2.getId()));
     }
 
+    // US-0007: Poder realizar la acción de “Unfollow” (dejar de seguir) a un determinado vendedor.
     @Test
     @DisplayName("unfollow - user followed not found")
     void unfollowTest_whenUserFollowedDoesntExist_thenThrowNotFoundException() {
