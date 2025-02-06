@@ -212,6 +212,7 @@ public class UserControllerTest {
                 .andExpect(jsonPath("$.message").value(expectedMessage));
     }
 
+    @Test
     @DisplayName("countFollowersForSeller - user not found")
     public void getCountFollowerForSellerTest_wheUserDoesntExists_thenReturn404() throws Exception {
         //Arrange
