@@ -238,6 +238,17 @@ public class UserControllerTest {
                 .andExpect(jsonPath("$.message").value(message));
     }
 
+    @Test
+    @DisplayName("countFollowersForSeller - INVALID ID")
+    public void getCountFollowerForSellerTest_whenInvalidId_thenReturn400() throws Exception {
+        //Arrange
+        Integer userId = -1;
+
+        //Act & Assertions
+        mockMvc.perform(get("/users/{userId}/followers/count", userId))
+                .andExpect(status().isBadRequest());
+    }
+
     // US 0003 - Obtener un listado de todos los usuarios que siguen a un determinado vendedor (¿Quién me sigue?).
     @ParameterizedTest
     @CsvSource({"name_asc", "name_desc", "DEFAULT"})
