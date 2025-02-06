@@ -84,7 +84,7 @@ public class UserServiceTest {
 
     @Test
     @DisplayName("follow - user followed not found")
-    void followTest_whenUserFollowedDoesntExists_thenThrowNotFoundException() {
+    void followTest_whenUserFollowedDoesntExist_thenThrowNotFoundException() {
         // Arrange
         Integer userFollowerId = 1;
         Integer userFollowedId = 2;
@@ -138,6 +138,20 @@ public class UserServiceTest {
 
         // Act & Assert
         assertThrows(AlreadyExistsException.class, () -> userService.follow(user1.getId(), user2.getId()));
+    }
+
+    @Test
+    @DisplayName("unfollow - user followed not found")
+    void unfollowTest_whenUserFollowedDoesntExist_thenThrowNotFoundException() {
+        // Arrange
+        Integer userFollowerId = 1;
+        Integer userFollowedId = 2;
+
+        when(userRepository.findById(userFollowerId)).thenReturn(Optional.of(mock(User.class)));
+        when(userRepository.findById(userFollowedId)).thenReturn(Optional.empty());
+
+        // Act & Assert
+        assertThrows(NotFoundException.class, () -> userService.unfollow(userFollowerId, userFollowedId));
     }
 
     // US 0002 - Obtener el resultado de la cantidad de usuarios que siguen a un determinado vendedor.
