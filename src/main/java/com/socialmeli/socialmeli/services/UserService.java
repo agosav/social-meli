@@ -38,12 +38,12 @@ public class UserService implements IUserService {
         User follower = getUserIfExists(followerId);
         User followed = getUserIfExists(followedId);
 
-        if (!followed.getIsSeller()) {
-            throw new UserNotSellerException(Message.USER_NOT_SELLER.format(followed.getName()));
-        }
-
         if (follower.equals(followed)) {
             throw new IllegalActionException(Message.CANNOT_FOLLOW_SELF.getStr());
+        }
+
+        if (!followed.getIsSeller()) {
+            throw new UserNotSellerException(Message.USER_NOT_SELLER.format(followed.getName()));
         }
 
         Follow follow = new Follow(follower, followed);
