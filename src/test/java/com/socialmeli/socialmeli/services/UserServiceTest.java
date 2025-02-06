@@ -14,7 +14,7 @@ import com.socialmeli.socialmeli.models.User;
 import com.socialmeli.socialmeli.repositories.IFollowRepository;
 import com.socialmeli.socialmeli.repositories.IUserRepository;
 
-import com.socialmeli.socialmeli.utils.UserTestUtils;
+import com.socialmeli.socialmeli.utils.UserFactory;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -45,15 +45,13 @@ public class UserServiceTest {
     @InjectMocks
     private UserService userService;
 
-    private final UserTestUtils userTestUtils = new UserTestUtils();
-
     // US 0001 - Poder realizar la acción de “Follow” (seguir) a un determinado vendedor.
     @Test
     @DisplayName("follow - successful")
     void followTest_whenSuccessful_thenReturnMessageDto() {
         // Arrange
-        User user1 = userTestUtils.createBuyer();
-        User user2 = userTestUtils.createSeller();
+        User user1 = UserFactory.createBuyer(1);
+        User user2 = UserFactory.createSeller(2);
 
         Follow follow = new Follow(user1, user2);
         Message expected = Message.USER_FOLLOWED;
@@ -102,8 +100,8 @@ public class UserServiceTest {
     @DisplayName("follow - user followed not seller")
     void followTest_whenUserFollowedIsNotSeller_thenThrowNotFoundException() {
         // Arrange
-        User user1 = userTestUtils.createBuyer();
-        User user2 = userTestUtils.createBuyer();
+        User user1 = UserFactory.createBuyer(1);
+        User user2 = UserFactory.createBuyer(2);
 
         when(userRepository.findById(user1.getId())).thenReturn(Optional.of(user1));
         when(userRepository.findById(user2.getId())).thenReturn(Optional.of(user2));
@@ -116,7 +114,7 @@ public class UserServiceTest {
     @DisplayName("follow - user followed is the same as follower")
     void followTest_whenUserFollowedIsTheSameAsFollower_thenThrowIllegalActionException() {
         // Arrange
-        User user1 = userTestUtils.createSeller();
+        User user1 = UserFactory.createSeller(1);
 
         when(userRepository.findById(user1.getId())).thenReturn(Optional.of(user1));
 
@@ -128,8 +126,8 @@ public class UserServiceTest {
     @DisplayName("follow - user already followed")
     void followTest_whenUserAlreadyFollowed_thenThrowAlreadyExistsException() {
         // Arrange
-        User user1 = userTestUtils.createBuyer();
-        User user2 = userTestUtils.createSeller();
+        User user1 = UserFactory.createBuyer(1);
+        User user2 = UserFactory.createSeller(2);
 
         Follow follow = new Follow(user1, user2);
 
@@ -147,10 +145,10 @@ public class UserServiceTest {
     @DisplayName("countFollowersForSeller")
     void countFollowersForSaller_whenUserExists_thenReturnCountFollowersForSeller() {
         // Arrange
-        User user1 = userTestUtils.createSeller(1, "Agostina Avalle");
-        User user2 = userTestUtils.createBuyer(2, "Carolina Comba");
-        User user4 = userTestUtils.createBuyer(4, "Eliana Navarro");
-        User user6 = userTestUtils.createBuyer(6, "Katerinne Peralta");
+        User user1 = UserFactory.createSeller(1, "Agostina Avalle");
+        User user2 = UserFactory.createBuyer(2, "Carolina Comba");
+        User user4 = UserFactory.createBuyer(4, "Eliana Navarro");
+        User user6 = UserFactory.createBuyer(6, "Katerinne Peralta");
 
         UserFollowerCountDto expected = new UserFollowerCountDto(user1.getId(), user1.getName(), 3);
         List<Follow> followers = List.of(
@@ -175,9 +173,9 @@ public class UserServiceTest {
     @CsvSource({"name_asc", "name_desc"})
     void getFollowedListTest_whenUserExists_thenReturnFollowedList(String order) {
         // Arrange
-        User user1 = userTestUtils.createSeller("Emilia Mernes");
-        User user2 = userTestUtils.createSeller("Taylor Swift");
-        User user3 = userTestUtils.createBuyer("Tini Stoessel");
+        User user1 = UserFactory.createSeller(1, "Emilia Mernes");
+        User user2 = UserFactory.createSeller(2, "Taylor Swift");
+        User user3 = UserFactory.createBuyer(3, "Tini Stoessel");
 
         List<UserDto> expectedList = (order.equals("name_asc"))
                 ? List.of(new UserDto(user2.getId(), user2.getName()), new UserDto(user3.getId(), user3.getName()))
