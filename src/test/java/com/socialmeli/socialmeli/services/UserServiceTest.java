@@ -143,7 +143,7 @@ public class UserServiceTest {
     // US 0002 - Obtener el resultado de la cantidad de usuarios que siguen a un determinado vendedor.
     @Test
     @DisplayName("countFollowersForSeller")
-    void countFollowersForSaller_whenUserExists_thenReturnCountFollowersForSeller() {
+    void countFollowersForSeller_whenUserExists_thenReturnCountFollowersForSeller() {
         // Arrange
         User user1 = UserFactory.createSeller(1, "Agostina Avalle");
         User user2 = UserFactory.createBuyer(2, "Carolina Comba");
@@ -166,6 +166,32 @@ public class UserServiceTest {
         // Assert
         assertEquals(expected, result);
     }
+
+    @Test
+    @DisplayName("countFollowersForSeller - user not found")
+    void countFollowersForSeller_whenUserDoesntExists_thenReturnThrowNotFoundException() {
+        // Arrange
+        Integer userId =7;
+
+        when(userRepository.findById(userId)).thenReturn(Optional.empty());
+
+        // Act & Assert
+        assertThrows(NotFoundException.class, () -> userService.countFollowers(userId));
+    }
+
+    @Test
+    @DisplayName("countFollowersForSeller - user not seller")
+    void countFollowersForSeller_whenUserDoesntSeller_thenReturnThrowNotSellerException() {
+        // Arrange
+        User user2 = UserFactory.createBuyer(2, "Carolina Comba");
+        List<Follow> followers = List.of();
+
+        when(userRepository.findById(user2.getId())).thenReturn(Optional.of(user2));
+
+        // Act & Assert
+        assertThrows(UserNotSellerException.class, () -> userService.countFollowers(user2.getId()));
+    }
+
 
     // US 0004 - Obtener un listado de todos los vendedores a los cuales sigue un determinado usuario (¿A quién sigo?).
     @ParameterizedTest
