@@ -26,7 +26,6 @@ import com.socialmeli.socialmeli.repositories.IPostRepository;
 import com.socialmeli.socialmeli.repositories.IUserRepository;
 import com.socialmeli.socialmeli.services.PostService;
 import com.socialmeli.socialmeli.utils.PostFactory;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.test.annotation.DirtiesContext;
@@ -40,15 +39,6 @@ public class ProductControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
-
-    @Autowired
-    private PostService service;
-
-    @Autowired
-    private IUserRepository userRepository;
-
-    @Autowired
-    private IPostRepository postRepository;
 
     @Autowired
     private ObjectMapper objectMapper;
@@ -237,5 +227,5 @@ public class ProductControllerTest {
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
     }
-    
+
 }
