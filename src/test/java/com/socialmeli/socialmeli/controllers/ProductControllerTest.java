@@ -1,7 +1,11 @@
 package com.socialmeli.socialmeli.controllers;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.socialmeli.socialmeli.dto.PostDto;
+import com.socialmeli.socialmeli.enums.Message;
 import com.socialmeli.socialmeli.models.User;
+import com.socialmeli.socialmeli.utils.PostFactory;
+import org.junit.jupiter.api.Disabled;
 import com.socialmeli.socialmeli.repositories.IPostRepository;
 import com.socialmeli.socialmeli.repositories.IUserRepository;
 import com.socialmeli.socialmeli.services.PostService;
@@ -19,14 +23,17 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 
 import org.springframework.test.annotation.DirtiesContext;
 
 import java.time.LocalDate;
 import java.util.List;
+
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 
 @SpringBootTest
 
@@ -240,6 +247,7 @@ public class ProductControllerTest {
     void savePost_whenBodyIsInvalid_thenReturn400(String url) {
         // TODO: Implementar este test cuando estén hechas las validaciones
     }
+
 
     @Test
     @DisplayName("US-0011 - Get the number of promotional products for a specific seller")
