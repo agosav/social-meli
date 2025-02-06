@@ -214,7 +214,7 @@ public class UserControllerTest {
 
     @Test
     @DisplayName("countFollowersForSeller - user not found")
-    public void getCountFollowerForSellerTest_wheUserDoesntExists_thenReturn404() throws Exception {
+    public void getCountFollowerForSellerTest_whenUserNotfound_thenReturn404() throws Exception {
         //Arrange
         Integer userId = 999;
         String message = Message.USER_NOT_FOUND.format(userId);
@@ -227,7 +227,7 @@ public class UserControllerTest {
 
     @Test
     @DisplayName("countFollowersForSeller - user not seller")
-    public void getCountFollowerForSellerTest_wheUserNotSeller_thenReturn400() throws Exception {
+    public void getCountFollowerForSellerTest_whenUserNotSeller_thenReturn400() throws Exception {
         //Arrange
         User userNotSeller = new User(2, "Carolina Comba", false);
         String message = Message.USER_NOT_SELLER.format(userNotSeller.getName());
@@ -236,6 +236,17 @@ public class UserControllerTest {
                 .andExpect(status().isBadRequest())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.message").value(message));
+    }
+
+    @Test
+    @DisplayName("countFollowersForSeller - INVALID ID")
+    public void getCountFollowerForSellerTest_whenInvalidId_thenReturn400() throws Exception {
+        //Arrange
+        Integer userId = -1;
+
+        //Act & Assertions
+        mockMvc.perform(get("/users/{userId}/followers/count", userId))
+                .andExpect(status().isBadRequest());
     }
 
     // US 0003 - Obtener un listado de todos los usuarios que siguen a un determinado vendedor (¿Quién me sigue?).
