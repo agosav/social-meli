@@ -170,7 +170,7 @@ public class UserServiceTest {
 
     @Test
     @DisplayName("countFollowersForSeller - user not found")
-    void countFollowersForSeller_whenUserDoesntExists_thenReturnThrowNotFoundException() {
+    void countFollowersForSeller_whenUserNotFound_thenReturnThrowNotFoundException() {
         // Arrange
         Integer userId = 7;
 
@@ -182,7 +182,7 @@ public class UserServiceTest {
 
     @Test
     @DisplayName("countFollowersForSeller - user not seller")
-    void countFollowersForSeller_whenUserDoesntSeller_thenReturnThrowNotSellerException() {
+    void countFollowersForSeller_whenUserNotSeller_thenReturnThrowNotSellerException() {
         // Arrange
         User user2 = UserFactory.createBuyer(2, "Carolina Comba");
         List<Follow> followers = List.of();
@@ -370,6 +370,31 @@ public class UserServiceTest {
 
         assertThat(exception.getMessage()).isEqualTo(Message.USER_NOT_FOLLOWED.format(user2.getName(), user1.getName()));
     }
+
+    @Test
+    @DisplayName("Test for 'Cannot unfollow yourself' exception")
+    public void unfollowTest_whenFollowerAndFollowedAreSame_thenThrowIllegalActionException() {
+        // Arrange
+        Integer userId = 1;
+        User follower = new User();
+        follower.setId(userId);
+
+        User followed = new User();
+        followed.setId(userId);
+
+        when(userRepository.findById(userId)).thenReturn(Optional.of(follower));
+
+        // Act
+        IllegalActionException exception = assertThrows(IllegalActionException.class, () -> {
+            userService.unfollow(follower.getId(), followed.getId());
+        });
+
+        // Assert
+        assertEquals(Message.CANNOT_UNFOLLOW_SELF.getStr(), exception.getMessage());
+    }
 }
+
+
+
 
 

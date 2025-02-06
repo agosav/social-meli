@@ -150,7 +150,7 @@ public class UserControllerTest {
 
     @Test
     @DisplayName("countFollowersForSeller - user not found")
-    public void getCountFollowerForSellerTest_wheUserDoesntExists_thenReturn404() throws Exception {
+    public void getCountFollowerForSellerTest_whenUserNotfound_thenReturn404() throws Exception {
         //Arrange
         Integer userId = 999;
         String message = Message.USER_NOT_FOUND.format(userId);
@@ -163,7 +163,7 @@ public class UserControllerTest {
 
     @Test
     @DisplayName("countFollowersForSeller - user not seller")
-    public void getCountFollowerForSellerTest_wheUserNotSeller_thenReturn400() throws Exception {
+    public void getCountFollowerForSellerTest_whenUserNotSeller_thenReturn400() throws Exception {
         //Arrange
         User userNotSeller = new User(2, "Carolina Comba", false);
         String message = Message.USER_NOT_SELLER.format(userNotSeller.getName());
@@ -172,6 +172,17 @@ public class UserControllerTest {
                 .andExpect(status().isBadRequest())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.message").value(message));
+    }
+
+    @Test
+    @DisplayName("countFollowersForSeller - INVALID ID")
+    public void getCountFollowerForSellerTest_whenInvalidId_thenReturn400() throws Exception {
+        //Arrange
+        Integer userId = -1;
+
+        //Act & Assertions
+        mockMvc.perform(get("/users/{userId}/followers/count", userId))
+                .andExpect(status().isBadRequest());
     }
 
     // US 0003 - Obtener un listado de todos los usuarios que siguen a un determinado vendedor (¿Quién me sigue?).
@@ -210,6 +221,57 @@ public class UserControllerTest {
             result.andExpect(jsonPath("$.followers[" + i + "].user_id").value(expectedId))
                     .andExpect(jsonPath("$.followers[" + i + "].user_name").value(expectedName));
         }
+    }
+
+    @Test
+    @DisplayName("getFollowerUsers - order invalid")
+    public void getFollowerUsersTest_whenOrderInvalid_thenReturn400() throws Exception {
+        // Arrange
+        String order = "asdasf";
+
+        // Act & Assert:
+        mockMvc.perform(get("/users/{userId}/followers/list", 1)
+                        .param("order", order))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @DisplayName("getFollowerUsers - user id invalid")
+    public void getFollowerUsersTest_whenUserIdInvalid_thenReturn400() throws Exception {
+        // Arrange
+        Integer userId = -1;
+
+        // Act & Assert:
+        mockMvc.perform(get("/users/{userId}/followers/list", userId))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @DisplayName("getFollowerUsers - user not found")
+    public void getFollowerUsersTest_whenUserDoesntExists_thenReturn404() throws Exception {
+        // Arrange
+        Integer userId = 999;
+        String message = Message.USER_NOT_FOUND.format(userId);
+
+        // Act & Assert
+        mockMvc.perform(get("/users/{userId}/followers/list", userId))
+                .andExpect(status().isNotFound())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.message").value(message));
+    }
+
+    @Test
+    @DisplayName("getFollowerUsers - user not seller")
+    public void getFollowerUsersTest_whenUserDoesntExists_thenReturn400() throws Exception {
+        // Arrange
+        User user = UserFactory.createBuyer(2, "Carolina Comba");
+        String message = Message.USER_NOT_SELLER.format(user.getName());
+
+        // Act & Assert
+        mockMvc.perform(get("/users/{userId}/followers/list", user.getId()))
+                .andExpect(status().isBadRequest())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.message").value(message));
     }
 
     // US 0004 - Obtener un listado de todos los vendedores a los cuales sigue un determinado usuario (¿A quién sigo?).
@@ -261,7 +323,6 @@ public class UserControllerTest {
                         .param("order", order))
                 .andExpect(status().isBadRequest());
     }
-
 
     // US 0007 - Poder realizar la acción de “Unfollow” (dejar de seguir) a un determinado vendedor.
     @Test
@@ -366,6 +427,17 @@ public class UserControllerTest {
                 .andExpect(status().isBadRequest())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.message").value(expectedMessage));
+    }
+
+    @Test
+    @DisplayName("getFollowedUsers - invalid user id")
+    public void getFollowedUsersTest_whenUserIdInvalid_thenReturn400() throws Exception {
+        // Arrange
+        Integer userId = -1;
+
+        // Act & Assert:
+        mockMvc.perform(get("/users/{userId}/followed/list", userId))
+                .andExpect(status().isBadRequest());
     }
 
     // Métodos privados
