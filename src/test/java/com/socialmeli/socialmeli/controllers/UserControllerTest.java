@@ -131,7 +131,8 @@ public class UserControllerTest {
     @ParameterizedTest
     @CsvSource({"name_asc", "name_desc", "DEFAULT"})
     @DisplayName("getFollowedUsers - successful with different order or default")
-    public void getFollowedUsersTest_whenOrderIsParametrizedOrNotProvided_thenReturnOrderedList(String order) throws Exception {
+    public void getFollowedUsersTest_whenOrderIsParametrizedOrNotProvided_thenReturnOrderedList(String order)
+            throws Exception {
         // Arrange
         User user1 = userTestUtils.createSeller(1, "Agostina Avalle");
         User user2 = userTestUtils.createBuyer(2, "Carolina Comba");
