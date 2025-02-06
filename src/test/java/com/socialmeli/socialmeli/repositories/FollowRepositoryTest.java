@@ -40,6 +40,23 @@ class FollowRepositoryTest {
         // Assert
         assertEquals(expected, result);
     }
+
+    @Test
+    @DisplayName("deleteTest - should remove the follow relationship from the repository")
+    void deleteTest() {
+        // Arrange
+        User user1 = new User(1, "Emilia Mernes", false);
+        User user2 = new User(2, "Taylor Swift", true);
+        Follow follow = new Follow(user1, user2);
+        followRepository.add(follow);
+
+        // Act
+        followRepository.delete(follow);
+
+        // Assert
+        assertFalse(followRepository.exists(follow));
+    }
+
     @Test
     @DisplayName("findFollowedUsersTest - should return a list of user that one user follows")
     void  findFollowedUsersTest_whenUserFollowsSellers_thenReturnListOfFollowedUsers() {
