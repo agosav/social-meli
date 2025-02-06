@@ -6,7 +6,6 @@ import com.socialmeli.socialmeli.repositories.IPostRepository;
 import com.socialmeli.socialmeli.repositories.IUserRepository;
 import com.socialmeli.socialmeli.services.PostService;
 import com.socialmeli.socialmeli.utils.PostFactory;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
@@ -119,13 +118,5 @@ public class ProductControllerTest {
         mockMvc.perform(post(url)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
-    }
-
-    @ParameterizedTest
-    @ValueSource(strings = {"/products/post", "/products/promo-post"})
-    @DisplayName("savePost - when body is invalid should return 400")
-    @Disabled
-    void savePost_whenBodyIsInvalid_thenReturn400(String url) {
-        // TODO: Implementar este test cuando estén hechas las validaciones
     }
 }
