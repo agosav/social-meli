@@ -149,110 +149,6 @@ public class UserControllerTest {
     }
 
     @Test
-    @DisplayName("unfollowToUserTest - successful")
-    @DirtiesContext(methodMode = DirtiesContext.MethodMode.AFTER_METHOD)
-    public void unfollowUserTest_whenSuccessfull_thenReturn200() throws Exception {
-        // Arrange
-        User follower = UserFactory.createBuyer(2, "Carolina Comba");
-        User followed = UserFactory.createSeller(1, "Agostina Avalle");
-
-        String expectedMessage = Message.USER_UNFOLLOWED.format(followed.getName());
-
-        // Act & Assert
-        mockMvc.perform(post("/users/{userId}/unfollow/{userIdToFollow}", follower.getId(), followed.getId()))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.message").value(expectedMessage));
-    }
-
-    @Test
-    @DisplayName("unfollowToUserTest - user followed not found")
-    public void unfollowUserTest_whenUserFollowedDoesntExists_thenReturn404() throws Exception {
-        // Arrange
-        User follower = UserFactory.createBuyer(2, "Carolina Comba");
-        User followed = UserFactory.createSeller(999, "Agostina Avalle");
-
-        String expectedMessage = Message.USER_NOT_FOUND.format(followed.getId());
-
-        // Act & Assert
-        mockMvc.perform(post("/users/{userId}/unfollow/{userIdToFollow}", follower.getId(), followed.getId()))
-                .andExpect(status().isNotFound())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.message").value(expectedMessage));
-    }
-
-    @Test
-    @DisplayName("unfollowToUserTest - user follower not found")
-    public void unfollowUserTest_whenUserFollowerDoesntExists_thenReturn404() throws Exception {
-        // Arrange
-        User follower = UserFactory.createBuyer(999, "Carolina Comba");
-        User followed = UserFactory.createSeller(1, "Agostina Avalle");
-
-        String expectedMessage = Message.USER_NOT_FOUND.format(follower.getId());
-
-        // Act & Assert
-        mockMvc.perform(post("/users/{userId}/unfollow/{userIdToFollow}", follower.getId(), followed.getId()))
-                .andExpect(status().isNotFound())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.message").value(expectedMessage));
-    }
-
-    @Test
-    @DisplayName("unfollow - invalid user follower id")
-    void unfollowTest_whenUserFollowerIdInvalid_thenReturn400() throws Exception {
-        // Arrange
-        Integer userFollowerId = -1;
-        Integer userFollowedId = 1;
-
-        // Act & Assert
-        mockMvc.perform(post("/users/{userId}/unfollow/{userIdToFollow}", userFollowerId, userFollowedId))
-                .andExpect(status().isBadRequest());
-    }
-
-    @Test
-    @DisplayName("unfollow - invalid user followed id")
-    void unfollowTest_whenUserFollowedIdInvalid_thenReturn400() throws Exception {
-        // Arrange
-        Integer userFollowerId = 1;
-        Integer userFollowedId = -1;
-
-        // Act & Assert
-        mockMvc.perform(post("/users/{userId}/unfollow/{userIdToFollow}", userFollowerId, userFollowedId))
-                .andExpect(status().isBadRequest());
-    }
-
-    @Test
-    @DisplayName("unfollowToUserTest - follower try to unfollow to user that is not following")
-    public void unfollowUserTest_whenFollowDoesntExists_thenReturn404() throws Exception {
-        // Arrange
-        User follower = UserFactory.createBuyer(2, "Carolina Comba");
-        User followed = UserFactory.createSeller(6, "Katerinne Peralta");
-
-        String expectedMessage = Message.USER_NOT_FOLLOWED.format(followed.getName(), follower.getName());
-
-        // Act & Assert
-        mockMvc.perform(post("/users/{userId}/unfollow/{userIdToFollow}", follower.getId(), followed.getId()))
-                .andExpect(status().isConflict())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.message").value(expectedMessage));
-    }
-
-    @Test
-    @DisplayName("unfollowToUserTest - follower try to unfollow yourself")
-    public void unfollowUserTest_whenFollowerTryToUnfollowYourself_thenReturn400() throws Exception {
-        // Arrange
-        User follower = UserFactory.createBuyer(2, "Carolina Comba");
-
-        String expectedMessage = Message.CANNOT_UNFOLLOW_SELF.getStr();
-
-        // Act & Assert
-        mockMvc.perform(post("/users/{userId}/unfollow/{userIdToFollow}", follower.getId(), follower.getId()))
-                .andExpect(status().isBadRequest())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.message").value(expectedMessage));
-    }
-
-    @Test
     @DisplayName("countFollowersForSeller - user not found")
     public void getCountFollowerForSellerTest_wheUserDoesntExists_thenReturn404() throws Exception {
         //Arrange
@@ -364,6 +260,112 @@ public class UserControllerTest {
         mockMvc.perform(get("/users/{userId}/followed/list", 1)
                         .param("order", order))
                 .andExpect(status().isBadRequest());
+    }
+
+
+    // US 0007 - Poder realizar la acción de “Unfollow” (dejar de seguir) a un determinado vendedor.
+    @Test
+    @DisplayName("unfollowToUserTest - successful")
+    @DirtiesContext(methodMode = DirtiesContext.MethodMode.AFTER_METHOD)
+    public void unfollowUserTest_whenSuccessfull_thenReturn200() throws Exception {
+        // Arrange
+        User follower = UserFactory.createBuyer(2, "Carolina Comba");
+        User followed = UserFactory.createSeller(1, "Agostina Avalle");
+
+        String expectedMessage = Message.USER_UNFOLLOWED.format(followed.getName());
+
+        // Act & Assert
+        mockMvc.perform(post("/users/{userId}/unfollow/{userIdToFollow}", follower.getId(), followed.getId()))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.message").value(expectedMessage));
+    }
+
+    @Test
+    @DisplayName("unfollowToUserTest - user followed not found")
+    public void unfollowUserTest_whenUserFollowedDoesntExists_thenReturn404() throws Exception {
+        // Arrange
+        User follower = UserFactory.createBuyer(2, "Carolina Comba");
+        User followed = UserFactory.createSeller(999, "Agostina Avalle");
+
+        String expectedMessage = Message.USER_NOT_FOUND.format(followed.getId());
+
+        // Act & Assert
+        mockMvc.perform(post("/users/{userId}/unfollow/{userIdToFollow}", follower.getId(), followed.getId()))
+                .andExpect(status().isNotFound())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.message").value(expectedMessage));
+    }
+
+    @Test
+    @DisplayName("unfollowToUserTest - user follower not found")
+    public void unfollowUserTest_whenUserFollowerDoesntExists_thenReturn404() throws Exception {
+        // Arrange
+        User follower = UserFactory.createBuyer(999, "Carolina Comba");
+        User followed = UserFactory.createSeller(1, "Agostina Avalle");
+
+        String expectedMessage = Message.USER_NOT_FOUND.format(follower.getId());
+
+        // Act & Assert
+        mockMvc.perform(post("/users/{userId}/unfollow/{userIdToFollow}", follower.getId(), followed.getId()))
+                .andExpect(status().isNotFound())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.message").value(expectedMessage));
+    }
+
+    @Test
+    @DisplayName("unfollow - invalid user follower id")
+    void unfollowTest_whenUserFollowerIdInvalid_thenReturn400() throws Exception {
+        // Arrange
+        Integer userFollowerId = -1;
+        Integer userFollowedId = 1;
+
+        // Act & Assert
+        mockMvc.perform(post("/users/{userId}/unfollow/{userIdToFollow}", userFollowerId, userFollowedId))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @DisplayName("unfollow - invalid user followed id")
+    void unfollowTest_whenUserFollowedIdInvalid_thenReturn400() throws Exception {
+        // Arrange
+        Integer userFollowerId = 1;
+        Integer userFollowedId = -1;
+
+        // Act & Assert
+        mockMvc.perform(post("/users/{userId}/unfollow/{userIdToFollow}", userFollowerId, userFollowedId))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @DisplayName("unfollowToUserTest - follower try to unfollow to user that is not following")
+    public void unfollowUserTest_whenFollowDoesntExists_thenReturn404() throws Exception {
+        // Arrange
+        User follower = UserFactory.createBuyer(2, "Carolina Comba");
+        User followed = UserFactory.createSeller(6, "Katerinne Peralta");
+
+        String expectedMessage = Message.USER_NOT_FOLLOWED.format(followed.getName(), follower.getName());
+
+        // Act & Assert
+        mockMvc.perform(post("/users/{userId}/unfollow/{userIdToFollow}", follower.getId(), followed.getId()))
+                .andExpect(status().isConflict())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.message").value(expectedMessage));
+    }
+
+    @Test
+    @DisplayName("unfollowToUserTest - follower try to unfollow yourself")
+    public void unfollowUserTest_whenFollowerTryToUnfollowYourself_thenReturn400() throws Exception {
+        // Arrange
+        User follower = UserFactory.createBuyer(2, "Carolina Comba");
+
+        String expectedMessage = Message.CANNOT_UNFOLLOW_SELF.getStr();
+
+        // Act & Assert
+        mockMvc.perform(post("/users/{userId}/unfollow/{userIdToFollow}", follower.getId(), follower.getId()))
+                .andExpect(status().isBadRequest())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.message").value(expectedMessage));
     }
 
     // Métodos privados
