@@ -5,6 +5,7 @@ import com.socialmeli.socialmeli.dto.response.UserFollowerCountDto;
 import com.socialmeli.socialmeli.dto.response.FollowerListDto;
 import com.socialmeli.socialmeli.dto.response.FollowedListDto;
 import com.socialmeli.socialmeli.services.IUserService;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
@@ -19,15 +20,17 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
-@Validated
 @RequestMapping("/users")
+@Validated
 public class UserController {
 
     private final IUserService userService;
 
     // US 0001 - Poder realizar la acción de “Follow” (seguir) a un determinado vendedor.
     @PostMapping("/{userId}/follow/{userIdToFollow}")
-    public ResponseEntity<MessageDto> followToUser(@PathVariable Integer userId, @PathVariable Integer userIdToFollow) {
+    public ResponseEntity<MessageDto> followToUser(
+            @Valid @Positive @PathVariable Integer userId,
+            @Valid @Positive @PathVariable Integer userIdToFollow) {
         return ResponseEntity.ok(userService.follow(userId, userIdToFollow));
     }
 

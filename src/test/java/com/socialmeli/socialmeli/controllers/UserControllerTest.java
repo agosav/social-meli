@@ -112,26 +112,26 @@ public class UserControllerTest {
 
     @Test
     @DisplayName("follow - invalid user follower id")
-    @Disabled
     void followTest_whenUserFollowerIdInvalid_thenReturn400() throws Exception {
         // Arrange
         Integer userFollowerId = -1;
         Integer userFollowedId = 1;
 
         // Act & Assert
-        performFollow(userFollowerId, userFollowedId, null, 400);
+        mockMvc.perform(post("/users/{userId}/follow/{userIdToFollow}", userFollowerId, userFollowedId))
+                .andExpect(status().isBadRequest());
     }
 
     @Test
     @DisplayName("follow - invalid user followed id")
-    @Disabled
     void followTest_whenUserFollowedIdInvalid_thenReturn400() throws Exception {
         // Arrange
         Integer userFollowerId = 1;
-        Integer userFollowedId = 2;
+        Integer userFollowedId = -1;
 
         // Act & Assert
-        performFollow(userFollowerId, userFollowedId, null, 400);
+        mockMvc.perform(post("/users/{userId}/follow/{userIdToFollow}", userFollowerId, userFollowedId))
+                .andExpect(status().isBadRequest());
     }
 
     //US-0002: Obtener el resultado de la cantidad de usuarios que siguen a un determinado vendedor
@@ -293,7 +293,7 @@ public class UserControllerTest {
     @Test
     @DisplayName("getFollowedUsers - invalid user id")
     @Disabled
-    void followTest_whenInvalidUserId_thenReturn400() throws Exception {
+    void getFollowedUsersTest_whenInvalidUserId_thenReturn400() throws Exception {
         // Arrange
         Integer userId = -1;
 
@@ -317,16 +317,6 @@ public class UserControllerTest {
                 .andExpect(status().isNotFound())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.message").value(message));
-    }
-
-    // Métodos privados
-
-    private void performFollow(Integer followerId, Integer followedId, String expectedMessage, int expectedStatus)
-            throws Exception {
-        mockMvc.perform(post("/users/{userId}/follow/{userIdToFollow}", followerId, followedId))
-                .andExpect(status().is(expectedStatus))
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.message").value(expectedMessage));
     }
 
     @Test
@@ -392,4 +382,13 @@ public class UserControllerTest {
                 .andExpect(status().isBadRequest());
     }
 
+    // Métodos privados
+
+    private void performFollow(Integer followerId, Integer followedId, String expectedMessage, int expectedStatus)
+            throws Exception {
+        mockMvc.perform(post("/users/{userId}/follow/{userIdToFollow}", followerId, followedId))
+                .andExpect(status().is(expectedStatus))
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.message").value(expectedMessage));
+    }
 }

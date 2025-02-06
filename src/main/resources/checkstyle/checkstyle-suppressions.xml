@@ -4,6 +4,4 @@
         "https://checkstyle.org/dtds/suppressions_1_2.dtd">
 <suppressions>
     <suppress files=".*Test.java" checks="MethodName"/>
-    <suppress files=".*Test.java" checks="MagicNumber"/>
-    <suppress files=".util/*" checks="MagicNumber"/>
 </suppressions>
