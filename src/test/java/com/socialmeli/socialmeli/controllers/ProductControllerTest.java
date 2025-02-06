@@ -22,9 +22,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.socialmeli.socialmeli.enums.Message;
-import com.socialmeli.socialmeli.repositories.IPostRepository;
-import com.socialmeli.socialmeli.repositories.IUserRepository;
-import com.socialmeli.socialmeli.services.PostService;
 import com.socialmeli.socialmeli.utils.PostFactory;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
