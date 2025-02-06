@@ -147,6 +147,18 @@ public class ProductControllerTest {
                 .andExpect(jsonPath("$.message").value(message));
     }
 
+    @Test
+    @DisplayName("T-0005: getPostsOfFollowedSellers - should return 404 when userid is not a number")
+    public void getPostsOfFollowedSellersUserIdNotANumberExceptionTests() throws Exception {
+        // Arrange
+        String order = "date_asc";
+        String userId = "numero";
+        // Act & Assert
+        mockMvc.perform(get("/products/followed/{userId}/list", userId)
+                        .param("order", order))
+                .andExpect(status().isBadRequest());
+    }
+
     @ParameterizedTest
     @ValueSource(strings = {"/products/post", "/products/promo-post"})
     @DisplayName("savePost - should return 200 OK when product does not exist and user is not seller")
