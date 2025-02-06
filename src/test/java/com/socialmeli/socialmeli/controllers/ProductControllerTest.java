@@ -5,6 +5,7 @@ import com.socialmeli.socialmeli.models.User;
 import com.socialmeli.socialmeli.utils.UserFactory;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -14,6 +15,7 @@ import java.time.LocalDate;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.util.Comparator;
 import java.util.List;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -42,11 +44,11 @@ public class ProductControllerTest {
     @Autowired
     private ObjectMapper objectMapper;
 
-    @Test
+    @ParameterizedTest
+    @CsvSource({"date_asc", "date_desc"})
     @DisplayName("T-0005: getPostsOfFollowedSellers by date asc")
-    public void getPostsOfFollowedSellersOrderByDateAscTest() throws Exception {
+    public void getPostsOfFollowedSellersTest_whenOrderByDateAscOrDesc_thenReturnAList(String order) throws Exception {
         // Arrange
-        String order = "date_asc";
         User user = UserFactory.createBuyer(2);
         List<PostDto> postsExpected = List.of(
                 PostFactory.createPostIdDateDto(4, LocalDate.of(2025, 1, 25)),
@@ -56,41 +58,15 @@ public class ProductControllerTest {
                 PostFactory.createPostIdDateDto(1, LocalDate.of(2025, 2, 2))
         );
 
-        // Act & Assert
-        ResultActions result = mockMvc.perform(get("/products/followed/{userId}/list", user.getId())
-                        .param("order", order))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.user_id").value(user.getId()))
-                .andExpect(jsonPath("$.posts").isArray())
-                .andExpect(jsonPath("$.posts.length()").value(postsExpected.size()));
-
-        for (int i = 0; i < postsExpected.size(); i++) {
-            Integer expectedId = postsExpected.get(i).getUserId();
-            String expectedDate = postsExpected.get(i).getDate().toString();
-            result.andExpect(jsonPath("$.posts[" + i + "].post_id").value(expectedId))
-                    .andExpect(jsonPath("$.posts[" + i + "].date").value(expectedDate));
+        if ("date_desc".equals(order)) {
+            postsExpected = postsExpected.stream()
+                    .sorted(Comparator.comparing(PostDto::getDate).reversed())
+                    .toList();
         }
-    }
-
-    @Test
-    @DisplayName("T-0005: getPostsOfFollowedSellers by date desc")
-    public void getPostsOfFollowedSellersOrderByDateDescTest() throws Exception {
-        // Arrange
-        String order = "date_desc";
-        User user = UserFactory.createBuyer(2);
-
-        List<PostDto> postsExpected = List.of(
-                PostFactory.createPostIdDateDto(1, LocalDate.of(2025, 2, 2)),
-                PostFactory.createPostIdDateDto(2, LocalDate.of(2025, 1, 31)),
-                PostFactory.createPostIdDateDto(3, LocalDate.of(2025, 1, 30)),
-                PostFactory.createPostIdDateDto(5, LocalDate.of(2025, 1, 27)),
-                PostFactory.createPostIdDateDto(4, LocalDate.of(2025, 1, 25))
-        );
 
         // Act & Assert
         ResultActions result = mockMvc.perform(get("/products/followed/{userId}/list", user.getId())
-                        .param("order", order))
+                        .param("order", "date_desc".equals(order) ? "" : order))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.user_id").value(user.getId()))
@@ -107,7 +83,7 @@ public class ProductControllerTest {
 
     @Test
     @DisplayName("T-0005: getPostsOfFollowedSellers - should return 400 when order does not match")
-    public void getPostsOfFollowedSellersOrderNotValidExceptionTests() throws Exception {
+    public void getPostsOfFollowedSellersTest_whenOrderDoesntMatch_thenThrow400() throws Exception {
         // Arrange
         String order = "word";
         User user = UserFactory.createBuyer(2);
@@ -120,7 +96,7 @@ public class ProductControllerTest {
 
     @Test
     @DisplayName("T-0005: getPostsOfFollowedSellers - should return 400 when user id is negative")
-    public void getPostsOfFollowedSellersUserIdNotValidExceptionTests() throws Exception {
+    public void getPostsOfFollowedSellersTest_whenUserIdIsInvalid_thenThrow400() throws Exception {
         // Arrange
         String order = "date_asc";
         Integer userIdNegative = -1;
@@ -133,7 +109,7 @@ public class ProductControllerTest {
 
     @Test
     @DisplayName("T-0005: getPostsOfFollowedSellers - should return 404 when user is not found")
-    public void getPostsOfFollowedSellersUserNotFoundExceptionTests() throws Exception {
+    public void getPostsOfFollowedSellersTest_whenUserIsNotFound_thenThrow404() throws Exception {
         // Arrange
         String order = "date_asc";
         Integer userId = 999;
@@ -149,7 +125,7 @@ public class ProductControllerTest {
 
     @Test
     @DisplayName("T-0005: getPostsOfFollowedSellers - should return 404 when userid is not a number")
-    public void getPostsOfFollowedSellersUserIdNotANumberExceptionTests() throws Exception {
+    public void getPostsOfFollowedSellersTest_whenUserIdIsNotANumber_thenThrow404() throws Exception {
         // Arrange
         String order = "date_asc";
         String userId = "numero";
@@ -239,6 +215,30 @@ public class ProductControllerTest {
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
     }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"/products/post", "/products/promo-post"})
+    @DisplayName("savePost - should return 400 when User Id is invalid")
+    @DirtiesContext(methodMode = DirtiesContext.MethodMode.AFTER_METHOD)
+    void savePost_whenUserIdIsInvalid_thenThrow400(String url) throws Exception {
+        // Arrange
+        Object post;
+
+        if (url.equals("/products/post")) {
+            post = PostFactory.createPostDto(-1, 1);
+        } else {
+            post = PostFactory.createPostSaleDto(-1, 1);
+        }
+
+        String message = Message.POST_PUBLISHED.getStr();
+
+        // Act & Assert
+        mockMvc.perform(post(url)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(post)))
+                .andExpect(status().isBadRequest());
+    }
+
     @Test
     @DisplayName("US-0011 - Get the number of promotional products for a specific seller")
     void getPromoPostCountTest() throws Exception {
