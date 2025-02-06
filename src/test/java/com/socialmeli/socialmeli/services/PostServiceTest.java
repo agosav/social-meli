@@ -162,7 +162,7 @@ class PostServiceTest {
 
     @Test
     @DisplayName("Test for 'User Not Found' exception in getRecentPostFromUsers")
-    public void testGetRecentPostFromUsers_UserNotFound() {
+    public void getRecentPostFromUsers_whenUserNotFound_thenException() {
         // Arrange
         Integer userId = 800;
         String order = "date_asc";
@@ -175,7 +175,8 @@ class PostServiceTest {
         });
 
         // Assert
-        assertEquals("User with ID 800 not found", exception.getMessage());
+        String expectedMessage = Message.USER_NOT_FOUND.format(userId);
+        assertEquals(expectedMessage, exception.getMessage());
     }
 
     // US 0005 - Dar de alta una nueva publicación.

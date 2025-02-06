@@ -335,3 +335,5 @@ public class UserServiceTest {
         assertThrows(NotFoundException.class, () -> userService.getFollowedList(userId, order));
     }
 }
+
+
