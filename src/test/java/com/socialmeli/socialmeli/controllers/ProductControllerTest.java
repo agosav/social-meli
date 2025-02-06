@@ -45,7 +45,7 @@ public class ProductControllerTest {
     private ObjectMapper objectMapper;
 
     @ParameterizedTest
-    @CsvSource({"date_asc", "date_desc"})
+    @CsvSource({"date_asc", "date_desc", "DEFAULT"})
     @DisplayName("T-0005: getPostsOfFollowedSellers by date asc")
     public void getPostsOfFollowedSellersTest_whenOrderByDateAscOrDesc_thenReturnAList(String order) throws Exception {
         // Arrange
@@ -58,7 +58,7 @@ public class ProductControllerTest {
                 PostFactory.createPostIdDateDto(1, LocalDate.of(2025, 2, 2))
         );
 
-        if ("date_desc".equals(order)) {
+        if ("date_desc".equals(order) || "DEFAULT".equals(order)) {
             postsExpected = postsExpected.stream()
                     .sorted(Comparator.comparing(PostDto::getDate).reversed())
                     .toList();
@@ -66,7 +66,7 @@ public class ProductControllerTest {
 
         // Act & Assert
         ResultActions result = mockMvc.perform(get("/products/followed/{userId}/list", user.getId())
-                        .param("order", "date_desc".equals(order) ? "" : order))
+                        .param("order", "DEFAULT".equals(order) ? "" : order))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.user_id").value(user.getId()))
