@@ -267,5 +267,21 @@ public class ProductControllerTest {
                         .param("user_id", "-5"))
                 .andExpect(status().isBadRequest());
     }
+    @Test
+    @DisplayName("US-0011 - UserIsNotSeller")
+    void getPromoPostCountTest_whenUserIsNotSeller_thenThrow() throws Exception {
 
+        mockMvc.perform(get("/products/promo-post/count")
+                        .param("user_id", "4"))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @DisplayName("US-0011 - Empty List")
+    void getPromoPostCountTest_whenListIsEmpty_thenThrow() throws Exception {
+
+        mockMvc.perform(get("/products/promo-post/count")
+                        .param("user_id", "7"))
+                .andExpect(status().isNotFound());
+    }
 }
