@@ -64,7 +64,7 @@
     },
     "category": 1,
     "price": 999.99,
-    "hasPromo": false,
+    "hasPromo": true,
     "discount": null
   },
   {
