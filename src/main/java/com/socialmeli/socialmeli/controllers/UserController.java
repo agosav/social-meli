@@ -5,6 +5,8 @@ import com.socialmeli.socialmeli.dto.response.UserFollowerCountDto;
 import com.socialmeli.socialmeli.dto.response.FollowerListDto;
 import com.socialmeli.socialmeli.dto.response.FollowedListDto;
 import com.socialmeli.socialmeli.services.IUserService;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -52,8 +54,8 @@ public class UserController {
     // US 0007 - Poder realizar la acción de “Unfollow” (dejar de seguir) a un determinado vendedor.
     @PostMapping("/{userId}/unfollow/{userIdToUnfollow}")
     public ResponseEntity<MessageDto> unfollowUser(
-            @PathVariable Integer userId,
-            @PathVariable Integer userIdToUnfollow) {
+            @Valid @Positive @PathVariable Integer userId,
+            @Valid @Positive @PathVariable Integer userIdToUnfollow) {
         return ResponseEntity.ok(userService.unfollow(userId, userIdToUnfollow));
     }
 }
