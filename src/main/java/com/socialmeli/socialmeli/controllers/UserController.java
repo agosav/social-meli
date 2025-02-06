@@ -5,7 +5,6 @@ import com.socialmeli.socialmeli.dto.response.UserFollowerCountDto;
 import com.socialmeli.socialmeli.dto.response.FollowerListDto;
 import com.socialmeli.socialmeli.dto.response.FollowedListDto;
 import com.socialmeli.socialmeli.services.IUserService;
-import jakarta.validation.Valid;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
@@ -29,8 +28,8 @@ public class UserController {
     // US 0001 - Poder realizar la acción de “Follow” (seguir) a un determinado vendedor.
     @PostMapping("/{userId}/follow/{userIdToFollow}")
     public ResponseEntity<MessageDto> followToUser(
-            @Valid @Positive @PathVariable Integer userId,
-            @Valid @Positive @PathVariable Integer userIdToFollow) {
+            @Positive @PathVariable Integer userId,
+            @Positive @PathVariable Integer userIdToFollow) {
         return ResponseEntity.ok(userService.follow(userId, userIdToFollow));
     }
 
@@ -61,8 +60,8 @@ public class UserController {
     // US 0007 - Poder realizar la acción de “Unfollow” (dejar de seguir) a un determinado vendedor.
     @PostMapping("/{userId}/unfollow/{userIdToUnfollow}")
     public ResponseEntity<MessageDto> unfollowUser(
-            @Valid @Positive @PathVariable Integer userId,
-            @Valid @Positive @PathVariable Integer userIdToUnfollow) {
+            @Positive @PathVariable Integer userId,
+            @Positive @PathVariable Integer userIdToUnfollow) {
         return ResponseEntity.ok(userService.unfollow(userId, userIdToUnfollow));
     }
 }
