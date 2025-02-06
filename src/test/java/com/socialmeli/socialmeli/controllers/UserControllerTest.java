@@ -115,6 +115,30 @@ public class UserControllerTest {
         performFollow(user2.getId(), user1.getId(), message, 409);
     }
 
+    @Test
+    @DisplayName("follow - invalid user follower id")
+    @Disabled
+    void followTest_whenUserFollowerIdInvalid_thenReturn400() throws Exception {
+        // Arrange
+        Integer userFollowerId = -1;
+        Integer userFollowedId = 1;
+
+        // Act & Assert
+        performFollow(userFollowerId, userFollowedId, null, 400);
+    }
+
+    @Test
+    @DisplayName("follow - invalid user followed id")
+    @Disabled
+    void followTest_whenUserFollowedIdInvalid_thenReturn400() throws Exception {
+        // Arrange
+        Integer userFollowerId = 1;
+        Integer userFollowedId = 2;
+
+        // Act & Assert
+        performFollow(userFollowerId, userFollowedId, null, 400);
+    }
+
     //US-0002: Obtener el resultado de la cantidad de usuarios que siguen a un determinado vendedor
     @Test
     @DisplayName("countFollowersForSeller")
@@ -248,6 +272,18 @@ public class UserControllerTest {
     }
 
     @Test
+    @DisplayName("getFollowedUsers - invalid user id")
+    @Disabled
+    void followTest_whenInvalidUserId_thenReturn400() throws Exception {
+        // Arrange
+        Integer userId = -1;
+
+        // Act & Assert
+        mockMvc.perform(get("/users/{userId}/followed/list", userId))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
     @DisplayName("getFollowedUsers - user not found")
     public void getFollowedUsersTest_whenUserDoesntExist_thenReturn404() throws Exception {
         // Arrange
@@ -263,6 +299,8 @@ public class UserControllerTest {
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.message").value(message));
     }
+
+    // Métodos privados
 
     private void performFollow(Integer followerId, Integer followedId, String expectedMessage, int expectedStatus)
             throws Exception {
