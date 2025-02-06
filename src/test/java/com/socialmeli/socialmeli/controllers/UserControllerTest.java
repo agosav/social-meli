@@ -6,7 +6,6 @@ import com.socialmeli.socialmeli.models.User;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import com.socialmeli.socialmeli.utils.UserFactory;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -112,26 +111,26 @@ public class UserControllerTest {
 
     @Test
     @DisplayName("follow - invalid user follower id")
-    @Disabled
     void followTest_whenUserFollowerIdInvalid_thenReturn400() throws Exception {
         // Arrange
         Integer userFollowerId = -1;
         Integer userFollowedId = 1;
 
         // Act & Assert
-        performFollow(userFollowerId, userFollowedId, null, 400);
+        mockMvc.perform(post("/users/{userId}/follow/{userIdToFollow}", userFollowerId, userFollowedId))
+                .andExpect(status().isBadRequest());
     }
 
     @Test
     @DisplayName("follow - invalid user followed id")
-    @Disabled
     void followTest_whenUserFollowedIdInvalid_thenReturn400() throws Exception {
         // Arrange
         Integer userFollowerId = 1;
-        Integer userFollowedId = 2;
+        Integer userFollowedId = -1;
 
         // Act & Assert
-        performFollow(userFollowerId, userFollowedId, null, 400);
+        mockMvc.perform(post("/users/{userId}/follow/{userIdToFollow}", userFollowerId, userFollowedId))
+                .andExpect(status().isBadRequest());
     }
 
     //US-0002: Obtener el resultado de la cantidad de usuarios que siguen a un determinado vendedor
@@ -238,6 +237,44 @@ public class UserControllerTest {
                 .andExpect(jsonPath("$.message").value(message));
     }
 
+    // US 0003 - Obtener un listado de todos los usuarios que siguen a un determinado vendedor (¿Quién me sigue?).
+    @ParameterizedTest
+    @CsvSource({"name_asc", "name_desc", "DEFAULT"})
+    @DisplayName("getFollowerUsers - successful with different order or default")
+    public void getFollowerUsersTest_whenOrderIsParametrizedOrNotProvided_thenReturnOrderedList(String order)
+            throws Exception {
+        // Arrange
+        User user1 = UserFactory.createSeller(1, "Agostina Avalle");
+        User user2 = UserFactory.createBuyer(2, "Carolina Comba");
+        User user6 = UserFactory.createBuyer(6, "Katerinne Peralta");
+        User user4 = UserFactory.createBuyer(4, "Eliana Navarro");
+
+        List<User> usersExpected;
+
+        if ("name_asc".equals(order) || "DEFAULT".equals(order)) {
+            usersExpected = List.of(user2, user4, user6); // Orden ascendente
+        } else {
+            usersExpected = List.of(user6, user4, user2); // Orden descendente
+        }
+
+        // Act & Assert
+        ResultActions result = mockMvc.perform(get("/users/{userId}/followers/list", user1.getId())
+                        .param("order", "DEFAULT".equals(order) ? "" : order))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.user_id").value(user1.getId()))
+                .andExpect(jsonPath("$.user_name").value(user1.getName()))
+                .andExpect(jsonPath("$.followers").isArray())
+                .andExpect(jsonPath("$.followers.length()").value(usersExpected.size()));
+
+        for (int i = 0; i < usersExpected.size(); i++) {
+            String expectedName = usersExpected.get(i).getName();
+            Integer expectedId = usersExpected.get(i).getId();
+            result.andExpect(jsonPath("$.followers[" + i + "].user_id").value(expectedId))
+                    .andExpect(jsonPath("$.followers[" + i + "].user_name").value(expectedName));
+        }
+    }
+
     // US 0004 - Obtener un listado de todos los vendedores a los cuales sigue un determinado usuario (¿A quién sigo?).
     @ParameterizedTest
     @CsvSource({"name_asc", "name_desc", "DEFAULT"})
@@ -277,111 +314,6 @@ public class UserControllerTest {
     }
 
     @Test
-    @Disabled
-    @DisplayName("getFollowedUsers - invalid order parameter")
-    public void getFollowedUsersTest_whenOrderIsInvalid_thenReturnDefaultOrderDesc() throws Exception {
-        // Arrange
-        String order = "asdasfcdxfvg";
-        Integer userId = 1;
-
-        // Act & Assert
-        mockMvc.perform(get("/users/{userId}/followed/list", userId)
-                        .param("order", order))
-                .andExpect(status().isBadRequest());
-    }
-
-    @Test
-    @DisplayName("getFollowedUsers - invalid user id")
-    @Disabled
-    void followTest_whenInvalidUserId_thenReturn400() throws Exception {
-        // Arrange
-        Integer userId = -1;
-
-        // Act & Assert
-        mockMvc.perform(get("/users/{userId}/followed/list", userId))
-                .andExpect(status().isBadRequest());
-    }
-
-    @Test
-    @DisplayName("getFollowedUsers - user not found")
-    public void getFollowedUsersTest_whenUserDoesntExist_thenReturn404() throws Exception {
-        // Arrange
-        String order = "name_asc";
-        Integer userId = 999;
-
-        String message = Message.USER_NOT_FOUND.format(userId);
-
-        // Act & Assert
-        mockMvc.perform(get("/users/{userId}/followed/list", userId)
-                        .param("order", order))
-                .andExpect(status().isNotFound())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.message").value(message));
-    }
-
-    // Métodos privados
-
-    private void performFollow(Integer followerId, Integer followedId, String expectedMessage, int expectedStatus)
-            throws Exception {
-        mockMvc.perform(post("/users/{userId}/follow/{userIdToFollow}", followerId, followedId))
-                .andExpect(status().is(expectedStatus))
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.message").value(expectedMessage));
-    }
-
-    @Test
-    @DisplayName("Test to validate sorting order by 'name_asc'")
-    public void testFollowedListOrderNameAsc() throws Exception {
-        // Arrange
-        String order = "name_asc";
-        User user1 = new User(1, "Agostina Avalle", true);
-        User user2 = new User(2, "Carolina Comba", false);
-        User user3 = new User(3, "Ciro Sánchez", true);
-        User user5 = new User(5, "Franca Pairetti", true);
-        // Act & Assert
-        mockMvc.perform(get("/users/{userId}/followed/list", user2.getId())
-                        .param("order", order))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.user_id").value(user2.getId()))
-                .andExpect(jsonPath("$.user_name").value(user2.getName()))
-                .andExpect(jsonPath("$.followed").isArray())
-                .andExpect(jsonPath("$.followed[0].user_id").value(user1.getId()))
-                .andExpect(jsonPath("$.followed[0].user_name").value(user1.getName()))
-                .andExpect(jsonPath("$.followed[1].user_id").value(user3.getId()))
-                .andExpect(jsonPath("$.followed[1].user_name").value(user3.getName()))
-                .andExpect(jsonPath("$.followed[2].user_id").value(user5.getId()))
-                .andExpect(jsonPath("$.followed[2].user_name").value(user5.getName()));
-    }
-
-    @Test
-    @DisplayName("Test to validate sorting order by 'name_desc'")
-    public void testFollowedListOrderNameDesc() throws Exception {
-        // Arrange:
-        String order = "name_desc";
-        User user1 = new User(1, "Agostina Avalle", true);
-        User user2 = new User(2, "Carolina Comba", false);
-        User user3 = new User(3, "Ciro Sánchez", true);
-        User user5 = new User(5, "Franca Pairetti", true);
-
-        // Act & Assert:
-        mockMvc.perform(get("/users/{userId}/followed/list", user2.getId())
-                        .param("order", order))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.user_id").value(user2.getId()))
-                .andExpect(jsonPath("$.user_name").value(user2.getName()))
-                .andExpect(jsonPath("$.followed").isArray())
-                .andExpect(jsonPath("$.followed[0].user_id").value(user5.getId())) //
-                .andExpect(jsonPath("$.followed[0].user_name").value(user5.getName()))
-                .andExpect(jsonPath("$.followed[1].user_id").value(user3.getId()))
-                .andExpect(jsonPath("$.followed[1].user_name").value(user3.getName()))
-                .andExpect(jsonPath("$.followed[2].user_id").value(user1.getId()))
-                .andExpect(jsonPath("$.followed[2].user_name").value(user1.getName()));
-    }
-
-    @Test
-    @Disabled
     @DisplayName("Test to validate exception when invalid order is provided for followed list")
     public void testFollowedListOrderException() throws Exception {
         // Arrange
@@ -393,4 +325,13 @@ public class UserControllerTest {
                 .andExpect(status().isBadRequest());
     }
 
+    // Métodos privados
+
+    private void performFollow(Integer followerId, Integer followedId, String expectedMessage, int expectedStatus)
+            throws Exception {
+        mockMvc.perform(post("/users/{userId}/follow/{userIdToFollow}", followerId, followedId))
+                .andExpect(status().is(expectedStatus))
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.message").value(expectedMessage));
+    }
 }

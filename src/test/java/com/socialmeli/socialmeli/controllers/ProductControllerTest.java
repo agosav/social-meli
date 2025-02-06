@@ -1,5 +1,23 @@
 package com.socialmeli.socialmeli.controllers;
 
+import com.socialmeli.socialmeli.dto.PostDto;
+import com.socialmeli.socialmeli.models.User;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.context.SpringBootTest;
+import java.time.LocalDate;
+import org.springframework.http.MediaType;
+import org.springframework.test.web.servlet.MockMvc;
+
+import java.util.List;
+
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.socialmeli.socialmeli.dto.ProductDto;
 import com.socialmeli.socialmeli.dto.response.PostIdDto;
@@ -15,10 +33,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.http.MediaType;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
@@ -26,8 +40,6 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -53,6 +65,110 @@ public class ProductControllerTest {
 
     @Autowired
     private ObjectMapper objectMapper;
+
+    @Test
+    @DisplayName("T-0005: getPostsOfFollowedSellers by date asc")
+    public void getPostsOfFollowedSellersOrderByDateAscTest() throws Exception {
+        // Arrange
+        String order = "date_asc";
+        User user = new User(2, "Carolina Comba", false);
+        List<PostDto> posts = List.of(
+                PostFactory.createPostIdDateDto(1, LocalDate.of(2025, 2, 2)),
+                PostFactory.createPostIdDateDto(2, LocalDate.of(2025, 1, 31)),
+                PostFactory.createPostIdDateDto(3, LocalDate.of(2025, 1, 30)),
+                PostFactory.createPostIdDateDto(4, LocalDate.of(2025, 1, 25)),
+                PostFactory.createPostIdDateDto(5, LocalDate.of(2025, 1, 27))
+        );
+
+        // Act & Assert
+        mockMvc.perform(get("/products/followed/{userId}/list", user.getId())
+                        .param("order", order))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.user_id").value(user.getId()))
+                .andExpect(jsonPath("$.posts[0].post_id").value(posts.get(3).getUserId()))
+                .andExpect(jsonPath("$.posts[0].date").value(posts.get(3).getDate().toString()))
+                .andExpect(jsonPath("$.posts[1].post_id").value(posts.get(4).getUserId()))
+                .andExpect(jsonPath("$.posts[1].date").value(posts.get(4).getDate().toString()))
+                .andExpect(jsonPath("$.posts[2].post_id").value(posts.get(2).getUserId()))
+                .andExpect(jsonPath("$.posts[2].date").value(posts.get(2).getDate().toString()))
+                .andExpect(jsonPath("$.posts[3].post_id").value(posts.get(1).getUserId()))
+                .andExpect(jsonPath("$.posts[3].date").value(posts.get(1).getDate().toString()))
+                .andExpect(jsonPath("$.posts[4].post_id").value(posts.get(0).getUserId()))
+                .andExpect(jsonPath("$.posts[4].date").value(posts.get(0).getDate().toString()));
+    }
+
+    @Test
+    @DisplayName("T-0005: getPostsOfFollowedSellers by date desc")
+    public void getPostsOfFollowedSellersOrderByDateDescTest() throws Exception {
+        // Arrange
+        String order = "date_desc";
+        User user = new User(2, "Carolina Comba", false);
+
+        List<PostDto> posts = List.of(
+                PostFactory.createPostIdDateDto(1, LocalDate.of(2025, 2, 2)),
+                PostFactory.createPostIdDateDto(2, LocalDate.of(2025, 1, 31)),
+                PostFactory.createPostIdDateDto(3, LocalDate.of(2025, 1, 30)),
+                PostFactory.createPostIdDateDto(4, LocalDate.of(2025, 1, 25)),
+                PostFactory.createPostIdDateDto(5, LocalDate.of(2025, 1, 27))
+        );
+
+        // Act & Assert
+        mockMvc.perform(get("/products/followed/{userId}/list", user.getId())
+                        .param("order", order))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.user_id").value(user.getId()))
+                .andExpect(jsonPath("$.posts[0].post_id").value(posts.get(0).getUserId()))
+                .andExpect(jsonPath("$.posts[0].date").value(posts.get(0).getDate().toString()))
+                .andExpect(jsonPath("$.posts[1].post_id").value(posts.get(1).getUserId()))
+                .andExpect(jsonPath("$.posts[1].date").value(posts.get(1).getDate().toString()))
+                .andExpect(jsonPath("$.posts[2].post_id").value(posts.get(2).getUserId()))
+                .andExpect(jsonPath("$.posts[2].date").value(posts.get(2).getDate().toString()))
+                .andExpect(jsonPath("$.posts[3].post_id").value(posts.get(4).getUserId()))
+                .andExpect(jsonPath("$.posts[3].date").value(posts.get(4).getDate().toString()))
+                .andExpect(jsonPath("$.posts[4].post_id").value(posts.get(3).getUserId()))
+                .andExpect(jsonPath("$.posts[4].date").value(posts.get(3).getDate().toString()));
+    }
+
+    @Test
+    @DisplayName("T-0005: getPostsOfFollowedSellers - should return 400 when order does not match")
+    public void getPostsOfFollowedSellersOrderNotValidExceptionTests() throws Exception {
+        // Arrange
+        String order = "word";
+        User user = new User(2, "Carolina Comba", false);
+
+        // Act & Assert
+        mockMvc.perform(get("/products/followed/{userId}/list", user.getId())
+                        .param("order", order))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @DisplayName("T-0005: getPostsOfFollowedSellers - should return 400 when user id is negative")
+    public void getPostsOfFollowedSellersUserIdNotValidExceptionTests() throws Exception {
+        // Arrange
+        String order = "date_asc";
+        Integer userIdNegative = -1;
+
+        // Act & Assert
+        mockMvc.perform(get("/products/followed/{userId}/list", userIdNegative)
+                        .param("order", order))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @DisplayName("T-0005: getPostsOfFollowedSellers - should return 404 when user is not found")
+    public void getPostsOfFollowedSellersUserNotFoundExceptionTests() throws Exception {
+        // Arrange
+        String order = "date_asc";
+        Integer userId = 999;
+
+        // Act & Assert
+        mockMvc.perform(get("/products/followed/{userId}/list", userId)
+                        .param("order", order))
+                .andExpect(status().isNotFound());
+    }
 
     @ParameterizedTest
     @ValueSource(strings = {"/products/post", "/products/promo-post"})
@@ -154,7 +270,7 @@ public class ProductControllerTest {
         List<PostIdDto> postIdDtos = List.of(postIdDto);
         ProductListDto productListDto = PostFactory.createProductListDto(userId, postIdDtos);
 
-        when(service.getRecentPostFromUsers(order, userId)).thenReturn(productListDto);
+
 
         mockMvc.perform(MockMvcRequestBuilders.get("/products/followed/{userId}/list", userId)
                         .param("order", order)

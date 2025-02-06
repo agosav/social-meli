@@ -6,9 +6,11 @@ import com.socialmeli.socialmeli.dto.response.FollowerListDto;
 import com.socialmeli.socialmeli.dto.response.FollowedListDto;
 import com.socialmeli.socialmeli.services.IUserService;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -18,6 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
+@Validated
 @RequestMapping("/users")
 public class UserController {
 
@@ -25,7 +28,9 @@ public class UserController {
 
     // US 0001 - Poder realizar la acción de “Follow” (seguir) a un determinado vendedor.
     @PostMapping("/{userId}/follow/{userIdToFollow}")
-    public ResponseEntity<MessageDto> followToUser(@PathVariable Integer userId, @PathVariable Integer userIdToFollow) {
+    public ResponseEntity<MessageDto> followToUser(
+            @Valid @Positive @PathVariable Integer userId,
+            @Valid @Positive @PathVariable Integer userIdToFollow) {
         return ResponseEntity.ok(userService.follow(userId, userIdToFollow));
     }
 
@@ -38,16 +43,18 @@ public class UserController {
     // US 0003 - Obtener un listado de todos los usuarios que siguen a un determinado vendedor (¿Quién me sigue?).
     @GetMapping("/{userId}/followers/list")
     public ResponseEntity<FollowerListDto> getFollowerList(
-            @PathVariable Integer userId,
-            @RequestParam(defaultValue = "name_asc") String order) {
+            @PathVariable @Positive Integer userId,
+            @RequestParam(defaultValue = "name_asc") @Pattern(regexp = "^(name_asc|name_desc)$",
+                    message = "Invalid order. Allowed values are 'name_asc' or 'name_desc'.") String order) {
         return ResponseEntity.ok(userService.getFollowerList(userId, order));
     }
 
     // US 0004 - Obtener un listado de todos los vendedores a los cuales sigue un determinado usuario (¿A quién sigo?).
     @GetMapping("/{userId}/followed/list")
     public ResponseEntity<FollowedListDto> getFollowedUsers(
-            @PathVariable Integer userId,
-            @RequestParam(defaultValue = "name_asc") String order) {
+            @PathVariable @Positive Integer userId,
+            @RequestParam(defaultValue = "name_asc") @Pattern(regexp = "^(name_asc|name_desc)$",
+                    message = "Invalid order. Allowed values are 'name_asc' or 'name_desc'.") String order) {
         return ResponseEntity.ok(userService.getFollowedList(userId, order));
     }
 
