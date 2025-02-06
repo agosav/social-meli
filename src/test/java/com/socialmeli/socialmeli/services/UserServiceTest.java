@@ -171,7 +171,7 @@ public class UserServiceTest {
     @DisplayName("countFollowersForSeller - user not found")
     void countFollowersForSeller_whenUserDoesntExists_thenReturnThrowNotFoundException() {
         // Arrange
-        Integer userId =7;
+        Integer userId = 7;
 
         when(userRepository.findById(userId)).thenReturn(Optional.empty());
 

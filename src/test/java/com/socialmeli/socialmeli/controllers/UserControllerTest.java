@@ -142,7 +142,7 @@ public class UserControllerTest {
     @DisplayName("countFollowersForSeller - user not seller")
     public void getCountFollowerForSellerTest_wheUserNotSeller_thenReturn400() throws Exception {
         //Arrange
-        User userNotSeller = new User(2,"Carolina Comba",false);
+        User userNotSeller = new User(2, "Carolina Comba", false);
         String message = Message.USER_NOT_SELLER.format(userNotSeller.getName());
         //Act & Assertions
         mockMvc.perform(get("/users/{userId}/followers/count", userNotSeller.getId()))
