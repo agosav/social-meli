@@ -38,7 +38,8 @@ public class ProductController {
     @GetMapping("/followed/{userId}/list")
     public ResponseEntity<ProductListDto> getPostsOfFollowedSellers(
             @Positive @PathVariable  Integer userId,
-            @Pattern(regexp = "date_desc|date_asc") @RequestParam(defaultValue = "date_desc") String order) {
+            @RequestParam(defaultValue = "date_desc") @Pattern(regexp = "^(date_asc|date_desc)$",
+                    message = "Invalid order. Allowed values are 'date_asc' or 'date_desc'.") String order) {
         return ResponseEntity.ok(postService.getRecentPostFromUsers(order, userId));
     }
 
