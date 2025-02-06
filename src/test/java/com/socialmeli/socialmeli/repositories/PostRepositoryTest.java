@@ -3,6 +3,7 @@ package com.socialmeli.socialmeli.repositories;
 import com.socialmeli.socialmeli.models.Post;
 import com.socialmeli.socialmeli.models.Product;
 import com.socialmeli.socialmeli.models.User;
+import com.socialmeli.socialmeli.utils.UserFactory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -141,5 +142,52 @@ class PostRepositoryTest {
 
         // Assert
         assertFalse(result);
+    }
+
+    @Test
+    @DisplayName("findPostsWithPromoByUserTest")
+    public void findPostsWithPromoByUserTest_whenPostExists_thenReturnListPosts() {
+        //Arrange
+        User user = UserFactory.createSeller(3, "Ciro Sánchez");
+        List<Post> expected = List.of(
+                Post.builder()
+                        .id(1)
+                        .user(user)
+                        .date(LocalDate.of(2025, 1, 19))
+                        .product(new Product(201, "headphones", "Electronics", "Dell", "Silver", "Includes charger and carrying case"))
+                        .category(1)
+                        .price(1200.00)
+                        .hasPromo(true)
+                        .discount(50.00)
+                        .build(),
+
+                Post.builder()
+                        .id(2)
+                        .user(user)
+                        .date(LocalDate.of(2025, 1, 20))
+                        .product(new Product(202, "Laptop", "Electronics", "Dell", "Silver", "Includes charger and carrying case"))
+                        .category(2)
+                        .price(1200.00)
+                        .hasPromo(true)
+                        .discount(50.00)
+                        .build(),
+
+                Post.builder()
+                        .id(3)
+                        .user(user)
+                        .date(LocalDate.of(2025, 1, 21))
+                        .product(new Product(203, "chair", "Furniture", "Dell", "Silver", "Includes charger and carrying case"))
+                        .category(2)
+                        .price(1200.00)
+                        .hasPromo(true)
+                        .discount(50.00)
+                        .build()
+        );
+
+        //Act
+        List<Post> result = postRepository.findPostsWithPromoByUser(user.getId());
+
+        //Assertion
+        assertEquals(expected, result);
     }
 }

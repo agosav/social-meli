@@ -5,8 +5,11 @@ import com.socialmeli.socialmeli.dto.response.UserFollowerCountDto;
 import com.socialmeli.socialmeli.dto.response.FollowerListDto;
 import com.socialmeli.socialmeli.dto.response.FollowedListDto;
 import com.socialmeli.socialmeli.services.IUserService;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -17,6 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/users")
+@Validated
 public class UserController {
 
     private final IUserService userService;
@@ -29,7 +33,7 @@ public class UserController {
 
     // US 0002 - Obtener el resultado de la cantidad de usuarios que siguen a un determinado vendedor.
     @GetMapping("/{userId}/followers/count")
-    public ResponseEntity<UserFollowerCountDto> getCountFollowerForSeller(@PathVariable Integer userId) {
+    public ResponseEntity<UserFollowerCountDto> getCountFollowerForSeller(@PathVariable @Valid @Positive Integer userId) {
         return ResponseEntity.ok(userService.countFollowers(userId));
     }
 
