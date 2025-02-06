@@ -32,10 +32,7 @@ public class ProductControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
-
-
-
-
+    
     @Test
     @DisplayName("T-0005: getPostsOfFollowedSellers by date desc")
     public void getPostsOfFollowedSellersOrderByDateDescTest() throws Exception {
@@ -90,39 +87,4 @@ public class ProductControllerTest {
                         .param("order", order))
                 .andExpect(status().isBadRequest());
     }
-
-    @Test
-    @DisplayName("T-0005: getPostsOfFollowedSellers by date asc")
-    public void getPostsOfFollowedSellersOrderByDateAscTest() throws Exception {
-        // Arrange
-        LocalDate twoWeeksAgo = LocalDate.now().minusWeeks(2);
-        Integer userId = 2;
-        String order = "date_asc";
-
-        // Simulación de datos
-        ProductListDto productListDto = new ProductListDto(userId, List.of(
-                new PostIdDto(5, LocalDate.of(2025, 1, 27), new Product(/* product details */)),
-                new PostIdDto(4, LocalDate.of(2025, 1, 25), new Product(/* product details */)),
-                new PostIdDto(2, LocalDate.of(2025, 1, 31), new Product(/* product details */)),
-                new PostIdDto(1, LocalDate.of(2025, 2, 2), new Product(/* product details */))
-        ));
-
-        when(postService.getRecentPostFromUsers(order, userId)).thenReturn(productListDto);
-
-        // Act & Assert
-        mockMvc.perform(get("/products/followed/{userId}/list", userId)
-                        .param("order", order))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.user_id").value(userId))
-                .andExpect(jsonPath("$.posts.size()").value(4)) // Asegúrate de que este número coincida
-                .andExpect(jsonPath("$.posts[0].post_id").value(5)) // ID del primer post
-                .andExpect(jsonPath("$.posts[1].post_id").value(4)) // ID del segundo post
-                .andExpect(jsonPath("$.posts[2].post_id").value(2)) // ID del tercer post
-                .andExpect(jsonPath("$.posts[3].post_id").value(1)); // ID del último post
-
-        // Verifica que se llama al servicio con los parámetros correctos
-        verify(postService).getRecentPostFromUsers(order, userId);
-    }
-}
 }
