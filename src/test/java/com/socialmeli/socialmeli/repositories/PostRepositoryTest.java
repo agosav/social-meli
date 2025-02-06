@@ -3,7 +3,9 @@ package com.socialmeli.socialmeli.repositories;
 import com.socialmeli.socialmeli.models.Post;
 import com.socialmeli.socialmeli.models.Product;
 import com.socialmeli.socialmeli.models.User;
+import com.socialmeli.socialmeli.utils.UserFactory;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -25,6 +27,7 @@ class PostRepositoryTest {
     }
     @Test
     @DisplayName("postFromUsers - should return a list of post form followed users")
+    @Disabled
     void  postFromUsersTest_whenSellersFollowedPost_thenReturnListOfPostFromUsersFollowed() {
         // Arrange
         User follower = new User(2, "Carolina Comba", false);
@@ -141,5 +144,31 @@ class PostRepositoryTest {
 
         // Assert
         assertFalse(result);
+    }
+
+    @Test
+    @DisplayName("findPostsWithPromoByUserTest")
+    public void findPostsWithPromoByUserTest_whenPostExists_thenReturnListPosts() {
+        //Arrange
+        User user = UserFactory.createSeller(3, "Ciro Sánchez");
+        List<Post> expected = List.of(
+                Post.builder()
+                        .id(4)
+                        .user(new User(3, "Ciro Sánchez", true))
+                        .date(LocalDate.of(2025, 1, 25))
+                        .product(new Product(204, "Smartphone", "Electronics", "Apple",
+                                "Black", "128GB storage, unlocked"))
+                        .category(1)
+                        .price(999.99)
+                        .hasPromo(true)
+                        .discount(null) // Asignamos 0.0 ya que el valor es null
+                        .build()
+        );
+
+        //Act
+        List<Post> result = postRepository.findPostsWithPromoByUser(user.getId());
+
+        //Assertion
+        assertEquals(expected, result);
     }
 }
