@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.DecimalMax;
+import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import lombok.AllArgsConstructor;
@@ -34,6 +35,7 @@ public class PostDto {
     private Integer category;
 
     @NotNull(message = "Price is required")
+    @DecimalMin(value = "0.0", message = "Price must be greater than 0.0")
     @DecimalMax(value = "10000000.0", message = "Price must be less than 10000000.0")
     private Double price;
 }
