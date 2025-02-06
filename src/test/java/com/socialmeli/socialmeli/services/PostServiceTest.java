@@ -6,10 +6,13 @@ import com.socialmeli.socialmeli.dto.ProductDto;
 import com.socialmeli.socialmeli.dto.response.MessageDto;
 import com.socialmeli.socialmeli.dto.response.PostIdDto;
 import com.socialmeli.socialmeli.dto.response.ProductListDto;
+import com.socialmeli.socialmeli.dto.response.ProductSaleCountDto;
 import com.socialmeli.socialmeli.enums.Message;
 import com.socialmeli.socialmeli.exception.AlreadyExistsException;
 import com.socialmeli.socialmeli.exception.NotFoundException;
+import com.socialmeli.socialmeli.exception.UserNotSellerException;
 import com.socialmeli.socialmeli.models.Post;
+import com.socialmeli.socialmeli.models.Product;
 import com.socialmeli.socialmeli.models.User;
 import com.socialmeli.socialmeli.repositories.IFollowRepository;
 import com.socialmeli.socialmeli.repositories.IPostRepository;
@@ -26,7 +29,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.annotation.DirtiesContext;
-
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -225,5 +227,97 @@ class PostServiceTest {
         } else {
             return service.savePostSale((PostSaleDto) post);
         }
+    }
+
+    //US-0011 - Obtener la cantidad de productos en promoción de un determinado vendedor
+    @Test
+    @DisplayName("countProductSaleByUser ")
+    public void getProductSaleCountByUser_whenUserExists_thenGetProductSaleCountByUser() {
+        //Arrange
+        User user = UserFactory.createSeller(3, "Ciro Sánchez");
+        ProductSaleCountDto expected = new ProductSaleCountDto(user.getId(), user.getName(), 3);
+        List<Post> posts = List.of(
+                Post.builder()
+                        .id(1)
+                        .user(user)
+                        .date(LocalDate.of(2025, 1, 19))
+                        .product(new Product(201, "headphones", "Electronics", "Dell",
+                                "Silver", "Includes charger and carrying case"))
+                        .category(1)
+                        .price(1200.00)
+                        .hasPromo(true)
+                        .discount(50.00)
+                        .build(),
+
+                Post.builder()
+                        .id(2)
+                        .user(user)
+                        .date(LocalDate.of(2025, 1, 20))
+                        .product(new Product(202, "Laptop", "Electronics", "Dell", "Silver",
+                                "Includes charger and carrying case"))
+                        .category(2)
+                        .price(1200.00)
+                        .hasPromo(true)
+                        .discount(50.00)
+                        .build(),
+
+                Post.builder()
+                        .id(3)
+                        .user(user)
+                        .date(LocalDate.of(2025, 1, 21))
+                        .product(new Product(203, "chair", "Furniture", "Dell", "Silver",
+                                "Includes charger and carrying case"))
+                        .category(2)
+                        .price(1200.00)
+                        .hasPromo(true)
+                        .discount(50.00)
+                        .build()
+        );
+
+        when(userRepository.findById(user.getId())).thenReturn(Optional.of(user));
+        when(postRepository.findPostsWithPromoByUser(user.getId())).thenReturn(posts);
+
+        //Act
+        ProductSaleCountDto result = service.getProductSaleCountByUser(user.getId());
+
+        //Assertions
+        assertEquals(expected, result);
+    }
+
+    @Test
+    @DisplayName("countProductSaleByUser - user is not seller")
+    public void getProductSaleCountByUser_whenUserIsNotSeller_thenThrowUserNotSellerException() {
+        //Arrange
+        User user = UserFactory.createBuyer(2, "Carolina Comba");
+
+        when(userRepository.findById(user.getId())).thenReturn(Optional.of(user));
+
+        //Act & Assertions
+        assertThrows(UserNotSellerException.class, () -> service.getProductSaleCountByUser(user.getId()));
+    }
+
+    @Test
+    @DisplayName("countProductSaleByUser - user not found")
+    public void getProductSaleCountByUser_whenUserNotFound_thenThrowUserNotFoundException() {
+        //Arrange
+        Integer id = 90;
+
+        when(userRepository.findById(id)).thenReturn(Optional.empty());
+
+        //Act & Assertions
+        assertThrows(NotFoundException.class, () -> service.getProductSaleCountByUser(id));
+    }
+
+    @Test
+    @DisplayName("countProductSaleByUser - user not found")
+    public void getProductSaleCountByUser_whenWithoutPromoPost_thenThrowUserNotFoundException() {
+        //Arrange
+        User user = UserFactory.createSeller(3, "Ciro Sánchez");
+
+        when(userRepository.findById(user.getId())).thenReturn(Optional.of(user));
+        when(postRepository.findPostsWithPromoByUser(user.getId())).thenReturn(List.of());
+
+        //Act & Assertions
+        assertThrows(UserNotSellerException.class, () -> service.getProductSaleCountByUser(user.getId()));
     }
 }

@@ -1,18 +1,11 @@
 package com.socialmeli.socialmeli.controllers;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.socialmeli.socialmeli.dto.PostDto;
 import com.socialmeli.socialmeli.enums.Message;
 import com.socialmeli.socialmeli.models.User;
-import com.socialmeli.socialmeli.utils.PostFactory;
 import org.junit.jupiter.api.Disabled;
-import com.socialmeli.socialmeli.repositories.IPostRepository;
-import com.socialmeli.socialmeli.repositories.IUserRepository;
-import com.socialmeli.socialmeli.services.PostService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -30,6 +23,19 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.socialmeli.socialmeli.repositories.IPostRepository;
+import com.socialmeli.socialmeli.repositories.IUserRepository;
+import com.socialmeli.socialmeli.services.PostService;
+import com.socialmeli.socialmeli.utils.PostFactory;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
+import org.springframework.test.annotation.DirtiesContext;
+
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+
 
 @SpringBootTest
 
