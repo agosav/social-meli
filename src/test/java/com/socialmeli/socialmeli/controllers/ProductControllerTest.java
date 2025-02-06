@@ -2,36 +2,34 @@ package com.socialmeli.socialmeli.controllers;
 
 import com.socialmeli.socialmeli.dto.PostDto;
 import com.socialmeli.socialmeli.models.User;
+import com.socialmeli.socialmeli.repositories.IPostRepository;
+import com.socialmeli.socialmeli.repositories.IUserRepository;
+import com.socialmeli.socialmeli.services.PostService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import java.time.LocalDate;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
-import java.util.List;
-
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.socialmeli.socialmeli.enums.Message;
-import com.socialmeli.socialmeli.repositories.IPostRepository;
-import com.socialmeli.socialmeli.repositories.IUserRepository;
-import com.socialmeli.socialmeli.services.PostService;
 import com.socialmeli.socialmeli.utils.PostFactory;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.test.annotation.DirtiesContext;
 
+import java.time.LocalDate;
+import java.util.List;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @SpringBootTest
+
 @AutoConfigureMockMvc
 public class ProductControllerTest {
 
@@ -242,4 +240,34 @@ public class ProductControllerTest {
     void savePost_whenBodyIsInvalid_thenReturn400(String url) {
         // TODO: Implementar este test cuando estén hechas las validaciones
     }
+
+    @Test
+    @DisplayName("US-0011 - Get the number of promotional products for a specific seller")
+    void getPromoPostCountTest() throws Exception {
+
+        mockMvc.perform(get("/products/promo-post/count")
+                        .param("user_id", "5"))
+                .andExpect(status().isOk()).andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.promo_products_count").value(1))
+                .andExpect(jsonPath("$.user_name").value("Franca Pairetti"));
+    }
+
+    @Test
+    @DisplayName("US-0011 - NotFoundException")
+    void getPromoPostCountTest_whenUserNotFound_thenThrow404() throws Exception {
+
+        mockMvc.perform(get("/products/promo-post/count")
+                        .param("user_id", "203"))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    @DisplayName("US-0011 - Invalid param")
+    void getPromoPostCountTest_when() throws Exception {
+
+        mockMvc.perform(get("/products/promo-post/count")
+                        .param("user_id", "-5"))
+                .andExpect(status().isBadRequest());
+    }
+
 }
