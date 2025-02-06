@@ -83,40 +83,6 @@ public class UserServiceTest {
         assertThrows(NotFoundException.class, () -> userService.follow(userFollowerId, userFollowedId));
     }
 
-    @Test
-    @DisplayName("unfollowTest - should return Message USER_UNFOLLOWED")
-    void unfollowTest_whenFollowedExists_thenReturnMessageOk() {
-        // Arrange
-        User follower = User.builder().id(1).name("Emilia Mernes").build();
-        User followed = User.builder().id(2).name("Taylor Swift").build();
-        Follow follow = new Follow(follower, followed);
-        when(userRepository.findById(follower.getId())).thenReturn(Optional.of(follower));
-        when(userRepository.findById(followed.getId())).thenReturn(Optional.of(followed));
-        when(followRepository.exists(follow)).thenReturn(true);
-
-        // Act
-        MessageDto result = userService.unfollow(follower.getId(), followed.getId());
-
-        // Assert
-        assertEquals(Message.USER_UNFOLLOWED.format(followed.getName()), result.getMessage());
-    }
-
-    @Test
-    @DisplayName("unfollowTest - should return NotFoundException")
-    void unfollowTest_whenFollowedNotExists_thenReturnNotFoundException() {
-        // Arrange
-        Integer userId = 1;
-        Integer followedId = 999;
-        when(userRepository.findById(userId)).thenReturn(Optional.of(new User(userId, "Emilia Mernes", false)));
-        when(userRepository.findById(followedId)).thenReturn(Optional.empty());
-
-        // Act & Assert
-        NotFoundException exception = assertThrows(NotFoundException.class,
-                () -> userService.unfollow(userId, followedId));
-
-        assertThat(exception.getMessage()).isEqualTo(Message.USER_NOT_FOUND.format(followedId));
-    }
-
     //US-0002 : Obtener el resultado de la cantidad de usuarios que siguen a un determinado vendedor
     @DisplayName("follow - user followed not found")
     void followTest_whenUserFollowedDoesntExists_thenThrowNotFoundException() {
@@ -333,6 +299,77 @@ public class UserServiceTest {
 
         // Act & Assert
         assertThrows(NotFoundException.class, () -> userService.getFollowedList(userId, order));
+    }
+
+    @Test
+    @DisplayName("unfollowTest - should return Message USER_UNFOLLOWED")
+    void unfollowTest_whenFollowedExists_thenReturnMessageOk() {
+        // Arrange
+        User follower = UserFactory.createBuyer(1, "Emilia Mernes");
+        User followed = UserFactory.createBuyer(2, "Taylor Swift");
+
+        Follow follow = new Follow(follower, followed);
+        when(userRepository.findById(follower.getId())).thenReturn(Optional.of(follower));
+        when(userRepository.findById(followed.getId())).thenReturn(Optional.of(followed));
+        when(followRepository.exists(follow)).thenReturn(true);
+
+        // Act
+        MessageDto result = userService.unfollow(follower.getId(), followed.getId());
+
+        // Assert
+        assertEquals(Message.USER_UNFOLLOWED.format(followed.getName()), result.getMessage());
+    }
+
+    @Test
+    @DisplayName("unfollowTest - should return NotFoundException")
+    void unfollowTest_whenFollowedNotExists_thenReturnNotFoundException() {
+        // Arrange
+        Integer followerId = 1;
+        Integer followedId = 999;
+        when(userRepository.findById(followerId)).thenReturn(Optional.of(new User(followerId, "Emilia Mernes", false)));
+        when(userRepository.findById(followedId)).thenReturn(Optional.empty());
+
+        // Act & Assert
+        NotFoundException exception = assertThrows(NotFoundException.class,
+                () -> userService.unfollow(followerId, followedId));
+
+        assertThat(exception.getMessage()).isEqualTo(Message.USER_NOT_FOUND.format(followedId));
+    }
+
+    @Test
+    @DisplayName("unfollowTest - should return NotFoundException")
+    void unfollowTest_whenFollowerNotExists_thenReturnNotFoundException() {
+        // Arrange
+        Integer followerId = 999;
+        Integer followedId = 1;
+        when(userRepository.findById(followerId)).thenReturn(Optional.of(new User(followerId, "Emilia Mernes", false)));
+        when(userRepository.findById(followedId)).thenReturn(Optional.empty());
+
+        // Act & Assert
+        NotFoundException exception = assertThrows(NotFoundException.class,
+                () -> userService.unfollow(followerId, followedId));
+
+        assertThat(exception.getMessage()).isEqualTo(Message.USER_NOT_FOUND.format(followedId));
+    }
+
+    @Test
+    @DisplayName("unfollowTest - should return AlreadyExistException")
+    void unfollowTest_whenFollowDoesntExists_thenThrowNotFoundException() {
+        // Arrange
+        User user1 = UserFactory.createSeller(1, "Emilia Mernes");
+        User user2 = UserFactory.createBuyer(2, "TaylorSwift");
+        when(userRepository.findById(user1.getId())).thenReturn(Optional.of(user1));
+        when(userRepository.findById(user2.getId())).thenReturn(Optional.of(user2));
+
+        Follow follow = new Follow(user1, user2);
+        when(followRepository.exists(follow)).thenReturn(false);
+
+        //Act & Assert
+        AlreadyExistsException exception = assertThrows(AlreadyExistsException.class,
+                () -> userService.unfollow(user1.getId(), user2.getId()));
+
+        assertThat(exception.getMessage()).isEqualTo(Message.USER_NOT_FOLLOWED.format(user2.getName(),
+                user1.getName()));
     }
 
     @Test
