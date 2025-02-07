@@ -229,7 +229,7 @@ public class ProductControllerTest {
     public void getPostsOfFollowedSellersTest_whenUserIsNotFound_thenThrow404(String order) throws Exception {
         // Arrange
         Integer userId = 999;
-        String message = Message.USER_NOT_FOUND.format(userId);
+        String message = "User with ID 999 not found";
 
         // Act & Assert
         mockMvc.perform(get("/products/followed/{userId}/list", userId)
