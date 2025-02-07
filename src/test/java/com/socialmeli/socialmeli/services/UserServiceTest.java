@@ -18,6 +18,8 @@ import com.socialmeli.socialmeli.utils.UserFactory;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -255,12 +257,12 @@ public class UserServiceTest {
         assertEquals(expected, result);
     }
 
-    @Test
+    @ParameterizedTest
+    @ValueSource(strings = {"name_asc", "name_desc"})
     @DisplayName("#69 Test for 'User Not Found'")
-    public void testGetFollowerList_UserNotFound() {
+    public void testGetFollowerList_UserNotFound(String order) {
         // Arrange
         Integer userId = 800;
-        String order = "name_asc";
 
         when(userRepository.findById(userId)).thenReturn(Optional.empty());
 
@@ -274,12 +276,11 @@ public class UserServiceTest {
         assertEquals("User with ID 800 not found", exception.getMessage());
     }
 
-    @Test
+    @ParameterizedTest
+    @ValueSource(strings = {"name_asc", "name_desc"})
     @DisplayName("#70 Test for 'User is not seller'")
-    public void testGetFollowerList_UserNotSeller() {
+    public void testGetFollowerList_UserNotSeller(String order) {
         // Arrange
-        String order = "name_asc";
-
         User user = UserFactory.createBuyer(1);
 
         when(userRepository.findById(user.getId())).thenReturn(Optional.of(user));
@@ -354,12 +355,12 @@ public class UserServiceTest {
     }
 
 
-    @Test
+    @ParameterizedTest
+    @ValueSource(strings = {"name_asc", "name_desc"})
     @DisplayName("#72 getFollowedList - when user doesn't exist should throw user not found exception")
-    void getFollowedListTest_whenUserDoesntExist_thenThrowNotFound() {
+    void getFollowedListTest_whenUserDoesntExist_thenThrowNotFound(String order) {
         // Arrange
         Integer userId = 999;
-        String order = "name_asc";
         when(userRepository.findById(userId)).thenReturn(Optional.empty());
 
         // Act & Assert
