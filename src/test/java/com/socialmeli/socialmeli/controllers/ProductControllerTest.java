@@ -48,7 +48,7 @@ public class ProductControllerTest {
     // US 0010 - Llevar a cabo la publicación de un nuevo producto en promoción.
     @ParameterizedTest
     @ValueSource(strings = {"/products/post", "/products/promo-post"})
-    @DisplayName("#21 savePost - should return 200 OK when product does not exist and user is not seller")
+    @DisplayName("#22 savePost - should return 200 OK when product does not exist and user is not seller")
     @DirtiesContext(methodMode = DirtiesContext.MethodMode.AFTER_METHOD)
     void savePost_whenProductDoesNotExistAndUserIsNotSeller_thenSavePost(String url) throws Exception {
         // Arrange
@@ -66,7 +66,7 @@ public class ProductControllerTest {
 
     @ParameterizedTest
     @ValueSource(strings = {"/products/post", "/products/promo-post"})
-    @DisplayName("#22 savePost - should return 200 when product does not exist and user is seller")
+    @DisplayName("#23 savePost - should return 200 when product does not exist and user is seller")
     @DirtiesContext(methodMode = DirtiesContext.MethodMode.AFTER_METHOD)
     void savePost_whenProductDoesNotExistAndUserIsSeller_thenSavePost(String url) throws Exception {
         // Arrange
@@ -84,7 +84,7 @@ public class ProductControllerTest {
 
     @ParameterizedTest
     @ValueSource(strings = {"/products/post", "/products/promo-post"})
-    @DisplayName("#23 savePost - should return 409 when product already exists")
+    @DisplayName("#24 savePost - should return 409 when product already exists")
     void savePost_whenProductAlreadyExists_thenReturn400(String url) throws Exception {
         // Arrange
         Object post = PostFactory.createPostDto(1, 201, Objects.equals(url, "/products/promo-post"));
@@ -101,7 +101,7 @@ public class ProductControllerTest {
 
     @ParameterizedTest
     @ValueSource(strings = {"/products/post", "/products/promo-post"})
-    @DisplayName("#24 savePost - should return 400 when User Id is invalid")
+    @DisplayName("#25 savePost - should return 400 when User Id is invalid")
     @DirtiesContext(methodMode = DirtiesContext.MethodMode.AFTER_METHOD)
     void savePost_whenUserIdIsInvalid_thenThrow400(String url) throws Exception {
         // Arrange
@@ -116,7 +116,7 @@ public class ProductControllerTest {
 
     @ParameterizedTest
     @ValueSource(strings = {"/products/post", "/products/promo-post"})
-    @DisplayName("#25 savePost - should return 400 when no body is received")
+    @DisplayName("#26 savePost - should return 400 when no body is received")
     void savePost_whenNoBodyReceived_thenReturn400(String url) throws Exception {
         // Act & Assert
         mockMvc.perform(post(url).contentType(MediaType.APPLICATION_JSON))
@@ -127,7 +127,7 @@ public class ProductControllerTest {
     // que un usuario sigue en las últimas dos semanas.
     @ParameterizedTest
     @ValueSource(strings = {"date_asc", "date_desc", "DEFAULT"})
-    @DisplayName("#26 getPostsOfFollowedSellers - successful")
+    @DisplayName("#27 getPostsOfFollowedSellers - successful")
     public void getPostsOfFollowedSellersTest_whenOrderByDateAscOrDesc_thenReturnAList(String order) throws Exception {
         // Arrange
         User user = UserFactory.createBuyer(2);
@@ -162,7 +162,7 @@ public class ProductControllerTest {
 
     @ParameterizedTest
     @ValueSource(strings = {"date_asc", "date_desc", "DEFAULT"})
-    @DisplayName("#27 getPostsOfFollowedSellers - should return 404 when userid is not a number")
+    @DisplayName("#28 getPostsOfFollowedSellers - should return 404 when userid is not a number")
     public void getPostsOfFollowedSellersTest_whenUserIdIsNotANumber_thenThrow400(String order) throws Exception {
         // Arrange
         String userId = "numero";
@@ -173,7 +173,7 @@ public class ProductControllerTest {
     }
 
     @Test
-    @DisplayName("#28 getPostsOfFollowedSellers - should return 400 when order does not match")
+    @DisplayName("#29 getPostsOfFollowedSellers - should return 400 when order does not match")
     public void getPostsOfFollowedSellersTest_whenOrderDoesntMatch_thenThrow400() throws Exception {
         // Arrange
         String order = "word";
@@ -187,7 +187,7 @@ public class ProductControllerTest {
 
     @ParameterizedTest
     @ValueSource(strings = {"date_asc", "date_desc", "DEFAULT"})
-    @DisplayName("#29 getPostsOfFollowedSellers - should return 400 when user id is negative")
+    @DisplayName("#30 getPostsOfFollowedSellers - should return 400 when user id is negative")
     public void getPostsOfFollowedSellersTest_whenUserIdIsInvalid_thenThrow400(String order) throws Exception {
         // Arrange
         Integer userIdNegative = -1;
@@ -200,7 +200,7 @@ public class ProductControllerTest {
 
     @ParameterizedTest
     @ValueSource(strings = {"date_asc", "date_desc", "DEFAULT"})
-    @DisplayName("#30 getPostsOfFollowedSellers - should return 404 when user is not found")
+    @DisplayName("#31 getPostsOfFollowedSellers - should return 404 when user is not found")
     public void getPostsOfFollowedSellersTest_whenUserIsNotFound_thenThrow404(String order) throws Exception {
         // Arrange
         Integer userId = 999;
@@ -216,7 +216,7 @@ public class ProductControllerTest {
 
     // US 0011 - Obtener la cantidad de productos en promoción de un determinado vendedor.
     @Test
-    @DisplayName("#38 Get the number of promotional products for a specific seller")
+    @DisplayName("#39 Get the number of promotional products for a specific seller")
     void getPromoPostCountTest() throws Exception {
 
         mockMvc.perform(get("/products/promo-post/count")
@@ -227,7 +227,7 @@ public class ProductControllerTest {
     }
 
     @Test
-    @DisplayName("#39 NotFoundException")
+    @DisplayName("#40 NotFoundException")
     void getPromoPostCountTest_whenUserNotFound_thenThrow404() throws Exception {
 
         mockMvc.perform(get("/products/promo-post/count")
@@ -236,7 +236,7 @@ public class ProductControllerTest {
     }
 
     @Test
-    @DisplayName("#40 UserIsNotSeller")
+    @DisplayName("#41 UserIsNotSeller")
     void getPromoPostCountTest_whenUserIsNotSeller_thenThrow() throws Exception {
 
         mockMvc.perform(get("/products/promo-post/count")
@@ -245,7 +245,7 @@ public class ProductControllerTest {
     }
 
     @Test
-    @DisplayName("#41 Invalid user id")
+    @DisplayName("#42 Invalid user id")
     void getPromoPostCountTest_when() throws Exception {
 
         mockMvc.perform(get("/products/promo-post/count")
@@ -254,7 +254,7 @@ public class ProductControllerTest {
     }
 
     @Test
-    @DisplayName("#42 Empty List")
+    @DisplayName("#43 Empty List")
     void getPromoPostCountTest_whenListIsEmpty_thenThrow() throws Exception {
 
         mockMvc.perform(get("/products/promo-post/count")
