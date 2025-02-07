@@ -18,8 +18,6 @@ import com.socialmeli.socialmeli.utils.UserFactory;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -195,7 +193,7 @@ public class UserServiceTest {
 
     // US 0003 - Obtener un listado de todos los usuarios que siguen a un determinado vendedor (¿Quién me sigue?).
     @Test
-    @DisplayName("#68 getFollowersList - should return followers list ordered by name")
+    @DisplayName("#68 getFollowersList - should return followers list ordered by name asc")
     void getFollowersListTest_whenUserExistsOrderByAsc_thenReturnFollowersList() {
         // Arrange
         String order = "name_asc";
@@ -227,7 +225,7 @@ public class UserServiceTest {
 
     // US 0003 - Obtener un listado de todos los usuarios que siguen a un determinado vendedor (¿Quién me sigue?).
     @Test
-    @DisplayName("#68 getFollowersList - should return followers list ordered by name")
+    @DisplayName("#68 getFollowersList - should return followers list ordered by name desc")
     void getFollowersListTest_whenUserExistsOrderByDesc_thenReturnFollowersList() {
         // Arrange
         String order = "name_desc";
@@ -293,18 +291,19 @@ public class UserServiceTest {
     }
 
     // US 0004 - Obtener un listado de todos los vendedores a los cuales sigue un determinado usuario (¿A quién sigo?).
-    @ParameterizedTest
-    @DisplayName("#71 getFollowedList - should return followers list ordered by name")
-    @ValueSource(strings = {"name_asc", "name_desc"})
-    void getFollowedListTest_whenUserExists_thenReturnFollowedList(String order) {
+    @Test
+    @DisplayName("#71 getFollowedList - should return followers list ordered by name asc")
+    void getFollowedListTest_whenUserExistsOrderByAsc_thenReturnFollowedList() {
         // Arrange
+        String order = "name_asc";
         User user1 = UserFactory.createSeller(1, "Emilia Mernes");
         User user2 = UserFactory.createSeller(2, "Taylor Swift");
         User user3 = UserFactory.createBuyer(3, "Tini Stoessel");
 
-        List<UserDto> expectedList = (order.equals("name_asc"))
-                ? List.of(new UserDto(user2.getId(), user2.getName()), new UserDto(user3.getId(), user3.getName()))
-                : List.of(new UserDto(user3.getId(), user3.getName()), new UserDto(user2.getId(), user2.getName()));
+        List<UserDto> expectedList = List.of(
+                new UserDto(user2.getId(), user2.getName()),
+                new UserDto(user3.getId(), user3.getName())
+        );
 
         FollowedListDto expected = new FollowedListDto(user1.getId(), user1.getName(), expectedList);
         List<Follow> follows = List.of(
@@ -321,6 +320,39 @@ public class UserServiceTest {
         // Assert
         assertEquals(expected, result);
     }
+
+    // US 0004 - Obtener un listado de todos los vendedores a los cuales sigue un determinado usuario (¿A quién sigo?).
+    @Test
+    @DisplayName("#71 getFollowedList - should return followers list ordered by name desc")
+    void getFollowedListTest_whenUserExistsOrderByDesc_thenReturnFollowedList() {
+        // Arrange
+        String order = "name_desc";
+        User user1 = UserFactory.createSeller(1, "Emilia Mernes");
+        User user2 = UserFactory.createSeller(2, "Taylor Swift");
+        User user3 = UserFactory.createBuyer(3, "Tini Stoessel");
+
+        List<UserDto> expectedList = List.of(
+                new UserDto(user3.getId(), user3.getName()),
+                new UserDto(user2.getId(), user2.getName())
+
+        );
+
+        FollowedListDto expected = new FollowedListDto(user1.getId(), user1.getName(), expectedList);
+        List<Follow> follows = List.of(
+                new Follow(user1, user2),
+                new Follow(user1, user3)
+        );
+
+        when(userRepository.findById(user1.getId())).thenReturn(Optional.of(user1));
+        when(followRepository.findAllByIdFollower(user1.getId())).thenReturn(follows);
+
+        // Act
+        FollowedListDto result = userService.getFollowedList(user1.getId(), order);
+
+        // Assert
+        assertEquals(expected, result);
+    }
+
 
     @Test
     @DisplayName("#72 getFollowedList - when user doesn't exist should throw user not found exception")
