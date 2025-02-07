@@ -30,8 +30,8 @@ public class MyMapper {
                 .user(user)
                 .date(postDto.getDate())
                 .price(postDto.getPrice())
-                .category(postDto.getCategory())
                 .product(toProduct(postDto.getProduct()))
+                .category(postDto.getCategory())
                 .build();
     }
 

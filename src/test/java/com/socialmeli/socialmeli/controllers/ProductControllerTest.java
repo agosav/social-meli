@@ -48,7 +48,7 @@ public class ProductControllerTest {
     // US 0010 - Llevar a cabo la publicación de un nuevo producto en promoción.
     @ParameterizedTest
     @ValueSource(strings = {"/products/post", "/products/promo-post"})
-    @DisplayName("#21 savePos - should return 200 OK when product does not exist and user is not seller")
+    @DisplayName("#21 savePost - should return 200 OK when product does not exist and user is not seller")
     @DirtiesContext(methodMode = DirtiesContext.MethodMode.AFTER_METHOD)
     void savePost_whenProductDoesNotExistAndUserIsNotSeller_thenSavePost(String url) throws Exception {
         // Arrange
@@ -127,7 +127,7 @@ public class ProductControllerTest {
     // que un usuario sigue en las últimas dos semanas.
     @ParameterizedTest
     @ValueSource(strings = {"date_asc", "date_desc", "DEFAULT"})
-    @DisplayName("#26 getPostsOfFollowedSellers by date")
+    @DisplayName("#26 getPostsOfFollowedSellers - successful")
     public void getPostsOfFollowedSellersTest_whenOrderByDateAscOrDesc_thenReturnAList(String order) throws Exception {
         // Arrange
         User user = UserFactory.createBuyer(2);

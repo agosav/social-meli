@@ -16,6 +16,7 @@ import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 
+import java.util.Comparator;
 import java.util.List;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -197,12 +198,12 @@ public class UserControllerTest {
         User user6 = UserFactory.createBuyer(6, "Katerinne Peralta");
         User user4 = UserFactory.createBuyer(4, "Eliana Navarro");
 
-        List<User> usersExpected;
+        List<User> usersExpected = List.of(user2, user4, user6);
 
-        if ("name_asc".equals(order) || "DEFAULT".equals(order)) {
-            usersExpected = List.of(user2, user4, user6); // Orden ascendente
-        } else {
-            usersExpected = List.of(user6, user4, user2); // Orden descendente
+        if ("name_desc".equals(order)) {
+            usersExpected = usersExpected.stream()
+                    .sorted(Comparator.comparing(User::getName).reversed())
+                    .toList();
         }
 
         // Act & Assert
