@@ -25,7 +25,7 @@ class FollowRepositoryTest {
     }
 
     @Test
-    @DisplayName("findAllByIdFollower - should return a list of follows by id follower")
+    @DisplayName("#42 findAllByIdFollower - should return a list of follows by id follower")
     void findAllByIdFollowerTest_whenSuccess_thenReturnListFollow() {
         // Arrange
         User user1 = UserFactory.createSeller(1, "Agostina Avalle");
@@ -42,7 +42,7 @@ class FollowRepositoryTest {
     }
 
     @Test
-    @DisplayName("deleteTest - should remove the follow relationship from the repository")
+    @DisplayName("#43 deleteTest - should remove the follow relationship from the repository")
     void deleteTest() {
         // Arrange
         User user1 = new User(1, "Emilia Mernes", false);
@@ -58,7 +58,7 @@ class FollowRepositoryTest {
     }
 
     @Test
-    @DisplayName("findFollowedUsersTest - should return a list of user that one user follows")
+    @DisplayName("#44 findFollowedUsersTest - should return a list of user that one user follows")
     void  findFollowedUsersTest_whenUserFollowsSellers_thenReturnListOfFollowedUsers() {
         // Arrange
         User user1 = new User(1, "Agostina Avalle", true);
@@ -74,7 +74,7 @@ class FollowRepositoryTest {
     }
 
     @Test
-    @DisplayName("findAllByIdFollowed - should return a list of follows by id follower")
+    @DisplayName("#45 findAllByIdFollowed - should return a list of follows by id follower")
     void findAllByIdFollowedTest_thenReturnListFollows() {
         //Arrange
         User user1 = UserFactory.createSeller(1, "Agostina Avalle");
@@ -95,7 +95,7 @@ class FollowRepositoryTest {
     }
 
     @Test
-    @DisplayName("exists - should return true when follow exists")
+    @DisplayName("#46 exists - should return true when follow exists")
     void existsTest_whenFollowExists_thenReturnTrue() {
         // Arrange
         User user1 = UserFactory.createBuyer(2, "Carolina Comba");
@@ -110,7 +110,7 @@ class FollowRepositoryTest {
     }
 
     @Test
-    @DisplayName("exists - should return false when follow doesnt exists")
+    @DisplayName("#47 exists - should return false when follow doesnt exists")
     void existsTest_whenFollowDoesntExists_thenReturnFalse() {
         // Arrange
         User user1 = UserFactory.createBuyer(2, "Carolina Comba");
@@ -125,7 +125,7 @@ class FollowRepositoryTest {
     }
 
     @Test
-    @DisplayName("add - should add a follow to the list")
+    @DisplayName("#48 add - should add a follow to the list")
     void addTest_whenAdd_thenVoid() {
         // Arrange
         User user1 = UserFactory.createSeller(1, "Agostina Avalle");

@@ -25,7 +25,7 @@ jobs:
         with:
           charts: true
           disableLinks: true
-          stats: 'totalComments,openedPullRequests,totalReviews'
+          stats: 'totalReviews,openedPullRequests,totalComments'
           sortBy: 'totalReviews'
 
   coverage:

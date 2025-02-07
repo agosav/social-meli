@@ -37,7 +37,6 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -53,10 +52,36 @@ class PostServiceTest {
     @InjectMocks
     private PostService service;
 
+    // US 0005 - Dar de alta una nueva publicación.
+    @ParameterizedTest
+    @ValueSource(strings = {"/products/post", "/products/promo-post"})
+    @DisplayName("#71 savePost - should save the post when product does not exist and user is not seller")
+    @DirtiesContext(methodMode = DirtiesContext.MethodMode.AFTER_METHOD)
+    void savePost_whenProductDoesNotExistAndUserIsNotSeller_thenSavePost(String url) {
+        savePostTest(url, 1, 300, false, false);
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"/products/post", "/products/promo-post"})
+    @DisplayName("#72 savePost - should save the post when product does not exist and user is seller")
+    @DirtiesContext(methodMode = DirtiesContext.MethodMode.AFTER_METHOD)
+    void savePost_whenProductDoesNotExistAndUserIsSeller_thenSavePost(String url) {
+        savePostTest(url, 2, 300, false, true);
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"/products/post", "/products/promo-post"})
+    @DisplayName("#73 savePost - should throw AlreadyExistsException when product already exists")
+    void savePost_whenProductAlreadyExists_thenThrowAlreadyExistsException(String url) {
+        savePostTest(url, 1, 201, true, false);
+    }
+
+    // US 0006 - Obtener un listado de las publicaciones realizadas en las últimas dos semanas,
+    // por los vendedores que un usuario sigue
     @Test
-    @DisplayName("getRecentPostFromUsersAscTest - should retrun a list of post ordered Asc")
+    @DisplayName("#74 getRecentPostFromUsersAscTest - should retrun a list of post ordered Asc")
     void getRecentPostFromUsersTest_whenFollowsPostedLast2WeeksAndOrderIsDateAsc_thenReturnListOfPostOrderedAsc() {
-        //ARRANGE
+        // Arrange
         String order = "date_asc";
         User user = EntityCreator.getUser();
         Integer id = user.getId();
@@ -87,20 +112,20 @@ class PostServiceTest {
 
         ProductListDto expected = new ProductListDto(id, expectedPosts);
 
-        //ACT
+        // Act
         ProductListDto actual = service.getRecentPostFromUsers(order, id);
-        //ASSERT
+        // Assert
         assertEquals(expected, actual);
         assertEquals(expected.getPosts(), actual.getPosts());
         verify(userRepository).findById(id);
         verify(followRepository).findFollowedUsers(user);
         verify(postRepository).postFromUsers(sellersFollowed);
     }
-    @Test
-    @DisplayName("getRecentPostFromUsersDescTest - should retrun a list of post ordered Desc")
-    void getRecentPostFromUsersTest_whenFollowedPostedLast2WeeksAndOrderIsDateDesc_thenReturnListOfPostOrderedDesc() {
-        //ARRANGE
 
+    @Test
+    @DisplayName("#75 getRecentPostFromUsersDescTest - should retrun a list of post ordered Desc")
+    void getRecentPostFromUsersTest_whenFollowedPostedLast2WeeksAndOrderIsDateDesc_thenReturnListOfPostOrderedDesc() {
+        // Arrange
         String order = "date_desc";
         User user = EntityCreator.getUser();
         Integer id = user.getId();
@@ -130,39 +155,19 @@ class PostServiceTest {
 
         ProductListDto expected = new ProductListDto(id, expectedPosts);
 
-        //ACT
+        // Act
         ProductListDto actual = service.getRecentPostFromUsers(order, id);
-        //ASSERT
+        // Assert
         assertEquals(expected, actual);
         assertEquals(expected.getPosts(), actual.getPosts());
         verify(userRepository).findById(id);
         verify(followRepository).findFollowedUsers(user);
         verify(postRepository).postFromUsers(sellersFollowed);
     }
+
     @Test
-    @DisplayName("getRecentPostFromUsersNotFoundTest - should throw NotFoundException")
+    @DisplayName("#76 getRecentPostFromUsersNotFoundTest - should throw NotFoundException")
     void getRecentPostFromUsersTest_whenUserNotFound_thenThrowUserNotFoundException() {
-        //ARRANGE
-        String order = "date_asc";
-        when(userRepository.findById(anyInt())).thenReturn(Optional.empty());
-        //Act & Assert
-        assertThrows(NotFoundException.class, () -> service.getRecentPostFromUsers(order, anyInt()));
-    }
-  /*  @Test
-    void getRecentPostFromUsersTest_whenOrderIsInvalid_thenThrowInvalidOrderException() {
-        //ARRANGE
-        String order = "MartinCapo";
-        Integer id = 1;
-        //Act & Assert
-        assertThrows(BadRequestException.class, () -> service.getRecentPostFromUsers(order, id));
-
-    }
-
-   */
-
-    @Test
-    @DisplayName("Test for 'User Not Found' exception in getRecentPostFromUsers")
-    public void getRecentPostFromUsers_whenUserNotFound_thenException() {
         // Arrange
         Integer userId = 800;
         String order = "date_asc";
@@ -179,78 +184,9 @@ class PostServiceTest {
         assertEquals(expectedMessage, exception.getMessage());
     }
 
-    // US 0005 - Dar de alta una nueva publicación.
-    @ParameterizedTest
-    @ValueSource(strings = {"/products/post", "/products/promo-post"})
-    @DisplayName("savePost - should save the post when product does not exist and user is not seller")
-    @DirtiesContext(methodMode = DirtiesContext.MethodMode.AFTER_METHOD)
-    void savePost_whenProductDoesNotExistAndUserIsNotSeller_thenSavePost(String url) {
-        savePostTest(url, 1, 300, false, false);
-    }
-
-    @ParameterizedTest
-    @ValueSource(strings = {"/products/post", "/products/promo-post"})
-    @DisplayName("savePost - should save the post when product does not exist and user is seller")
-    @DirtiesContext(methodMode = DirtiesContext.MethodMode.AFTER_METHOD)
-    void savePost_whenProductDoesNotExistAndUserIsSeller_thenSavePost(String url) {
-        savePostTest(url, 2, 300, false, true);
-    }
-
-    @ParameterizedTest
-    @ValueSource(strings = {"/products/post", "/products/promo-post"})
-    @DisplayName("savePost - should throw AlreadyExistsException when product already exists")
-    void savePost_whenProductAlreadyExists_thenThrowAlreadyExistsException(String url) {
-        savePostTest(url, 1, 201, true, false);
-    }
-
-    private void savePostTest(String url, Integer userId, Integer productId, boolean productExists, boolean isSeller) {
-        // Arrange
-        User user = isSeller ? UserFactory.createSeller(userId) : UserFactory.createBuyer(userId);
-        Object post = createPostDto(url, userId, productId);
-
-        String message = Message.POST_PUBLISHED.getStr();
-
-        when(userRepository.findById(user.getId())).thenReturn(Optional.of(user));
-        when(postRepository.existsProductById(productId)).thenReturn(productExists);
-
-        // Act & Assert
-        if (productExists) {
-            assertThrows(AlreadyExistsException.class, () -> {
-                executeSavePost(url, post);
-            });
-        } else {
-            MessageDto result = executeSavePost(url, post);
-
-            if (isSeller) {
-                verify(userRepository, never()).update(user);
-            } else {
-                verify(userRepository).update(user);
-            }
-
-            verify(postRepository).save(any(Post.class));
-            assertEquals(message, result.getMessage());
-        }
-    }
-
-    private Object createPostDto(String url, Integer userId, Integer productId) {
-        if (url.equals("/products/post")) {
-            return PostFactory.createPostDto(userId, productId);
-        } else {
-            return PostFactory.createPostSaleDto(userId, productId);
-        }
-    }
-
-    private MessageDto executeSavePost(String url, Object post) {
-        if (url.equals("/products/post")) {
-            return service.savePost((PostDto) post);
-        } else {
-            return service.savePostSale((PostSaleDto) post);
-        }
-    }
-
     //US-0011 - Obtener la cantidad de productos en promoción de un determinado vendedor
     @Test
-    @DisplayName("countProductSaleByUser ")
+    @DisplayName("#82 countProductSaleByUser - successful")
     public void getProductSaleCountByUser_whenUserExists_thenGetProductSaleCountByUser() {
         //Arrange
         User user = UserFactory.createSeller(3, "Ciro Sánchez");
@@ -304,19 +240,7 @@ class PostServiceTest {
     }
 
     @Test
-    @DisplayName("countProductSaleByUser - user is not seller")
-    public void getProductSaleCountByUser_whenUserIsNotSeller_thenThrowUserNotSellerException() {
-        //Arrange
-        User user = UserFactory.createBuyer(2, "Carolina Comba");
-
-        when(userRepository.findById(user.getId())).thenReturn(Optional.of(user));
-
-        //Act & Assertions
-        assertThrows(UserNotSellerException.class, () -> service.getProductSaleCountByUser(user.getId()));
-    }
-
-    @Test
-    @DisplayName("countProductSaleByUser - user not found")
+    @DisplayName("#83 countProductSaleByUser - user not found")
     public void getProductSaleCountByUser_whenUserNotFound_thenThrowUserNotFoundException() {
         //Arrange
         Integer id = 90;
@@ -328,7 +252,19 @@ class PostServiceTest {
     }
 
     @Test
-    @DisplayName("countProductSaleByUser - user not found")
+    @DisplayName("#84 countProductSaleByUser - user is not seller")
+    public void getProductSaleCountByUser_whenUserIsNotSeller_thenThrowUserNotSellerException() {
+        //Arrange
+        User user = UserFactory.createBuyer(2, "Carolina Comba");
+
+        when(userRepository.findById(user.getId())).thenReturn(Optional.of(user));
+
+        //Act & Assertions
+        assertThrows(UserNotSellerException.class, () -> service.getProductSaleCountByUser(user.getId()));
+    }
+
+    @Test
+    @DisplayName("#85 countProductSaleByUser - empty list")
     public void getProductSaleCountByUser_whenWithoutPromoPost_thenThrowUserNotFoundException() {
         //Arrange
         User user = UserFactory.createSeller(3, "Ciro Sánchez");
@@ -338,5 +274,52 @@ class PostServiceTest {
 
         //Act & Assertions
         assertThrows(UserNotSellerException.class, () -> service.getProductSaleCountByUser(user.getId()));
+    }
+
+    // Métodos privados
+
+    private void savePostTest(String url, Integer userId, Integer productId, boolean productExists, boolean isSeller) {
+        // Arrange
+        User user = isSeller ? UserFactory.createSeller(userId) : UserFactory.createBuyer(userId);
+        Object post = createPostDto(url, userId, productId);
+
+        String message = Message.POST_PUBLISHED.getStr();
+
+        when(userRepository.findById(user.getId())).thenReturn(Optional.of(user));
+        when(postRepository.existsProductById(productId)).thenReturn(productExists);
+
+        // Act & Assert
+        if (productExists) {
+            assertThrows(AlreadyExistsException.class, () -> {
+                executeSavePost(url, post);
+            });
+        } else {
+            MessageDto result = executeSavePost(url, post);
+
+            if (isSeller) {
+                verify(userRepository, never()).update(user);
+            } else {
+                verify(userRepository).update(user);
+            }
+
+            verify(postRepository).save(any(Post.class));
+            assertEquals(message, result.getMessage());
+        }
+    }
+
+    private Object createPostDto(String url, Integer userId, Integer productId) {
+        if (url.equals("/products/post")) {
+            return PostFactory.createPostDto(userId, productId);
+        } else {
+            return PostFactory.createPostSaleDto(userId, productId);
+        }
+    }
+
+    private MessageDto executeSavePost(String url, Object post) {
+        if (url.equals("/products/post")) {
+            return service.savePost((PostDto) post);
+        } else {
+            return service.savePostSale((PostSaleDto) post);
+        }
     }
 }
