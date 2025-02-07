@@ -194,18 +194,51 @@ public class UserServiceTest {
     }
 
     // US 0003 - Obtener un listado de todos los usuarios que siguen a un determinado vendedor (¿Quién me sigue?).
-    @ParameterizedTest
+    @Test
     @DisplayName("#68 getFollowersList - should return followers list ordered by name")
-    @ValueSource(strings = {"name_asc", "name_desc"})
-    void getFollowersListTest_whenUserExists_thenReturnFollowersList(String order) {
+    void getFollowersListTest_whenUserExistsOrderByAsc_thenReturnFollowersList() {
         // Arrange
+        String order = "name_asc";
         User user1 = UserFactory.createSeller(1, "Emilia Mernes");
         User user2 = UserFactory.createSeller(2, "Taylor Swift");
         User user3 = UserFactory.createBuyer(3, "Tini Stoessel");
 
-        List<UserDto> expectedList = (order.equals("name_asc"))
-                ? List.of(new UserDto(user2.getId(), user2.getName()), new UserDto(user3.getId(), user3.getName()))
-                : List.of(new UserDto(user3.getId(), user3.getName()), new UserDto(user2.getId(), user2.getName()));
+        List<UserDto> expectedList = List.of(
+                new UserDto(user2.getId(), user2.getName()),
+                new UserDto(user3.getId(), user3.getName())
+        );
+
+        FollowerListDto expected = new FollowerListDto(user1.getId(), user1.getName(), expectedList);
+
+        List<Follow> follows = List.of(
+                new Follow(user2, user1),
+                new Follow(user3, user1)
+        );
+
+        when(userRepository.findById(user1.getId())).thenReturn(Optional.of(user1));
+        when(followRepository.findAllByIdFollowed(user1.getId())).thenReturn(follows);
+
+        // Act
+        FollowerListDto result = userService.getFollowerList(user1.getId(), order);
+
+        // Assert
+        assertEquals(expected, result);
+    }
+
+    // US 0003 - Obtener un listado de todos los usuarios que siguen a un determinado vendedor (¿Quién me sigue?).
+    @Test
+    @DisplayName("#68 getFollowersList - should return followers list ordered by name")
+    void getFollowersListTest_whenUserExistsOrderByDesc_thenReturnFollowersList() {
+        // Arrange
+        String order = "name_desc";
+        User user1 = UserFactory.createSeller(1, "Emilia Mernes");
+        User user2 = UserFactory.createSeller(2, "Taylor Swift");
+        User user3 = UserFactory.createBuyer(3, "Tini Stoessel");
+
+        List<UserDto> expectedList = List.of(
+                new UserDto(user3.getId(), user3.getName()),
+                new UserDto(user2.getId(), user2.getName())
+        );
 
         FollowerListDto expected = new FollowerListDto(user1.getId(), user1.getName(), expectedList);
 
