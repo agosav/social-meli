@@ -128,7 +128,7 @@ public class ProductControllerTest {
     @ParameterizedTest
     @ValueSource(strings = {"date_desc", "DEFAULT"})
     @DisplayName("#26 getPostsOfFollowedSellers - successful")
-    public void getPostsOfFollowedSellersTest_whenOrderByDateAscOrDesc_thenReturnAList(String order) throws Exception {
+    public void getPostsOfFollowedSellersTest_whenOrderByDateDescOrDefault_thenReturnAList(String order) throws Exception {
         // Arrange
         User user = UserFactory.createBuyer(2);
         List<PostDto> postsExpected = List.of(

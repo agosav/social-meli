@@ -187,10 +187,41 @@ public class UserControllerTest {
     }
 
     // US 0003 - Obtener un listado de todos los usuarios que siguen a un determinado vendedor (¿Quién me sigue?).
-    @ParameterizedTest
-    @ValueSource(strings = {"name_asc", "name_desc", "DEFAULT"})
+    @Test
     @DisplayName("#13 getFollowerUsers - successful with different order or default")
-    public void getFollowerUsersTest_whenOrderIsParametrizedOrNotProvided_thenReturnOrderedList(String order)
+    public void getFollowerUsersTest_whenOrderByNameDesc_thenReturnOrderedList()
+            throws Exception {
+        // Arrange
+        String order = "name_desc";
+        User user1 = UserFactory.createSeller(1, "Agostina Avalle");
+        User user4 = UserFactory.createBuyer(4, "Eliana Navarro");
+        User user6 = UserFactory.createBuyer(6, "Katerinne Peralta");
+        User user2 = UserFactory.createBuyer(2, "Carolina Comba");
+
+        List<User> usersExpected = List.of(user6, user4, user2);
+
+        // Act & Assert
+        ResultActions result = mockMvc.perform(get("/users/{userId}/followers/list", user1.getId())
+                        .param("order", order))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.user_id").value(user1.getId()))
+                .andExpect(jsonPath("$.user_name").value(user1.getName()))
+                .andExpect(jsonPath("$.followers").isArray())
+                .andExpect(jsonPath("$.followers.length()").value(usersExpected.size()));
+
+        for (int i = 0; i < usersExpected.size(); i++) {
+            String expectedName = usersExpected.get(i).getName();
+            Integer expectedId = usersExpected.get(i).getId();
+            result.andExpect(jsonPath("$.followers[" + i + "].user_id").value(expectedId))
+                    .andExpect(jsonPath("$.followers[" + i + "].user_name").value(expectedName));
+        }
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"name_asc", "DEFAULT"})
+    @DisplayName("#13 getFollowerUsers - successful with different order or default")
+    public void getFollowerUsersTest_whenOrderByNameDAscOrDefault_thenReturnOrderedList(String order)
             throws Exception {
         // Arrange
         User user1 = UserFactory.createSeller(1, "Agostina Avalle");
@@ -199,12 +230,6 @@ public class UserControllerTest {
         User user4 = UserFactory.createBuyer(4, "Eliana Navarro");
 
         List<User> usersExpected = List.of(user2, user4, user6);
-
-        if ("name_desc".equals(order)) {
-            usersExpected = usersExpected.stream()
-                    .sorted(Comparator.comparing(User::getName).reversed())
-                    .toList();
-        }
 
         // Act & Assert
         ResultActions result = mockMvc.perform(get("/users/{userId}/followers/list", user1.getId())
