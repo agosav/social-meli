@@ -24,7 +24,7 @@ class UserRepositoryTest {
     }
 
     @Test
-    @DisplayName("#54 findByIdTest - should return user when user exists")
+    @DisplayName("#55 findByIdTest - should return user when user exists")
     void findByIdTest_whenUserExists_thenReturnUser() {
         // Arrange
         User expected = UserFactory.createSeller(1, "Agostina Avalle");
@@ -37,7 +37,7 @@ class UserRepositoryTest {
     }
 
     @Test
-    @DisplayName("#55 findByIdTest - should return user when user doesn't exists")
+    @DisplayName("#56 findByIdTest - should return user when user doesn't exists")
     void findByIdTest_whenUserDoesntExists_thenReturnUser() {
         // Arrange
         Integer userId = 999;
@@ -49,7 +49,7 @@ class UserRepositoryTest {
     }
 
     @Test
-    @DisplayName("#56 update - should update the user details correctly")
+    @DisplayName("#57 update - should update the user details correctly")
     void updateTest_whenUserExists_thenUpdateUser() {
         // Arrange
         User user = UserFactory.createBuyer(2, "Carolina Comba");

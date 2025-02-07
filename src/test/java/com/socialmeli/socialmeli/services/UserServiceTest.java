@@ -48,7 +48,7 @@ public class UserServiceTest {
 
     // US 0001 - Poder realizar la acción de “Follow” (seguir) a un determinado vendedor.
     @Test
-    @DisplayName("#57 follow - successful")
+    @DisplayName("#58 follow - successful")
     void followTest_whenSuccessful_thenReturnMessageDto() {
         // Arrange
         User user1 = UserFactory.createBuyer(1);
@@ -71,7 +71,7 @@ public class UserServiceTest {
     }
 
     @Test
-    @DisplayName("#58 follow - user follower not found")
+    @DisplayName("#59 follow - user follower not found")
     void followTest_whenUserFollowerDoesntExists_thenThrowNotFoundException() {
         // Arrange
         Integer userFollowerId = 1;
@@ -84,7 +84,7 @@ public class UserServiceTest {
     }
 
     @Test
-    @DisplayName("#59 follow - user followed not found")
+    @DisplayName("#60 follow - user followed not found")
     void followTest_whenUserFollowedDoesntExists_thenThrowNotFoundException() {
         // Arrange
         Integer userFollowerId = 1;
@@ -98,7 +98,7 @@ public class UserServiceTest {
     }
 
     @Test
-    @DisplayName("#60 follow - user followed not seller")
+    @DisplayName("#61 follow - user followed not seller")
     void followTest_whenUserFollowedIsNotSeller_thenThrowNotFoundException() {
         // Arrange
         User user1 = UserFactory.createBuyer(1);
@@ -112,7 +112,7 @@ public class UserServiceTest {
     }
 
     @Test
-    @DisplayName("#61 follow - user followed is the same as follower")
+    @DisplayName("#62 follow - user followed is the same as follower")
     void followTest_whenUserFollowedIsTheSameAsFollower_thenThrowIllegalActionException() {
         // Arrange
         User user1 = UserFactory.createSeller(1);
@@ -124,7 +124,7 @@ public class UserServiceTest {
     }
 
     @Test
-    @DisplayName("#62 follow - user already followed")
+    @DisplayName("#63 follow - user already followed")
     void followTest_whenUserAlreadyFollowed_thenThrowAlreadyExistsException() {
         // Arrange
         User user1 = UserFactory.createBuyer(1);
@@ -143,7 +143,7 @@ public class UserServiceTest {
 
     // US 0002 - Obtener el resultado de la cantidad de usuarios que siguen a un determinado vendedor.
     @Test
-    @DisplayName("#63 countFollowersForSeller - successful")
+    @DisplayName("#64 countFollowersForSeller - successful")
     void countFollowersForSeller_whenUserExists_thenReturnCountFollowersForSeller() {
         // Arrange
         User user1 = UserFactory.createSeller(1, "Agostina Avalle");
@@ -169,7 +169,7 @@ public class UserServiceTest {
     }
 
     @Test
-    @DisplayName("#64 countFollowersForSeller - user not found")
+    @DisplayName("#65 countFollowersForSeller - user not found")
     void countFollowersForSeller_whenUserNotFound_thenReturnThrowNotFoundException() {
         // Arrange
         Integer userId = 7;
@@ -181,7 +181,7 @@ public class UserServiceTest {
     }
 
     @Test
-    @DisplayName("#65 countFollowersForSeller - user not seller")
+    @DisplayName("#66 countFollowersForSeller - user not seller")
     void countFollowersForSeller_whenUserNotSeller_thenReturnThrowNotSellerException() {
         // Arrange
         User user2 = UserFactory.createBuyer(2, "Carolina Comba");
@@ -195,7 +195,7 @@ public class UserServiceTest {
 
     // US 0003 - Obtener un listado de todos los usuarios que siguen a un determinado vendedor (¿Quién me sigue?).
     @ParameterizedTest
-    @DisplayName("#66 getFollowersList - should return followers list ordered by name")
+    @DisplayName("#67 getFollowersList - should return followers list ordered by name")
     @ValueSource(strings = {"name_asc", "name_desc"})
     void getFollowersListTest_whenUserExists_thenReturnFollowersList(String order) {
         // Arrange
@@ -225,7 +225,7 @@ public class UserServiceTest {
     }
 
     @Test
-    @DisplayName("#67 Test for 'User Not Found'")
+    @DisplayName("#68 Test for 'User Not Found'")
     public void testGetFollowerList_UserNotFound() {
         // Arrange
         Integer userId = 800;
@@ -244,7 +244,7 @@ public class UserServiceTest {
     }
 
     @Test
-    @DisplayName("#68 Test for 'User is not seller'")
+    @DisplayName("#69 Test for 'User is not seller'")
     public void testGetFollowerList_UserNotSeller() {
         // Arrange
         String order = "name_asc";
@@ -261,7 +261,7 @@ public class UserServiceTest {
 
     // US 0004 - Obtener un listado de todos los vendedores a los cuales sigue un determinado usuario (¿A quién sigo?).
     @ParameterizedTest
-    @DisplayName("#69 getFollowedList - should return followers list ordered by name")
+    @DisplayName("#70 getFollowedList - should return followers list ordered by name")
     @ValueSource(strings = {"name_asc", "name_desc"})
     void getFollowedListTest_whenUserExists_thenReturnFollowedList(String order) {
         // Arrange
@@ -290,7 +290,7 @@ public class UserServiceTest {
     }
 
     @Test
-    @DisplayName("#70 getFollowedList - when user doesn't exist should throw user not found exception")
+    @DisplayName("#71 getFollowedList - when user doesn't exist should throw user not found exception")
     void getFollowedListTest_whenUserDoesntExist_thenThrowNotFound() {
         // Arrange
         Integer userId = 999;
@@ -303,7 +303,7 @@ public class UserServiceTest {
 
     // US 0007 - Poder realizar la acción de "Unfollow" (dejar de seguir) a un determinado vendedor.
     @Test
-    @DisplayName("#77 unfollowTest - should return Message USER_UNFOLLOWED")
+    @DisplayName("#78 unfollowTest - should return Message USER_UNFOLLOWED")
     void unfollowTest_whenFollowedExists_thenReturnMessageOk() {
         // Arrange
         User follower = UserFactory.createBuyer(1, "Emilia Mernes");
@@ -354,7 +354,7 @@ public class UserServiceTest {
     }
 
     @Test
-    @DisplayName("#80 unfollowTest - should return AlreadyExistException")
+    @DisplayName("#81 unfollowTest - should return AlreadyExistException")
     void unfollowTest_whenFollowDoesntExists_thenThrowNotFoundException() {
         // Arrange
         User user1 = UserFactory.createSeller(1, "Emilia Mernes");
@@ -374,7 +374,7 @@ public class UserServiceTest {
     }
 
     @Test
-    @DisplayName("#81 Test for 'Cannot unfollow yourself' exception")
+    @DisplayName("#82 Test for 'Cannot unfollow yourself' exception")
     public void unfollowTest_whenFollowerAndFollowedAreSame_thenThrowIllegalActionException() {
         // Arrange
         Integer userId = 1;
