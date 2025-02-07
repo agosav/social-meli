@@ -157,16 +157,16 @@ public class ProductControllerTest {
         // Arrange
         User user = UserFactory.createBuyer(2);
         List<PostDto> postsExpected = List.of(
-                PostFactory.createPostIdDateDto(4, LocalDate.of(2025, 1, 25)),
-                PostFactory.createPostIdDateDto(5, LocalDate.of(2025, 1, 27)),
-                PostFactory.createPostIdDateDto(3, LocalDate.of(2025, 1, 30)),
+                PostFactory.createPostIdDateDto(1, LocalDate.of(2025, 2, 2)),
                 PostFactory.createPostIdDateDto(2, LocalDate.of(2025, 1, 31)),
-                PostFactory.createPostIdDateDto(1, LocalDate.of(2025, 2, 2))
+                PostFactory.createPostIdDateDto(3, LocalDate.of(2025, 1, 30)),
+                PostFactory.createPostIdDateDto(5, LocalDate.of(2025, 1, 27)),
+                PostFactory.createPostIdDateDto(4, LocalDate.of(2025, 1, 25))
         );
 
-        if ("date_desc".equals(order) || "DEFAULT".equals(order)) {
+        if ("date_asc".equals(order)) {
             postsExpected = postsExpected.stream()
-                    .sorted(Comparator.comparing(PostDto::getDate).reversed())
+                    .sorted(Comparator.comparing(PostDto::getDate))
                     .toList();
         }
 
