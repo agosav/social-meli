@@ -249,29 +249,33 @@ public class UserControllerTest {
         }
     }
 
-    @Test
+    @ParameterizedTest
     @DisplayName("#14 getFollowerUsers - user not found")
-    public void getFollowerUsersTest_whenUserDoesntExists_thenReturn404() throws Exception {
+    @ValueSource(strings = {"name_asc", "name_desc", "DEFAULT"})
+    public void getFollowerUsersTest_whenUserDoesntExists_thenReturn404(String order) throws Exception {
         // Arrange
         Integer userId = 999;
         String message = Message.USER_NOT_FOUND.format(userId);
 
         // Act & Assert
-        mockMvc.perform(get("/users/{userId}/followers/list", userId))
+        mockMvc.perform(get("/users/{userId}/followers/list", userId)
+                        .param("order", "DEFAULT".equals(order) ? "" : order))
                 .andExpect(status().isNotFound())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.message").value(message));
     }
 
-    @Test
+    @ParameterizedTest
     @DisplayName("#15 getFollowerUsers - user not seller")
-    public void getFollowerUsersTest_whenUserDoesntExists_thenReturn400() throws Exception {
+    @ValueSource(strings = {"name_asc", "name_desc", "DEFAULT"})
+    public void getFollowerUsersTest_whenUserDoesntExists_thenReturn400(String order) throws Exception {
         // Arrange
         User user = UserFactory.createBuyer(2, "Carolina Comba");
         String message = Message.USER_NOT_SELLER.format(user.getName());
 
         // Act & Assert
-        mockMvc.perform(get("/users/{userId}/followers/list", user.getId()))
+        mockMvc.perform(get("/users/{userId}/followers/list", user.getId())
+                        .param("order", "DEFAULT".equals(order) ? "" : order))
                 .andExpect(status().isBadRequest())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.message").value(message));
@@ -289,14 +293,16 @@ public class UserControllerTest {
                 .andExpect(status().isBadRequest());
     }
 
-    @Test
+    @ParameterizedTest
     @DisplayName("#17 getFollowerUsers - user id invalid")
-    public void getFollowerUsersTest_whenUserIdInvalid_thenReturn400() throws Exception {
+    @ValueSource(strings = {"name_asc", "name_desc", "DEFAULT"})
+    public void getFollowerUsersTest_whenUserIdInvalid_thenReturn400(String order) throws Exception {
         // Arrange
         Integer userId = -1;
 
         // Act & Assert:
-        mockMvc.perform(get("/users/{userId}/followers/list", userId))
+        mockMvc.perform(get("/users/{userId}/followers/list", userId)
+                        .param("order", "DEFAULT".equals(order) ? "" : order))
                 .andExpect(status().isBadRequest());
     }
 
@@ -350,20 +356,35 @@ public class UserControllerTest {
                 .andExpect(status().isBadRequest());
     }
 
-    @Test
-    @DisplayName("#20 getFollowedUsers - invalid user id")
-    public void getFollowedUsersTest_whenUserIdInvalid_thenReturn400() throws Exception {
+    @ParameterizedTest
+    @DisplayName("#20 getFollowedUsers - user not found")
+    @ValueSource(strings = {"name_asc", "name_desc", "DEFAULT"})
+    public void getFollowedUsersTest_whenUserNotFound_thenReturn404(String order) throws Exception {
+        // Arrange
+        Integer userId = 999;
+
+        // Act & Assert:
+        mockMvc.perform(get("/users/{userId}/followed/list", userId)
+                        .param("order", "DEFAULT".equals(order) ? "" : order))
+                .andExpect(status().isNotFound());
+    }
+
+    @ParameterizedTest
+    @DisplayName("#21 getFollowedUsers - invalid user id")
+    @ValueSource(strings = {"name_asc", "name_desc", "DEFAULT"})
+    public void getFollowedUsersTest_whenUserIdInvalid_thenReturn400(String order) throws Exception {
         // Arrange
         Integer userId = -1;
 
         // Act & Assert:
-        mockMvc.perform(get("/users/{userId}/followed/list", userId))
+        mockMvc.perform(get("/users/{userId}/followed/list", userId)
+                        .param("order", "DEFAULT".equals(order) ? "" : order))
                 .andExpect(status().isBadRequest());
     }
 
     // US 0007 - Poder realizar la acción de “Unfollow” (dejar de seguir) a un determinado vendedor.
     @Test
-    @DisplayName("#31 unfollowToUserTest - successful")
+    @DisplayName("#32 unfollowToUserTest - successful")
     @DirtiesContext(methodMode = DirtiesContext.MethodMode.AFTER_METHOD)
     public void unfollowUserTest_whenSuccessfull_thenReturn200() throws Exception {
         // Arrange
@@ -377,7 +398,7 @@ public class UserControllerTest {
     }
 
     @Test
-    @DisplayName("#32 unfollowToUserTest - user followed not found")
+    @DisplayName("#33 unfollowToUserTest - user followed not found")
     public void unfollowUserTest_whenUserFollowedDoesntExists_thenReturn404() throws Exception {
         // Arrange
         User follower = UserFactory.createBuyer(2, "Carolina Comba");
@@ -390,7 +411,7 @@ public class UserControllerTest {
     }
 
     @Test
-    @DisplayName("#33 unfollowToUserTest - user follower not found")
+    @DisplayName("#34 unfollowToUserTest - user follower not found")
     public void unfollowUserTest_whenUserFollowerDoesntExists_thenReturn404() throws Exception {
         // Arrange
         User follower = UserFactory.createBuyer(999, "Carolina Comba");
@@ -403,7 +424,7 @@ public class UserControllerTest {
     }
 
     @Test
-    @DisplayName("#34 unfollow - invalid user followed id")
+    @DisplayName("#35 unfollow - invalid user followed id")
     void unfollowTest_whenUserFollowedIdInvalid_thenReturn400() throws Exception {
         // Arrange
         Integer userFollowerId = 1;
@@ -415,7 +436,7 @@ public class UserControllerTest {
     }
 
     @Test
-    @DisplayName("#35 unfollow - invalid user follower id")
+    @DisplayName("#36 unfollow - invalid user follower id")
     void unfollowTest_whenUserFollowerIdInvalid_thenReturn400() throws Exception {
         // Arrange
         Integer userFollowerId = -1;
@@ -427,7 +448,7 @@ public class UserControllerTest {
     }
 
     @Test
-    @DisplayName("#36 unfollowToUserTest - follower try to unfollow to user that is not following")
+    @DisplayName("#37 unfollowToUserTest - follower try to unfollow to user that is not following")
     public void unfollowUserTest_whenFollowDoesntExists_thenReturn404() throws Exception {
         // Arrange
         User follower = UserFactory.createBuyer(2, "Carolina Comba");
@@ -440,7 +461,7 @@ public class UserControllerTest {
     }
 
     @Test
-    @DisplayName("#37 unfollowToUserTest - follower try to unfollow yourself")
+    @DisplayName("#38 unfollowToUserTest - follower try to unfollow yourself")
     public void unfollowUserTest_whenFollowerTryToUnfollowYourself_thenReturn400() throws Exception {
         // Arrange
         User follower = UserFactory.createBuyer(2, "Carolina Comba");

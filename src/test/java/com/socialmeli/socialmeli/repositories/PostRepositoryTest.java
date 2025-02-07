@@ -25,7 +25,7 @@ class PostRepositoryTest {
         postRepository.loadDataBase();
     }
     @Test
-    @DisplayName("#50 postFromUsers - should return a list of post form followed users")
+    @DisplayName("#51 postFromUsers - should return a list of post form followed users")
     void  postFromUsersTest_whenSellersFollowedPost_thenReturnListOfPostFromUsersFollowed() {
         // Arrange
         User follower = new User(2, "Carolina Comba", false);
@@ -112,7 +112,7 @@ class PostRepositoryTest {
     }
 
     @Test
-    @DisplayName("#51 save - should save post to the list")
+    @DisplayName("#52 save - should save post to the list")
     void saveTest_whenSave_thenVoid() {
         // Arrange
         Post post = Post.builder().id(500).build();
@@ -125,7 +125,7 @@ class PostRepositoryTest {
     }
 
     @Test
-    @DisplayName("#52 existsProductById - should return true when post exists")
+    @DisplayName("#53 existsProductById - should return true when post exists")
     void existsProductByIdTest_whenPostExists_thenReturnTrue() {
         // Act
         boolean result = postRepository.existsProductById(201);
@@ -135,7 +135,7 @@ class PostRepositoryTest {
     }
 
     @Test
-    @DisplayName("#53 existsProductById - should return false when post doesnt exists")
+    @DisplayName("#54 existsProductById - should return false when post doesnt exists")
     void existsProductByIdTest_whenPostDoesntExists_thenReturnFalse() {
         // Act
         boolean result = postRepository.existsProductById(999);
@@ -145,7 +145,7 @@ class PostRepositoryTest {
     }
 
     @Test
-    @DisplayName("#54 findPostsWithPromoByUserTest")
+    @DisplayName("#55 findPostsWithPromoByUserTest")
     public void findPostsWithPromoByUserTest_whenPostExists_thenReturnListPosts() {
         //Arrange
         User user = UserFactory.createSeller(3, "Ciro Sánchez");
