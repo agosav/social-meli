@@ -63,8 +63,8 @@ public class FollowRepository implements IFollowRepository {
     }
 
     @Override
-    public List<User> findFollowedUsers(User user) {
-        return follows.stream().filter(follow -> follow.getUserFollower().equals(user))
+    public List<User> findFollowedUsersById(Integer id) {
+        return follows.stream().filter(follow -> follow.getUserFollower().getId().equals(id))
                 .map(Follow::getUserFollowed).toList();
     }
 }

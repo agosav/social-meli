@@ -158,7 +158,7 @@ class PostServiceTest {
         List<User> sellersFollowed = UserFactory.getListOfSellers();
         List<Post> postsFromFollows = PostFactory.getPostsForUsers(sellersFollowed);
         when(userRepository.findById(id)).thenReturn(Optional.of(user));
-        when(followRepository.findFollowedUsers(user)).thenReturn(sellersFollowed);
+        when(followRepository.findFollowedUsersById(id)).thenReturn(sellersFollowed);
         when(postRepository.postFromUsers(sellersFollowed)).thenReturn(postsFromFollows);
         List<PostIdDto> expectedPosts = new ArrayList<>();
         expectedPosts.add(PostIdDto.builder()
@@ -188,7 +188,7 @@ class PostServiceTest {
         assertEquals(expected, actual);
         assertEquals(expected.getPosts(), actual.getPosts());
         verify(userRepository).findById(id);
-        verify(followRepository).findFollowedUsers(user);
+        verify(followRepository).findFollowedUsersById(id);
         verify(postRepository).postFromUsers(sellersFollowed);
     }
 
@@ -202,7 +202,7 @@ class PostServiceTest {
         List<User> sellersFollowed = UserFactory.getListOfSellers();
         List<Post> postsFromFollows = PostFactory.getPostsForUsers(sellersFollowed);
         when(userRepository.findById(id)).thenReturn(Optional.of(user));
-        when(followRepository.findFollowedUsers(user)).thenReturn(sellersFollowed);
+        when(followRepository.findFollowedUsersById(id)).thenReturn(sellersFollowed);
         when(postRepository.postFromUsers(sellersFollowed)).thenReturn(postsFromFollows);
         List<PostIdDto> expectedPosts = new ArrayList<>();
         expectedPosts.add(PostIdDto.builder()
@@ -231,7 +231,7 @@ class PostServiceTest {
         assertEquals(expected, actual);
         assertEquals(expected.getPosts(), actual.getPosts());
         verify(userRepository).findById(id);
-        verify(followRepository).findFollowedUsers(user);
+        verify(followRepository).findFollowedUsersById(id);
         verify(postRepository).postFromUsers(sellersFollowed);
     }
 

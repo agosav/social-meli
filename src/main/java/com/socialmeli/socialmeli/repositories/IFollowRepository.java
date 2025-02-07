@@ -5,7 +5,7 @@ import com.socialmeli.socialmeli.models.User;
 import java.util.List;
 
 public interface IFollowRepository {
-    List<User> findFollowedUsers(User user);
+    List<User> findFollowedUsersById(Integer id);
 
     void add(Follow follow);
 
