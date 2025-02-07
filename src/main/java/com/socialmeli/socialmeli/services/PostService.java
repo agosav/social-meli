@@ -91,7 +91,7 @@ public class PostService implements IPostService {
     @Override
     public ProductListDto getRecentPostFromUsers(String order, Integer userId) {
         User user = getUserIfExists(userId);
-        List<User> followed = followRepository.findFollowedUsers(user);
+        List<User> followed = followRepository.findFollowedUsersById(userId);
         List<Post> postsFromFollows = postRepository.postFromUsers(followed);
         List<PostIdDto> postsSinceLastWeek = filterPostsSince(postsFromFollows, LocalDate.now().minusWeeks(2));
 
