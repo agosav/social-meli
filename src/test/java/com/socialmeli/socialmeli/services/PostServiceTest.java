@@ -3,11 +3,9 @@ package com.socialmeli.socialmeli.services;
 import com.socialmeli.socialmeli.dto.PostDto;
 import com.socialmeli.socialmeli.dto.PostSaleDto;
 import com.socialmeli.socialmeli.dto.ProductDto;
-import com.socialmeli.socialmeli.dto.response.MessageDto;
 import com.socialmeli.socialmeli.dto.response.PostIdDto;
 import com.socialmeli.socialmeli.dto.response.ProductListDto;
 import com.socialmeli.socialmeli.dto.response.ProductSaleCountDto;
-import com.socialmeli.socialmeli.enums.Message;
 import com.socialmeli.socialmeli.exception.AlreadyExistsException;
 import com.socialmeli.socialmeli.exception.NotFoundException;
 import com.socialmeli.socialmeli.exception.UserNotSellerException;
@@ -69,24 +67,19 @@ class PostServiceTest {
         User user = UserFactory.createBuyer(userId);
         Object post = PostFactory.createPostDto(userId, productId, hasPromo);
 
-        String message = Message.POST_PUBLISHED.getStr();
-
         when(userRepository.findById(user.getId())).thenReturn(Optional.of(user));
         when(postRepository.existsProductById(productId)).thenReturn(false);
 
         // Act
-        MessageDto result;
-
         if (hasPromo) {
-            result = service.savePostSale((PostSaleDto) post);
+            service.savePostSale((PostSaleDto) post);
         } else {
-            result = service.savePost((PostDto) post);
+            service.savePost((PostDto) post);
         }
 
         // Assert
         verify(userRepository).update(user);
         verify(postRepository).save(any(Post.class));
-        assertEquals(message, result.getMessage());
     }
 
     @ParameterizedTest
@@ -101,25 +94,20 @@ class PostServiceTest {
         User user = UserFactory.createSeller(userId);
         Object post = PostFactory.createPostDto(userId, productId, hasPromo);
 
-        String message = Message.POST_PUBLISHED.getStr();
-
         when(userRepository.findById(user.getId())).thenReturn(Optional.of(user));
         when(postRepository.existsProductById(productId)).thenReturn(false);
 
         // Act
-        MessageDto result;
-
         if (hasPromo) {
-            result = service.savePostSale((PostSaleDto) post);
+            service.savePostSale((PostSaleDto) post);
         } else {
-            result = service.savePost((PostDto) post);
+            service.savePost((PostDto) post);
         }
 
         // Assert
         verify(userRepository, never()).update(user);
 
         verify(postRepository).save(any(Post.class));
-        assertEquals(message, result.getMessage());
     }
 
     @ParameterizedTest
@@ -244,14 +232,10 @@ class PostServiceTest {
 
         when(userRepository.findById(userId)).thenReturn(Optional.empty());
 
-        // Act
-        NotFoundException exception = assertThrows(NotFoundException.class, () -> {
+        // Act & Assert
+        assertThrows(NotFoundException.class, () -> {
             service.getRecentPostFromUsers(order, userId);
         });
-
-        // Assert
-        String expectedMessage = Message.USER_NOT_FOUND.format(userId);
-        assertEquals(expectedMessage, exception.getMessage());
     }
 
     //US-0011 - Obtener la cantidad de productos en promoción de un determinado vendedor

@@ -40,7 +40,7 @@ public class UserControllerTest {
         User user1 = UserFactory.createSeller(1, "Agostina Avalle");
         User user5 = UserFactory.createSeller(5, "Franca Pairetti");
 
-        String message = Message.USER_FOLLOWED.format(user1.getName());
+        String message = "Agostina Avalle followed successfully";
 
         // Act & Assert
         performFollow(user5.getId(), user1.getId(), message, 200);
@@ -53,7 +53,7 @@ public class UserControllerTest {
         Integer userFollowerId = 999;
         Integer userFollowedId = 2;
 
-        String message = Message.USER_NOT_FOUND.format(userFollowerId);
+        String message = "User with ID 999 not found";
 
         // Act & Assert
         performFollow(userFollowerId, userFollowedId, message, 404);
@@ -66,7 +66,7 @@ public class UserControllerTest {
         Integer userFollowerId = 1;
         Integer userFollowedId = 999;
 
-        String message = Message.USER_NOT_FOUND.format(userFollowedId);
+        String message = "User with ID 999 not found";
 
         // Act & Assert
         performFollow(userFollowerId, userFollowedId, message, 404);
@@ -79,7 +79,7 @@ public class UserControllerTest {
         Integer userIdSeller = 1;
         User userNotSeller = UserFactory.createBuyer(2, "Carolina Comba");
 
-        String message = Message.USER_NOT_SELLER.format(userNotSeller.getName());
+        String message = "Carolina Comba is not a seller";
 
         // Act & Assert
         performFollow(userIdSeller, userNotSeller.getId(), message, 400);
@@ -90,7 +90,7 @@ public class UserControllerTest {
     public void followTest_whenUserFollowedIsTheSameAsFollower_thenReturn400() throws Exception {
         // Arrange
         Integer userId = 1;
-        String message = Message.CANNOT_FOLLOW_SELF.getStr();
+        String message = "You cannot follow yourself";
 
         // Act & Assert
         performFollow(userId, userId, message, 400);
@@ -103,7 +103,7 @@ public class UserControllerTest {
         User user2 = UserFactory.createBuyer(2, "Carolina Comba");
         User user1 = UserFactory.createSeller(1, "Agostina Avalle");
 
-        String message = Message.USER_ALREADY_FOLLOWED.format(user1.getName(), user2.getName());
+        String message = "Agostina Avalle is already followed by Carolina Comba";
 
         // Act & Assert
         performFollow(user2.getId(), user1.getId(), message, 409);
@@ -137,9 +137,10 @@ public class UserControllerTest {
     @Test
     @DisplayName("#9 countFollowersForSeller - successful")
     public void getCountFollowerForSellerTest_wheUserExists_thenReturnUserFollowerCountDto() throws Exception {
-        //Arrange
+        // Arrange
         UserFollowerCountDto user1 = new UserFollowerCountDto(1, "Agostina Avalle", 3);
-        //Act & Assertions
+
+        // Act & Assert
         mockMvc.perform(get("/users/{userId}/followers/count", user1.getId()))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
@@ -151,10 +152,11 @@ public class UserControllerTest {
     @Test
     @DisplayName("#10 countFollowersForSeller - user not found")
     public void getCountFollowerForSellerTest_whenUserNotfound_thenReturn404() throws Exception {
-        //Arrange
+        // Arrange
         Integer userId = 999;
-        String message = Message.USER_NOT_FOUND.format(userId);
-        //Act & Assertions
+        String message = "User with ID 999 not found";
+
+        // Act & Assert
         mockMvc.perform(get("/users/{userId}/followers/count", userId))
                 .andExpect(status().isNotFound())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
@@ -164,10 +166,11 @@ public class UserControllerTest {
     @Test
     @DisplayName("#11 countFollowersForSeller - user not seller")
     public void getCountFollowerForSellerTest_whenUserNotSeller_thenReturn400() throws Exception {
-        //Arrange
+        // Arrange
         User userNotSeller = new User(2, "Carolina Comba", false);
-        String message = Message.USER_NOT_SELLER.format(userNotSeller.getName());
-        //Act & Assertions
+        String message = "Carolina Comba is not a seller";
+
+        // Act & Assert
         mockMvc.perform(get("/users/{userId}/followers/count", userNotSeller.getId()))
                 .andExpect(status().isBadRequest())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
@@ -180,14 +183,14 @@ public class UserControllerTest {
         //Arrange
         Integer userId = -1;
 
-        //Act & Assertions
+        //Act & Assert
         mockMvc.perform(get("/users/{userId}/followers/count", userId))
                 .andExpect(status().isBadRequest());
     }
 
     // US 0003 - Obtener un listado de todos los usuarios que siguen a un determinado vendedor (¿Quién me sigue?).
     @Test
-    @DisplayName("#13 getFollowerUsers - successful with different order or default")
+    @DisplayName("#13 getFollowerUsers - successful with name_desc")
     public void getFollowerUsersTest_whenOrderByNameDesc_thenReturnOrderedList()
             throws Exception {
         // Arrange
@@ -219,7 +222,7 @@ public class UserControllerTest {
 
     @ParameterizedTest
     @ValueSource(strings = {"name_asc", "DEFAULT"})
-    @DisplayName("#13 getFollowerUsers - successful with different order or default")
+    @DisplayName("#13 getFollowerUsers - successful with name_asc or default")
     public void getFollowerUsersTest_whenOrderByNameDAscOrDefault_thenReturnOrderedList(String order)
             throws Exception {
         // Arrange
@@ -254,7 +257,7 @@ public class UserControllerTest {
     public void getFollowerUsersTest_whenUserDoesntExists_thenReturn404(String order) throws Exception {
         // Arrange
         Integer userId = 999;
-        String message = Message.USER_NOT_FOUND.format(userId);
+        String message = "User with ID 999 not found";
 
         // Act & Assert
         mockMvc.perform(get("/users/{userId}/followers/list", userId)
@@ -270,7 +273,7 @@ public class UserControllerTest {
     public void getFollowerUsersTest_whenUserDoesntExists_thenReturn400(String order) throws Exception {
         // Arrange
         User user = UserFactory.createBuyer(2, "Carolina Comba");
-        String message = Message.USER_NOT_SELLER.format(user.getName());
+        String message = "Carolina Comba is not a seller";
 
         // Act & Assert
         mockMvc.perform(get("/users/{userId}/followers/list", user.getId())
@@ -307,9 +310,9 @@ public class UserControllerTest {
 
     // US 0004 - Obtener un listado de todos los vendedores a los cuales sigue un determinado usuario (¿A quién sigo?).
     @ParameterizedTest
-    @ValueSource(strings = {"name_asc", "name_desc", "DEFAULT"})
-    @DisplayName("#18 getFollowedUsers - successful with different order or default")
-    public void getFollowedUsersTest_whenOrderIsParametrizedOrNotProvided_thenReturnOrderedList(String order)
+    @ValueSource(strings = {"name_asc", "DEFAULT"})
+    @DisplayName("#18 getFollowedUsers - successful with name_asc or default")
+    public void getFollowedUsersTest_whenOrderIsAscOrDefault_thenReturnOrderedList(String order)
             throws Exception {
         // Arrange
         User user1 = UserFactory.createSeller(1, "Agostina Avalle");
@@ -317,17 +320,43 @@ public class UserControllerTest {
         User user3 = UserFactory.createSeller(3, "Ciro Sánchez");
         User user5 = UserFactory.createSeller(5, "Franca Pairetti");
 
-        List<User> usersExpected;
-
-        if ("name_asc".equals(order) || "DEFAULT".equals(order)) {
-            usersExpected = List.of(user1, user3, user5); // Orden ascendente
-        } else {
-            usersExpected = List.of(user5, user3, user1); // Orden descendente
-        }
+        List<User> usersExpected = List.of(user1, user3, user5); // Orden ascendente
 
         // Act & Assert
         ResultActions result = mockMvc.perform(get("/users/{userId}/followed/list", user2.getId())
                         .param("order", "DEFAULT".equals(order) ? "" : order))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.user_id").value(user2.getId()))
+                .andExpect(jsonPath("$.user_name").value(user2.getName()))
+                .andExpect(jsonPath("$.followed").isArray())
+                .andExpect(jsonPath("$.followed.length()").value(usersExpected.size()));
+
+        for (int i = 0; i < usersExpected.size(); i++) {
+            String expectedName = usersExpected.get(i).getName();
+            Integer expectedId = usersExpected.get(i).getId();
+            result.andExpect(jsonPath("$.followed[" + i + "].user_id").value(expectedId))
+                    .andExpect(jsonPath("$.followed[" + i + "].user_name").value(expectedName));
+        }
+    }
+
+    @Test
+    @DisplayName("#18 getFollowedUsers - successful with name_desc")
+    public void getFollowedUsersTest_whenOrderIsParametrizedOrNotProvided_thenReturnOrderedList()
+            throws Exception {
+        // Arrange
+        String order = "name_desc";
+
+        User user1 = UserFactory.createSeller(1, "Agostina Avalle");
+        User user2 = UserFactory.createBuyer(2, "Carolina Comba");
+        User user3 = UserFactory.createSeller(3, "Ciro Sánchez");
+        User user5 = UserFactory.createSeller(5, "Franca Pairetti");
+
+        List<User> usersExpected = List.of(user5, user3, user1); // Orden descendente
+
+        // Act & Assert
+        ResultActions result = mockMvc.perform(get("/users/{userId}/followed/list", user2.getId())
+                        .param("order", order))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.user_id").value(user2.getId()))
@@ -390,7 +419,7 @@ public class UserControllerTest {
         User follower = UserFactory.createBuyer(2, "Carolina Comba");
         User followed = UserFactory.createSeller(1, "Agostina Avalle");
 
-        String expectedMessage = Message.USER_UNFOLLOWED.format(followed.getName());
+        String expectedMessage = "Agostina Avalle unfollowed successfully";
 
         // Act & Assert
         performUnfollow(follower.getId(), followed.getId(), expectedMessage, 200);
@@ -401,9 +430,9 @@ public class UserControllerTest {
     public void unfollowUserTest_whenUserFollowedDoesntExists_thenReturn404() throws Exception {
         // Arrange
         User follower = UserFactory.createBuyer(2, "Carolina Comba");
-        User followed = UserFactory.createSeller(999, "Agostina Avalle");
+        User followed = UserFactory.createSeller(999);
 
-        String expectedMessage = Message.USER_NOT_FOUND.format(followed.getId());
+        String expectedMessage = "User with ID 999 not found";
 
         // Act & Assert
         performUnfollow(follower.getId(), followed.getId(), expectedMessage, 404);
@@ -413,10 +442,10 @@ public class UserControllerTest {
     @DisplayName("#34 unfollowToUserTest - user follower not found")
     public void unfollowUserTest_whenUserFollowerDoesntExists_thenReturn404() throws Exception {
         // Arrange
-        User follower = UserFactory.createBuyer(999, "Carolina Comba");
+        User follower = UserFactory.createBuyer(999);
         User followed = UserFactory.createSeller(1, "Agostina Avalle");
 
-        String expectedMessage = Message.USER_NOT_FOUND.format(follower.getId());
+        String expectedMessage = "User with ID 999 not found";
 
         // Act & Assert
         performUnfollow(follower.getId(), followed.getId(), expectedMessage, 404);
@@ -453,7 +482,7 @@ public class UserControllerTest {
         User follower = UserFactory.createBuyer(2, "Carolina Comba");
         User followed = UserFactory.createSeller(6, "Katerinne Peralta");
 
-        String expectedMessage = Message.USER_NOT_FOLLOWED.format(followed.getName(), follower.getName());
+        String expectedMessage = "Katerinne Peralta is not followed by Carolina Comba";
 
         // Act & Assert
         performUnfollow(follower.getId(), followed.getId(), expectedMessage, 409);
@@ -465,7 +494,7 @@ public class UserControllerTest {
         // Arrange
         User follower = UserFactory.createBuyer(2, "Carolina Comba");
 
-        String expectedMessage = Message.CANNOT_UNFOLLOW_SELF.getStr();
+        String expectedMessage = "You cannot unfollow yourself";
 
         // Act & Assert
         performUnfollow(follower.getId(), follower.getId(), expectedMessage, 400);

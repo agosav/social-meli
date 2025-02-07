@@ -3,9 +3,7 @@ package com.socialmeli.socialmeli.services;
 import com.socialmeli.socialmeli.dto.response.UserDto;
 import com.socialmeli.socialmeli.dto.response.FollowerListDto;
 import com.socialmeli.socialmeli.dto.response.FollowedListDto;
-import com.socialmeli.socialmeli.dto.response.MessageDto;
 import com.socialmeli.socialmeli.dto.response.UserFollowerCountDto;
-import com.socialmeli.socialmeli.enums.Message;
 import com.socialmeli.socialmeli.exception.NotFoundException;
 import com.socialmeli.socialmeli.exception.AlreadyExistsException;
 import com.socialmeli.socialmeli.exception.IllegalActionException;
@@ -27,7 +25,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.util.List;
 import java.util.Optional;
 
-import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.verify;
@@ -55,7 +52,6 @@ public class UserServiceTest {
         User user2 = UserFactory.createSeller(2);
 
         Follow follow = new Follow(user1, user2);
-        Message expected = Message.USER_FOLLOWED;
 
         when(userRepository.findById(user1.getId())).thenReturn(Optional.of(user1));
         when(userRepository.findById(user2.getId())).thenReturn(Optional.of(user2));
@@ -63,11 +59,10 @@ public class UserServiceTest {
         when(followRepository.exists(follow)).thenReturn(false);
 
         // Act
-        MessageDto result = userService.follow(user1.getId(), user2.getId());
+        userService.follow(user1.getId(), user2.getId());
 
-        // Arrange
+        // Assert
         verify(followRepository).add(follow);
-        assertEquals(expected.format(user2.getName()), result.getMessage());
     }
 
     @Test
@@ -185,7 +180,6 @@ public class UserServiceTest {
     void countFollowersForSeller_whenUserNotSeller_thenReturnThrowNotSellerException() {
         // Arrange
         User user2 = UserFactory.createBuyer(2, "Carolina Comba");
-        List<Follow> followers = List.of();
 
         when(userRepository.findById(user2.getId())).thenReturn(Optional.of(user2));
 
@@ -315,10 +309,10 @@ public class UserServiceTest {
         when(followRepository.exists(follow)).thenReturn(true);
 
         // Act
-        MessageDto result = userService.unfollow(follower.getId(), followed.getId());
+        userService.unfollow(follower.getId(), followed.getId());
 
         // Assert
-        assertEquals(Message.USER_UNFOLLOWED.format(followed.getName()), result.getMessage());
+        verify(followRepository).delete(follow);
     }
 
     @Test
@@ -331,10 +325,8 @@ public class UserServiceTest {
         when(userRepository.findById(followedId)).thenReturn(Optional.empty());
 
         // Act & Assert
-        NotFoundException exception = assertThrows(NotFoundException.class,
+        assertThrows(NotFoundException.class,
                 () -> userService.unfollow(followerId, followedId));
-
-        assertThat(exception.getMessage()).isEqualTo(Message.USER_NOT_FOUND.format(followedId));
     }
 
     @Test
@@ -347,10 +339,8 @@ public class UserServiceTest {
         when(userRepository.findById(followedId)).thenReturn(Optional.empty());
 
         // Act & Assert
-        NotFoundException exception = assertThrows(NotFoundException.class,
+        assertThrows(NotFoundException.class,
                 () -> userService.unfollow(followerId, followedId));
-
-        assertThat(exception.getMessage()).isEqualTo(Message.USER_NOT_FOUND.format(followedId));
     }
 
     @Test
@@ -366,11 +356,8 @@ public class UserServiceTest {
         when(followRepository.exists(follow)).thenReturn(false);
 
         //Act & Assert
-        AlreadyExistsException exception = assertThrows(AlreadyExistsException.class,
+        assertThrows(AlreadyExistsException.class,
                 () -> userService.unfollow(user1.getId(), user2.getId()));
-
-        assertThat(exception.getMessage()).isEqualTo(Message.USER_NOT_FOLLOWED.format(user2.getName(),
-                user1.getName()));
     }
 
     @Test
@@ -386,13 +373,10 @@ public class UserServiceTest {
 
         when(userRepository.findById(userId)).thenReturn(Optional.of(follower));
 
-        // Act
-        IllegalActionException exception = assertThrows(IllegalActionException.class, () -> {
+        // Act & Assert
+        assertThrows(IllegalActionException.class, () -> {
             userService.unfollow(follower.getId(), followed.getId());
         });
-
-        // Assert
-        assertEquals(Message.CANNOT_UNFOLLOW_SELF.getStr(), exception.getMessage());
     }
 }
 
