@@ -17,7 +17,6 @@ import com.socialmeli.socialmeli.models.User;
 import com.socialmeli.socialmeli.repositories.IFollowRepository;
 import com.socialmeli.socialmeli.repositories.IPostRepository;
 import com.socialmeli.socialmeli.repositories.IUserRepository;
-import com.socialmeli.socialmeli.utils.EntityCreator;
 import com.socialmeli.socialmeli.utils.PostFactory;
 import com.socialmeli.socialmeli.utils.UserFactory;
 import org.junit.jupiter.api.DisplayName;
@@ -43,37 +42,108 @@ import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class PostServiceTest {
+
     @Mock
     private  IPostRepository postRepository;
+
     @Mock
     private  IUserRepository userRepository;
+
     @Mock
     private  IFollowRepository followRepository;
+
     @InjectMocks
     private PostService service;
 
     // US 0005 - Dar de alta una nueva publicación.
+    // US 0010 - Llevar a cabo la publicación de un nuevo producto en promoción.
     @ParameterizedTest
-    @ValueSource(strings = {"/products/post", "/products/promo-post"})
+    @ValueSource(booleans = {true, false})
     @DisplayName("#71 savePost - should save the post when product does not exist and user is not seller")
     @DirtiesContext(methodMode = DirtiesContext.MethodMode.AFTER_METHOD)
-    void savePost_whenProductDoesNotExistAndUserIsNotSeller_thenSavePost(String url) {
-        savePostTest(url, 1, 300, false, false);
+    void savePost_whenProductDoesNotExistAndUserIsNotSeller_thenSavePost(boolean hasPromo) {
+        // Arrange
+        Integer userId = 2;
+        Integer productId = 300;
+
+        User user = UserFactory.createBuyer(userId);
+        Object post = PostFactory.createPostDto(userId, productId, hasPromo);
+
+        String message = Message.POST_PUBLISHED.getStr();
+
+        when(userRepository.findById(user.getId())).thenReturn(Optional.of(user));
+        when(postRepository.existsProductById(productId)).thenReturn(false);
+
+        // Act
+        MessageDto result;
+
+        if (hasPromo) {
+            result = service.savePostSale((PostSaleDto) post);
+        } else {
+            result = service.savePost((PostDto) post);
+        }
+
+        // Assert
+        verify(userRepository).update(user);
+        verify(postRepository).save(any(Post.class));
+        assertEquals(message, result.getMessage());
     }
 
     @ParameterizedTest
-    @ValueSource(strings = {"/products/post", "/products/promo-post"})
+    @ValueSource(booleans = {true, false})
     @DisplayName("#72 savePost - should save the post when product does not exist and user is seller")
     @DirtiesContext(methodMode = DirtiesContext.MethodMode.AFTER_METHOD)
-    void savePost_whenProductDoesNotExistAndUserIsSeller_thenSavePost(String url) {
-        savePostTest(url, 2, 300, false, true);
+    void savePost_whenProductDoesNotExistAndUserIsSeller_thenSavePost(boolean hasPromo) {
+        // Arrange
+        Integer userId = 1;
+        Integer productId = 2;
+
+        User user = UserFactory.createSeller(userId);
+        Object post = PostFactory.createPostDto(userId, productId, hasPromo);
+
+        String message = Message.POST_PUBLISHED.getStr();
+
+        when(userRepository.findById(user.getId())).thenReturn(Optional.of(user));
+        when(postRepository.existsProductById(productId)).thenReturn(false);
+
+        // Act
+        MessageDto result;
+
+        if (hasPromo) {
+            result = service.savePostSale((PostSaleDto) post);
+        } else {
+            result = service.savePost((PostDto) post);
+        }
+
+        // Assert
+        verify(userRepository, never()).update(user);
+
+        verify(postRepository).save(any(Post.class));
+        assertEquals(message, result.getMessage());
     }
 
     @ParameterizedTest
-    @ValueSource(strings = {"/products/post", "/products/promo-post"})
+    @ValueSource(booleans = {true, false})
     @DisplayName("#73 savePost - should throw AlreadyExistsException when product already exists")
-    void savePost_whenProductAlreadyExists_thenThrowAlreadyExistsException(String url) {
-        savePostTest(url, 1, 201, true, false);
+    void savePost_whenProductAlreadyExists_thenThrowAlreadyExistsException(boolean hasPromo) {
+        // Arrange
+        Integer userId = 1;
+        Integer productId = 201;
+
+        User user = UserFactory.createSeller(userId);
+        Object post = PostFactory.createPostDto(userId, productId, hasPromo);
+
+        when(userRepository.findById(user.getId())).thenReturn(Optional.of(user));
+        when(postRepository.existsProductById(productId)).thenReturn(true);
+
+        // Act & Assert
+        assertThrows(AlreadyExistsException.class, () -> {
+            if (hasPromo) {
+                service.savePostSale((PostSaleDto) post);
+            } else {
+                service.savePost((PostDto) post);
+            }
+        });
     }
 
     // US 0006 - Obtener un listado de las publicaciones realizadas en las últimas dos semanas,
@@ -83,10 +153,10 @@ class PostServiceTest {
     void getRecentPostFromUsersTest_whenFollowsPostedLast2WeeksAndOrderIsDateAsc_thenReturnListOfPostOrderedAsc() {
         // Arrange
         String order = "date_asc";
-        User user = EntityCreator.getUser();
+        User user = UserFactory.createBuyer(4);
         Integer id = user.getId();
-        List<User> sellersFollowed = EntityCreator.getListOfSellers();
-        List<Post> postsFromFollows = EntityCreator.getPostsForUsers(sellersFollowed);
+        List<User> sellersFollowed = UserFactory.getListOfSellers();
+        List<Post> postsFromFollows = PostFactory.getPostsForUsers(sellersFollowed);
         when(userRepository.findById(id)).thenReturn(Optional.of(user));
         when(followRepository.findFollowedUsers(user)).thenReturn(sellersFollowed);
         when(postRepository.postFromUsers(sellersFollowed)).thenReturn(postsFromFollows);
@@ -127,10 +197,10 @@ class PostServiceTest {
     void getRecentPostFromUsersTest_whenFollowedPostedLast2WeeksAndOrderIsDateDesc_thenReturnListOfPostOrderedDesc() {
         // Arrange
         String order = "date_desc";
-        User user = EntityCreator.getUser();
+        User user = UserFactory.createBuyer(4);
         Integer id = user.getId();
-        List<User> sellersFollowed = EntityCreator.getListOfSellers();
-        List<Post> postsFromFollows = EntityCreator.getPostsForUsers(sellersFollowed);
+        List<User> sellersFollowed = UserFactory.getListOfSellers();
+        List<Post> postsFromFollows = PostFactory.getPostsForUsers(sellersFollowed);
         when(userRepository.findById(id)).thenReturn(Optional.of(user));
         when(followRepository.findFollowedUsers(user)).thenReturn(sellersFollowed);
         when(postRepository.postFromUsers(sellersFollowed)).thenReturn(postsFromFollows);
@@ -274,52 +344,5 @@ class PostServiceTest {
 
         //Act & Assertions
         assertThrows(UserNotSellerException.class, () -> service.getProductSaleCountByUser(user.getId()));
-    }
-
-    // Métodos privados
-
-    private void savePostTest(String url, Integer userId, Integer productId, boolean productExists, boolean isSeller) {
-        // Arrange
-        User user = isSeller ? UserFactory.createSeller(userId) : UserFactory.createBuyer(userId);
-        Object post = createPostDto(url, userId, productId);
-
-        String message = Message.POST_PUBLISHED.getStr();
-
-        when(userRepository.findById(user.getId())).thenReturn(Optional.of(user));
-        when(postRepository.existsProductById(productId)).thenReturn(productExists);
-
-        // Act & Assert
-        if (productExists) {
-            assertThrows(AlreadyExistsException.class, () -> {
-                executeSavePost(url, post);
-            });
-        } else {
-            MessageDto result = executeSavePost(url, post);
-
-            if (isSeller) {
-                verify(userRepository, never()).update(user);
-            } else {
-                verify(userRepository).update(user);
-            }
-
-            verify(postRepository).save(any(Post.class));
-            assertEquals(message, result.getMessage());
-        }
-    }
-
-    private Object createPostDto(String url, Integer userId, Integer productId) {
-        if (url.equals("/products/post")) {
-            return PostFactory.createPostDto(userId, productId);
-        } else {
-            return PostFactory.createPostSaleDto(userId, productId);
-        }
-    }
-
-    private MessageDto executeSavePost(String url, Object post) {
-        if (url.equals("/products/post")) {
-            return service.savePost((PostDto) post);
-        } else {
-            return service.savePostSale((PostSaleDto) post);
-        }
     }
 }

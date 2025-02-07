@@ -7,7 +7,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import com.socialmeli.socialmeli.utils.UserFactory;
 import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -187,7 +187,7 @@ public class UserControllerTest {
 
     // US 0003 - Obtener un listado de todos los usuarios que siguen a un determinado vendedor (¿Quién me sigue?).
     @ParameterizedTest
-    @CsvSource({"name_asc", "name_desc", "DEFAULT"})
+    @ValueSource(strings = {"name_asc", "name_desc", "DEFAULT"})
     @DisplayName("#13 getFollowerUsers - successful with different order or default")
     public void getFollowerUsersTest_whenOrderIsParametrizedOrNotProvided_thenReturnOrderedList(String order)
             throws Exception {
@@ -276,7 +276,7 @@ public class UserControllerTest {
 
     // US 0004 - Obtener un listado de todos los vendedores a los cuales sigue un determinado usuario (¿A quién sigo?).
     @ParameterizedTest
-    @CsvSource({"name_asc", "name_desc", "DEFAULT"})
+    @ValueSource(strings = {"name_asc", "name_desc", "DEFAULT"})
     @DisplayName("#18 getFollowedUsers - successful with different order or default")
     public void getFollowedUsersTest_whenOrderIsParametrizedOrNotProvided_thenReturnOrderedList(String order)
             throws Exception {
@@ -347,10 +347,7 @@ public class UserControllerTest {
         String expectedMessage = Message.USER_UNFOLLOWED.format(followed.getName());
 
         // Act & Assert
-        mockMvc.perform(post("/users/{userId}/unfollow/{userIdToFollow}", follower.getId(), followed.getId()))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.message").value(expectedMessage));
+        performUnfollow(follower.getId(), followed.getId(), expectedMessage, 200);
     }
 
     @Test
@@ -363,10 +360,7 @@ public class UserControllerTest {
         String expectedMessage = Message.USER_NOT_FOUND.format(followed.getId());
 
         // Act & Assert
-        mockMvc.perform(post("/users/{userId}/unfollow/{userIdToFollow}", follower.getId(), followed.getId()))
-                .andExpect(status().isNotFound())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.message").value(expectedMessage));
+        performUnfollow(follower.getId(), followed.getId(), expectedMessage, 404);
     }
 
     @Test
@@ -379,10 +373,7 @@ public class UserControllerTest {
         String expectedMessage = Message.USER_NOT_FOUND.format(follower.getId());
 
         // Act & Assert
-        mockMvc.perform(post("/users/{userId}/unfollow/{userIdToFollow}", follower.getId(), followed.getId()))
-                .andExpect(status().isNotFound())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.message").value(expectedMessage));
+        performUnfollow(follower.getId(), followed.getId(), expectedMessage, 404);
     }
 
     @Test
@@ -419,10 +410,7 @@ public class UserControllerTest {
         String expectedMessage = Message.USER_NOT_FOLLOWED.format(followed.getName(), follower.getName());
 
         // Act & Assert
-        mockMvc.perform(post("/users/{userId}/unfollow/{userIdToFollow}", follower.getId(), followed.getId()))
-                .andExpect(status().isConflict())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.message").value(expectedMessage));
+        performUnfollow(follower.getId(), followed.getId(), expectedMessage, 409);
     }
 
     @Test
@@ -434,17 +422,21 @@ public class UserControllerTest {
         String expectedMessage = Message.CANNOT_UNFOLLOW_SELF.getStr();
 
         // Act & Assert
-        mockMvc.perform(post("/users/{userId}/unfollow/{userIdToFollow}", follower.getId(), follower.getId()))
-                .andExpect(status().isBadRequest())
+        performUnfollow(follower.getId(), follower.getId(), expectedMessage, 400);
+    }
+
+    // Métodos privados
+    private void performFollow(Integer followerId, Integer followedId, String expectedMessage, int expectedStatus)
+            throws Exception {
+        mockMvc.perform(post("/users/{userId}/follow/{userIdToFollow}", followerId, followedId))
+                .andExpect(status().is(expectedStatus))
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.message").value(expectedMessage));
     }
 
-    // Métodos privados
-
-    private void performFollow(Integer followerId, Integer followedId, String expectedMessage, int expectedStatus)
+    private void performUnfollow(Integer followerId, Integer followedId, String expectedMessage, int expectedStatus)
             throws Exception {
-        mockMvc.perform(post("/users/{userId}/follow/{userIdToFollow}", followerId, followedId))
+        mockMvc.perform(post("/users/{userId}/unfollow/{userIdToFollow}", followerId, followedId))
                 .andExpect(status().is(expectedStatus))
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.message").value(expectedMessage));
