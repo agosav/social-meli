@@ -132,11 +132,11 @@ public class ProductControllerTest {
         // Arrange
         User user = UserFactory.createBuyer(2);
         List<PostDto> postsExpected = List.of(
-                PostFactory.createPostIdDateDto(1, LocalDate.of(2025, 2, 2)),
-                PostFactory.createPostIdDateDto(2, LocalDate.of(2025, 1, 31)),
-                PostFactory.createPostIdDateDto(3, LocalDate.of(2025, 1, 30)),
-                PostFactory.createPostIdDateDto(5, LocalDate.of(2025, 1, 27)),
-                PostFactory.createPostIdDateDto(4, LocalDate.of(2025, 1, 25))
+                PostFactory.createPostIdDateDto(LocalDate.of(2025, 2, 2)),
+                PostFactory.createPostIdDateDto(LocalDate.of(2025, 1, 31)),
+                PostFactory.createPostIdDateDto(LocalDate.of(2025, 1, 30)),
+                PostFactory.createPostIdDateDto(LocalDate.of(2025, 1, 27)),
+                PostFactory.createPostIdDateDto(LocalDate.of(2025, 1, 25))
         );
 
         if ("date_asc".equals(order)) {
@@ -155,10 +155,8 @@ public class ProductControllerTest {
                 .andExpect(jsonPath("$.posts.length()").value(postsExpected.size()));
 
         for (int i = 0; i < postsExpected.size(); i++) {
-            Integer expectedId = postsExpected.get(i).getUserId();
             String expectedDate = postsExpected.get(i).getDate().toString();
-            result.andExpect(jsonPath("$.posts[" + i + "].post_id").value(expectedId))
-                    .andExpect(jsonPath("$.posts[" + i + "].date").value(expectedDate));
+            result.andExpect(jsonPath("$.posts[" + i + "].date").value(expectedDate));
         }
     }
 

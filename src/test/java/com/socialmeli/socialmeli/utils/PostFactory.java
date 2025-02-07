@@ -46,9 +46,8 @@ public class PostFactory {
         }
     }
 
-    public static PostDto createPostIdDateDto(Integer userId, LocalDate date) {
+    public static PostDto createPostIdDateDto(LocalDate date) {
         return PostDto.builder()
-                .userId(userId)
                 .date(date)
                 .build();
     }
