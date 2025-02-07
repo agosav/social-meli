@@ -126,28 +126,53 @@ public class ProductControllerTest {
     // US-0006: Obtener un listado de las publicaciones realizadas por los vendedores
     // que un usuario sigue en las últimas dos semanas.
     @ParameterizedTest
-    @ValueSource(strings = {"date_asc", "date_desc", "DEFAULT"})
+    @ValueSource(strings = {"date_desc", "DEFAULT"})
     @DisplayName("#26 getPostsOfFollowedSellers - successful")
     public void getPostsOfFollowedSellersTest_whenOrderByDateAscOrDesc_thenReturnAList(String order) throws Exception {
         // Arrange
         User user = UserFactory.createBuyer(2);
         List<PostDto> postsExpected = List.of(
-                PostFactory.createPostIdDateDto(LocalDate.of(2025, 2, 2)),
-                PostFactory.createPostIdDateDto(LocalDate.of(2025, 1, 31)),
-                PostFactory.createPostIdDateDto(LocalDate.of(2025, 1, 30)),
-                PostFactory.createPostIdDateDto(LocalDate.of(2025, 1, 27)),
-                PostFactory.createPostIdDateDto(LocalDate.of(2025, 1, 25))
+                PostFactory.createPostDateDto(LocalDate.of(2025, 2, 2)),
+                PostFactory.createPostDateDto(LocalDate.of(2025, 1, 31)),
+                PostFactory.createPostDateDto(LocalDate.of(2025, 1, 30)),
+                PostFactory.createPostDateDto(LocalDate.of(2025, 1, 27)),
+                PostFactory.createPostDateDto(LocalDate.of(2025, 1, 25))
         );
-
-        if ("date_asc".equals(order)) {
-            postsExpected = postsExpected.stream()
-                    .sorted(Comparator.comparing(PostDto::getDate))
-                    .toList();
-        }
 
         // Act & Assert
         ResultActions result = mockMvc.perform(get("/products/followed/{userId}/list", user.getId())
                         .param("order", "DEFAULT".equals(order) ? "" : order))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.user_id").value(user.getId()))
+                .andExpect(jsonPath("$.posts").isArray())
+                .andExpect(jsonPath("$.posts.length()").value(postsExpected.size()));
+
+        for (int i = 0; i < postsExpected.size(); i++) {
+            String expectedDate = postsExpected.get(i).getDate().toString();
+            result.andExpect(jsonPath("$.posts[" + i + "].date").value(expectedDate));
+        }
+    }
+
+    // US-0006: Obtener un listado de las publicaciones realizadas por los vendedores
+    // que un usuario sigue en las últimas dos semanas.
+    @Test
+    @DisplayName("#26 getPostsOfFollowedSellers - successful")
+    public void getPostsOfFollowedSellersTest_whenOrderByDateAsc_thenReturnAList() throws Exception {
+        // Arrange
+        String order = "date_asc";
+        User user = UserFactory.createBuyer(2);
+        List<PostDto> postsExpected = List.of(
+                PostFactory.createPostDateDto(LocalDate.of(2025, 1, 25)),
+                PostFactory.createPostDateDto(LocalDate.of(2025, 1, 27)),
+                PostFactory.createPostDateDto(LocalDate.of(2025, 1, 30)),
+                PostFactory.createPostDateDto(LocalDate.of(2025, 1, 31)),
+                PostFactory.createPostDateDto(LocalDate.of(2025, 2, 2))
+        );
+
+        // Act & Assert
+        ResultActions result = mockMvc.perform(get("/products/followed/{userId}/list", user.getId())
+                        .param("order", order))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.user_id").value(user.getId()))
