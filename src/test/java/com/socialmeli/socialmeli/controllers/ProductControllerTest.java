@@ -162,15 +162,15 @@ public class ProductControllerTest {
         }
     }
 
-    @Test
+    @ParameterizedTest
+    @ValueSource(strings = {"date_asc", "date_desc", "DEFAULT"})
     @DisplayName("#27 getPostsOfFollowedSellers - should return 404 when userid is not a number")
-    public void getPostsOfFollowedSellersTest_whenUserIdIsNotANumber_thenThrow400() throws Exception {
+    public void getPostsOfFollowedSellersTest_whenUserIdIsNotANumber_thenThrow400(String order) throws Exception {
         // Arrange
-        String order = "date_asc";
         String userId = "numero";
         // Act & Assert
         mockMvc.perform(get("/products/followed/{userId}/list", userId)
-                        .param("order", order))
+                        .param("order", "DEFAULT".equals(order) ? "" : order))
                 .andExpect(status().isBadRequest());
     }
 
@@ -187,30 +187,30 @@ public class ProductControllerTest {
                 .andExpect(status().isBadRequest());
     }
 
-    @Test
+    @ParameterizedTest
+    @ValueSource(strings = {"date_asc", "date_desc", "DEFAULT"})
     @DisplayName("#29 getPostsOfFollowedSellers - should return 400 when user id is negative")
-    public void getPostsOfFollowedSellersTest_whenUserIdIsInvalid_thenThrow400() throws Exception {
+    public void getPostsOfFollowedSellersTest_whenUserIdIsInvalid_thenThrow400(String order) throws Exception {
         // Arrange
-        String order = "date_asc";
         Integer userIdNegative = -1;
 
         // Act & Assert
         mockMvc.perform(get("/products/followed/{userId}/list", userIdNegative)
-                        .param("order", order))
+                        .param("order", "DEFAULT".equals(order) ? "" : order))
                 .andExpect(status().isBadRequest());
     }
 
-    @Test
+    @ParameterizedTest
+    @ValueSource(strings = {"date_asc", "date_desc", "DEFAULT"})
     @DisplayName("#30 getPostsOfFollowedSellers - should return 404 when user is not found")
-    public void getPostsOfFollowedSellersTest_whenUserIsNotFound_thenThrow404() throws Exception {
+    public void getPostsOfFollowedSellersTest_whenUserIsNotFound_thenThrow404(String order) throws Exception {
         // Arrange
-        String order = "date_asc";
         Integer userId = 999;
         String message = Message.USER_NOT_FOUND.format(userId);
 
         // Act & Assert
         mockMvc.perform(get("/products/followed/{userId}/list", userId)
-                        .param("order", order))
+                        .param("order", "DEFAULT".equals(order) ? "" : order))
                 .andExpect(status().isNotFound())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.message").value(message));
