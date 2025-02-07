@@ -48,7 +48,6 @@ class FollowRepositoryTest {
         User user1 = new User(1, "Emilia Mernes", false);
         User user2 = new User(2, "Taylor Swift", true);
         Follow follow = new Follow(user1, user2);
-        followRepository.add(follow);
 
         // Act
         followRepository.delete(follow);
