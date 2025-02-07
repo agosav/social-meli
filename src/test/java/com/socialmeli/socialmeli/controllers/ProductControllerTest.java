@@ -189,7 +189,7 @@ public class ProductControllerTest {
 
     @Test
     @DisplayName("#27 getPostsOfFollowedSellers - should return 404 when userid is not a number")
-    public void getPostsOfFollowedSellersTest_whenUserIdIsNotANumber_thenThrow404() throws Exception {
+    public void getPostsOfFollowedSellersTest_whenUserIdIsNotANumber_thenThrow400() throws Exception {
         // Arrange
         String order = "date_asc";
         String userId = "numero";
