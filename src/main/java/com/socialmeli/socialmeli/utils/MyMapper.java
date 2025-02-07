@@ -29,9 +29,9 @@ public class MyMapper {
         return Post.builder()
                 .user(user)
                 .date(postDto.getDate())
+                .price(postDto.getPrice())
                 .product(toProduct(postDto.getProduct()))
                 .category(postDto.getCategory())
-                .price(postDto.getPrice())
                 .build();
     }
 

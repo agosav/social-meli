@@ -5,7 +5,6 @@ import com.socialmeli.socialmeli.models.User;
 import com.socialmeli.socialmeli.utils.UserFactory;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.params.provider.CsvSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -17,6 +16,7 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -44,19 +44,15 @@ public class ProductControllerTest {
     @Autowired
     private ObjectMapper objectMapper;
 
+    // US 0005 - Dar de alta una nueva publicación.
+    // US 0010 - Llevar a cabo la publicación de un nuevo producto en promoción.
     @ParameterizedTest
     @ValueSource(strings = {"/products/post", "/products/promo-post"})
     @DisplayName("#21 savePost - should return 200 OK when product does not exist and user is not seller")
     @DirtiesContext(methodMode = DirtiesContext.MethodMode.AFTER_METHOD)
     void savePost_whenProductDoesNotExistAndUserIsNotSeller_thenSavePost(String url) throws Exception {
         // Arrange
-        Object post;
-
-        if (url.equals("/products/post")) {
-            post = PostFactory.createPostDto(2, 1);
-        } else {
-            post = PostFactory.createPostSaleDto(2, 1);
-        }
+        Object post = PostFactory.createPostDto(2, 1, Objects.equals(url, "/products/promo-post"));
 
         String message = Message.POST_PUBLISHED.getStr();
 
@@ -74,13 +70,7 @@ public class ProductControllerTest {
     @DirtiesContext(methodMode = DirtiesContext.MethodMode.AFTER_METHOD)
     void savePost_whenProductDoesNotExistAndUserIsSeller_thenSavePost(String url) throws Exception {
         // Arrange
-        Object post;
-
-        if (url.equals("/products/post")) {
-            post = PostFactory.createPostDto(1, 1);
-        } else {
-            post = PostFactory.createPostSaleDto(1, 1);
-        }
+        Object post = PostFactory.createPostDto(1, 1, Objects.equals(url, "/products/promo-post"));
 
         String message = Message.POST_PUBLISHED.getStr();
 
@@ -97,13 +87,7 @@ public class ProductControllerTest {
     @DisplayName("#23 savePost - should return 409 when product already exists")
     void savePost_whenProductAlreadyExists_thenReturn400(String url) throws Exception {
         // Arrange
-        Object post;
-
-        if (url.equals("/products/post")) {
-            post = PostFactory.createPostDto(1, 201);
-        } else {
-            post = PostFactory.createPostSaleDto(1, 201);
-        }
+        Object post = PostFactory.createPostDto(1, 201, Objects.equals(url, "/products/promo-post"));
 
         String message = Message.PRODUCT_ALREADY_EXISTS.getStr();
 
@@ -121,15 +105,7 @@ public class ProductControllerTest {
     @DirtiesContext(methodMode = DirtiesContext.MethodMode.AFTER_METHOD)
     void savePost_whenUserIdIsInvalid_thenThrow400(String url) throws Exception {
         // Arrange
-        Object post;
-
-        if (url.equals("/products/post")) {
-            post = PostFactory.createPostDto(-1, 1);
-        } else {
-            post = PostFactory.createPostSaleDto(-1, 1);
-        }
-
-        String message = Message.POST_PUBLISHED.getStr();
+        Object post = PostFactory.createPostDto(-1, 1, Objects.equals(url, "/products/promo-post"));
 
         // Act & Assert
         mockMvc.perform(post(url)
@@ -143,16 +119,15 @@ public class ProductControllerTest {
     @DisplayName("#25 savePost - should return 400 when no body is received")
     void savePost_whenNoBodyReceived_thenReturn400(String url) throws Exception {
         // Act & Assert
-        mockMvc.perform(post(url)
-                        .contentType(MediaType.APPLICATION_JSON))
+        mockMvc.perform(post(url).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
     }
 
     // US-0006: Obtener un listado de las publicaciones realizadas por los vendedores
     // que un usuario sigue en las últimas dos semanas.
     @ParameterizedTest
-    @CsvSource({"date_asc", "date_desc", "DEFAULT"})
-    @DisplayName("#26 getPostsOfFollowedSellers by date")
+    @ValueSource(strings = {"date_asc", "date_desc", "DEFAULT"})
+    @DisplayName("#26 getPostsOfFollowedSellers - successful")
     public void getPostsOfFollowedSellersTest_whenOrderByDateAscOrDesc_thenReturnAList(String order) throws Exception {
         // Arrange
         User user = UserFactory.createBuyer(2);
