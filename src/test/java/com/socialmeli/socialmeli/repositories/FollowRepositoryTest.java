@@ -2,6 +2,7 @@ package com.socialmeli.socialmeli.repositories;
 
 import com.socialmeli.socialmeli.models.Follow;
 import com.socialmeli.socialmeli.models.User;
+import com.socialmeli.socialmeli.utils.FollowFactory;
 import com.socialmeli.socialmeli.utils.UserFactory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -28,11 +29,8 @@ class FollowRepositoryTest {
     @DisplayName("#44 findAllByIdFollower - should return a list of follows by id follower")
     void findAllByIdFollowerTest_whenSuccess_thenReturnListFollow() {
         // Arrange
-        User user1 = UserFactory.createSeller(1, "Agostina Avalle");
-        User user3 = UserFactory.createSeller(3, "Ciro Sánchez");
         User user4 = UserFactory.createBuyer(4, "Eliana Navarro");
-
-        List<Follow> expected = List.of(new Follow(user4, user3), new Follow(user4, user1));
+        List<Follow> expected = FollowFactory.createListFollower();
 
         // Act
         List<Follow> result = followRepository.findAllByIdFollower(user4.getId());
@@ -45,8 +43,8 @@ class FollowRepositoryTest {
     @DisplayName("#45 deleteTest - should remove the follow relationship from the repository")
     void deleteTest() {
         // Arrange
-        User user1 = new User(1, "Emilia Mernes", false);
-        User user2 = new User(2, "Taylor Swift", true);
+        User user1 = UserFactory.createBuyer(1);
+        User user2 = UserFactory.createSeller(2);
         Follow follow = new Follow(user1, user2);
 
         // Act
@@ -60,10 +58,8 @@ class FollowRepositoryTest {
     @DisplayName("#46 findFollowedUsersByIdTest - should return a list of user that one user follows")
     void  findFollowedUsersByIdTest_whenUserFollowsSellers_thenReturnListOfFollowedUsers() {
         // Arrange
-        User user1 = new User(1, "Agostina Avalle", true);
-        List<User> expected = List.of(
-                new User(3, "Ciro Sánchez", true)
-        );
+        User user1 = UserFactory.createSeller(1, "Agostina Avalle");
+        List<User> expected = List.of(UserFactory.createSeller(3, "Ciro Sánchez"));
 
         // Act
         List<User> result = followRepository.findFollowedUsersById(user1.getId());
@@ -77,14 +73,7 @@ class FollowRepositoryTest {
     void findAllByIdFollowedTest_thenReturnListFollows() {
         //Arrange
         User user1 = UserFactory.createSeller(1, "Agostina Avalle");
-        User user2 = UserFactory.createBuyer(2, "Carolina Comba");
-        User user4 = UserFactory.createBuyer(4, "Eliana Navarro");
-        User user6 = UserFactory.createBuyer(6, "Katerinne Peralta");
-        List<Follow> expected =  List.of(
-                new Follow(user2, user1),
-                new Follow(user4, user1),
-                new Follow(user6, user1)
-        );
+        List<Follow> expected =  FollowFactory.createListFollows();
 
         //Act
         List<Follow> result = followRepository.findAllByIdFollowed(user1.getId());

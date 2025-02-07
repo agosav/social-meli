@@ -1,6 +1,5 @@
 package com.socialmeli.socialmeli.controllers;
 
-import com.socialmeli.socialmeli.enums.Message;
 import com.socialmeli.socialmeli.dto.response.UserFollowerCountDto;
 import com.socialmeli.socialmeli.models.User;
 import org.junit.jupiter.api.DisplayName;
@@ -167,7 +166,7 @@ public class UserControllerTest {
     @DisplayName("#11 countFollowersForSeller - user not seller")
     public void getCountFollowerForSellerTest_whenUserNotSeller_thenReturn400() throws Exception {
         // Arrange
-        User userNotSeller = new User(2, "Carolina Comba", false);
+        User userNotSeller = UserFactory.createBuyer(2, "Carolina Comba");
         String message = "Carolina Comba is not a seller";
 
         // Act & Assert
@@ -196,11 +195,7 @@ public class UserControllerTest {
         // Arrange
         String order = "name_desc";
         User user1 = UserFactory.createSeller(1, "Agostina Avalle");
-        User user4 = UserFactory.createBuyer(4, "Eliana Navarro");
-        User user6 = UserFactory.createBuyer(6, "Katerinne Peralta");
-        User user2 = UserFactory.createBuyer(2, "Carolina Comba");
-
-        List<User> usersExpected = List.of(user6, user4, user2);
+        List<User> usersExpected = UserFactory.getFollowersListForUser1Desc();
 
         // Act & Assert
         ResultActions result = mockMvc.perform(get("/users/{userId}/followers/list", user1.getId())
@@ -227,11 +222,7 @@ public class UserControllerTest {
             throws Exception {
         // Arrange
         User user1 = UserFactory.createSeller(1, "Agostina Avalle");
-        User user2 = UserFactory.createBuyer(2, "Carolina Comba");
-        User user6 = UserFactory.createBuyer(6, "Katerinne Peralta");
-        User user4 = UserFactory.createBuyer(4, "Eliana Navarro");
-
-        List<User> usersExpected = List.of(user2, user4, user6);
+        List<User> usersExpected = UserFactory.getFollowersListForUser1Asc();
 
         // Act & Assert
         ResultActions result = mockMvc.perform(get("/users/{userId}/followers/list", user1.getId())
@@ -315,12 +306,8 @@ public class UserControllerTest {
     public void getFollowedUsersTest_whenOrderIsAscOrDefault_thenReturnOrderedList(String order)
             throws Exception {
         // Arrange
-        User user1 = UserFactory.createSeller(1, "Agostina Avalle");
         User user2 = UserFactory.createBuyer(2, "Carolina Comba");
-        User user3 = UserFactory.createSeller(3, "Ciro Sánchez");
-        User user5 = UserFactory.createSeller(5, "Franca Pairetti");
-
-        List<User> usersExpected = List.of(user1, user3, user5); // Orden ascendente
+        List<User> usersExpected = UserFactory.getFollowedListForUser2Asc();
 
         // Act & Assert
         ResultActions result = mockMvc.perform(get("/users/{userId}/followed/list", user2.getId())
@@ -346,13 +333,8 @@ public class UserControllerTest {
             throws Exception {
         // Arrange
         String order = "name_desc";
-
-        User user1 = UserFactory.createSeller(1, "Agostina Avalle");
         User user2 = UserFactory.createBuyer(2, "Carolina Comba");
-        User user3 = UserFactory.createSeller(3, "Ciro Sánchez");
-        User user5 = UserFactory.createSeller(5, "Franca Pairetti");
-
-        List<User> usersExpected = List.of(user5, user3, user1); // Orden descendente
+        List<User> usersExpected = UserFactory.getFollowedListForUser2Desc();
 
         // Act & Assert
         ResultActions result = mockMvc.perform(get("/users/{userId}/followed/list", user2.getId())

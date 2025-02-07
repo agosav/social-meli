@@ -3,6 +3,7 @@ package com.socialmeli.socialmeli.repositories;
 import com.socialmeli.socialmeli.models.Post;
 import com.socialmeli.socialmeli.models.Product;
 import com.socialmeli.socialmeli.models.User;
+import com.socialmeli.socialmeli.utils.PostFactory;
 import com.socialmeli.socialmeli.utils.UserFactory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -115,7 +116,7 @@ class PostRepositoryTest {
     @DisplayName("#52 save - should save post to the list")
     void saveTest_whenSave_thenVoid() {
         // Arrange
-        Post post = Post.builder().id(500).build();
+        Post post = new Post();
 
         // Act
         postRepository.save(post);
@@ -149,19 +150,7 @@ class PostRepositoryTest {
     public void findPostsWithPromoByUserTest_whenPostExists_thenReturnListPosts() {
         //Arrange
         User user = UserFactory.createSeller(3, "Ciro Sánchez");
-        List<Post> expected = List.of(
-                Post.builder()
-                        .id(4)
-                        .user(new User(3, "Ciro Sánchez", true))
-                        .date(LocalDate.of(2025, 1, 25))
-                        .product(new Product(204, "Smartphone", "Electronics", "Apple",
-                                "Black", "128GB storage, unlocked"))
-                        .category(1)
-                        .price(999.99)
-                        .hasPromo(true)
-                        .discount(null) // Asignamos 0.0 ya que el valor es null
-                        .build()
-        );
+        List<Post> expected = PostFactory.createListPostWithPromo();
 
         //Act
         List<Post> result = postRepository.findPostsWithPromoByUser(user.getId());

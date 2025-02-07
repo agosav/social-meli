@@ -10,7 +10,6 @@ import com.socialmeli.socialmeli.exception.AlreadyExistsException;
 import com.socialmeli.socialmeli.exception.NotFoundException;
 import com.socialmeli.socialmeli.exception.UserNotSellerException;
 import com.socialmeli.socialmeli.models.Post;
-import com.socialmeli.socialmeli.models.Product;
 import com.socialmeli.socialmeli.models.User;
 import com.socialmeli.socialmeli.repositories.IFollowRepository;
 import com.socialmeli.socialmeli.repositories.IPostRepository;
@@ -245,43 +244,7 @@ class PostServiceTest {
         //Arrange
         User user = UserFactory.createSeller(3, "Ciro Sánchez");
         ProductSaleCountDto expected = new ProductSaleCountDto(user.getId(), user.getName(), 3);
-        List<Post> posts = List.of(
-                Post.builder()
-                        .id(1)
-                        .user(user)
-                        .date(LocalDate.of(2025, 1, 19))
-                        .product(new Product(201, "headphones", "Electronics", "Dell",
-                                "Silver", "Includes charger and carrying case"))
-                        .category(1)
-                        .price(1200.00)
-                        .hasPromo(true)
-                        .discount(50.00)
-                        .build(),
-
-                Post.builder()
-                        .id(2)
-                        .user(user)
-                        .date(LocalDate.of(2025, 1, 20))
-                        .product(new Product(202, "Laptop", "Electronics", "Dell", "Silver",
-                                "Includes charger and carrying case"))
-                        .category(2)
-                        .price(1200.00)
-                        .hasPromo(true)
-                        .discount(50.00)
-                        .build(),
-
-                Post.builder()
-                        .id(3)
-                        .user(user)
-                        .date(LocalDate.of(2025, 1, 21))
-                        .product(new Product(203, "chair", "Furniture", "Dell", "Silver",
-                                "Includes charger and carrying case"))
-                        .category(2)
-                        .price(1200.00)
-                        .hasPromo(true)
-                        .discount(50.00)
-                        .build()
-        );
+        List<Post> posts = PostFactory.createListPostSale(user);
 
         when(userRepository.findById(user.getId())).thenReturn(Optional.of(user));
         when(postRepository.findPostsWithPromoByUser(user.getId())).thenReturn(posts);

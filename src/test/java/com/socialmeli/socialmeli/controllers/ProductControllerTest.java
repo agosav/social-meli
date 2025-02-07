@@ -9,8 +9,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import java.time.LocalDate;
-
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -130,13 +128,7 @@ public class ProductControllerTest {
             throws Exception {
         // Arrange
         User user = UserFactory.createBuyer(2);
-        List<PostDto> postsExpected = List.of(
-                PostFactory.createPostDateDto(LocalDate.of(2025, 2, 2)),
-                PostFactory.createPostDateDto(LocalDate.of(2025, 1, 31)),
-                PostFactory.createPostDateDto(LocalDate.of(2025, 1, 30)),
-                PostFactory.createPostDateDto(LocalDate.of(2025, 1, 27)),
-                PostFactory.createPostDateDto(LocalDate.of(2025, 1, 25))
-        );
+        List<PostDto> postsExpected = PostFactory.createListPostDtoForUser2Desc();
 
         // Act & Assert
         ResultActions result = mockMvc.perform(get("/products/followed/{userId}/list", user.getId())
@@ -161,13 +153,7 @@ public class ProductControllerTest {
         // Arrange
         String order = "date_asc";
         User user = UserFactory.createBuyer(2);
-        List<PostDto> postsExpected = List.of(
-                PostFactory.createPostDateDto(LocalDate.of(2025, 1, 25)),
-                PostFactory.createPostDateDto(LocalDate.of(2025, 1, 27)),
-                PostFactory.createPostDateDto(LocalDate.of(2025, 1, 30)),
-                PostFactory.createPostDateDto(LocalDate.of(2025, 1, 31)),
-                PostFactory.createPostDateDto(LocalDate.of(2025, 2, 2))
-        );
+        List<PostDto> postsExpected = PostFactory.createListPostDtoForUser2Asc();
 
         // Act & Assert
         ResultActions result = mockMvc.perform(get("/products/followed/{userId}/list", user.getId())
