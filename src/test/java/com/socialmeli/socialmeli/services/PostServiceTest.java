@@ -59,7 +59,7 @@ class PostServiceTest {
     // US 0010 - Llevar a cabo la publicación de un nuevo producto en promoción.
     @ParameterizedTest
     @ValueSource(booleans = {true, false})
-    @DisplayName("#71 savePost - should save the post when product does not exist and user is not seller")
+    @DisplayName("#72 savePost - should save the post when product does not exist and user is not seller")
     @DirtiesContext(methodMode = DirtiesContext.MethodMode.AFTER_METHOD)
     void savePost_whenProductDoesNotExistAndUserIsNotSeller_thenSavePost(boolean hasPromo) {
         // Arrange
@@ -91,7 +91,7 @@ class PostServiceTest {
 
     @ParameterizedTest
     @ValueSource(booleans = {true, false})
-    @DisplayName("#72 savePost - should save the post when product does not exist and user is seller")
+    @DisplayName("#73 savePost - should save the post when product does not exist and user is seller")
     @DirtiesContext(methodMode = DirtiesContext.MethodMode.AFTER_METHOD)
     void savePost_whenProductDoesNotExistAndUserIsSeller_thenSavePost(boolean hasPromo) {
         // Arrange
@@ -124,7 +124,7 @@ class PostServiceTest {
 
     @ParameterizedTest
     @ValueSource(booleans = {true, false})
-    @DisplayName("#73 savePost - should throw AlreadyExistsException when product already exists")
+    @DisplayName("#74 savePost - should throw AlreadyExistsException when product already exists")
     void savePost_whenProductAlreadyExists_thenThrowAlreadyExistsException(boolean hasPromo) {
         // Arrange
         Integer userId = 1;
@@ -149,7 +149,7 @@ class PostServiceTest {
     // US 0006 - Obtener un listado de las publicaciones realizadas en las últimas dos semanas,
     // por los vendedores que un usuario sigue
     @Test
-    @DisplayName("#74 getRecentPostFromUsersAscTest - should retrun a list of post ordered Asc")
+    @DisplayName("#75 getRecentPostFromUsersAscTest - should retrun a list of post ordered Asc")
     void getRecentPostFromUsersTest_whenFollowsPostedLast2WeeksAndOrderIsDateAsc_thenReturnListOfPostOrderedAsc() {
         // Arrange
         String order = "date_asc";
@@ -193,7 +193,7 @@ class PostServiceTest {
     }
 
     @Test
-    @DisplayName("#75 getRecentPostFromUsersDescTest - should retrun a list of post ordered Desc")
+    @DisplayName("#76 getRecentPostFromUsersDescTest - should retrun a list of post ordered Desc")
     void getRecentPostFromUsersTest_whenFollowedPostedLast2WeeksAndOrderIsDateDesc_thenReturnListOfPostOrderedDesc() {
         // Arrange
         String order = "date_desc";
@@ -236,7 +236,7 @@ class PostServiceTest {
     }
 
     @Test
-    @DisplayName("#76 getRecentPostFromUsersNotFoundTest - should throw NotFoundException")
+    @DisplayName("#77 getRecentPostFromUsersNotFoundTest - should throw NotFoundException")
     void getRecentPostFromUsersTest_whenUserNotFound_thenThrowUserNotFoundException() {
         // Arrange
         Integer userId = 800;
@@ -256,7 +256,7 @@ class PostServiceTest {
 
     //US-0011 - Obtener la cantidad de productos en promoción de un determinado vendedor
     @Test
-    @DisplayName("#82 countProductSaleByUser - successful")
+    @DisplayName("#83 countProductSaleByUser - successful")
     public void getProductSaleCountByUser_whenUserExists_thenGetProductSaleCountByUser() {
         //Arrange
         User user = UserFactory.createSeller(3, "Ciro Sánchez");
@@ -310,7 +310,7 @@ class PostServiceTest {
     }
 
     @Test
-    @DisplayName("#83 countProductSaleByUser - user not found")
+    @DisplayName("#84 countProductSaleByUser - user not found")
     public void getProductSaleCountByUser_whenUserNotFound_thenThrowUserNotFoundException() {
         //Arrange
         Integer id = 90;
@@ -322,7 +322,7 @@ class PostServiceTest {
     }
 
     @Test
-    @DisplayName("#84 countProductSaleByUser - user is not seller")
+    @DisplayName("#85 countProductSaleByUser - user is not seller")
     public void getProductSaleCountByUser_whenUserIsNotSeller_thenThrowUserNotSellerException() {
         //Arrange
         User user = UserFactory.createBuyer(2, "Carolina Comba");
@@ -334,7 +334,7 @@ class PostServiceTest {
     }
 
     @Test
-    @DisplayName("#85 countProductSaleByUser - empty list")
+    @DisplayName("#86 countProductSaleByUser - empty list")
     public void getProductSaleCountByUser_whenWithoutPromoPost_thenThrowUserNotFoundException() {
         //Arrange
         User user = UserFactory.createSeller(3, "Ciro Sánchez");
