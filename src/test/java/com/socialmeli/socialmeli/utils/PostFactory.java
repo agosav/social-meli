@@ -83,4 +83,80 @@ public class PostFactory {
 
         return posts;
     }
+
+    public static List<PostDto> createListPostDtoForUser2Desc() {
+        return List.of(
+                PostFactory.createPostDateDto(LocalDate.of(2025, 2, 2)),
+                PostFactory.createPostDateDto(LocalDate.of(2025, 1, 31)),
+                PostFactory.createPostDateDto(LocalDate.of(2025, 1, 30)),
+                PostFactory.createPostDateDto(LocalDate.of(2025, 1, 27)),
+                PostFactory.createPostDateDto(LocalDate.of(2025, 1, 25))
+        );
+    }
+
+    public static List<PostDto> createListPostDtoForUser2Asc() {
+        return List.of(
+                PostFactory.createPostDateDto(LocalDate.of(2025, 1, 25)),
+                PostFactory.createPostDateDto(LocalDate.of(2025, 1, 27)),
+                PostFactory.createPostDateDto(LocalDate.of(2025, 1, 30)),
+                PostFactory.createPostDateDto(LocalDate.of(2025, 1, 31)),
+                PostFactory.createPostDateDto(LocalDate.of(2025, 2, 2))
+        );
+    }
+
+    public static List<Post> createListPostSale(User user) {
+        return List.of(
+                Post.builder()
+                        .id(1)
+                        .user(user)
+                        .date(LocalDate.of(2025, 1, 19))
+                        .product(new Product(201, "headphones", "Electronics", "Dell",
+                                "Silver", "Includes charger and carrying case"))
+                        .category(1)
+                        .price(1200.00)
+                        .hasPromo(true)
+                        .discount(50.00)
+                        .build(),
+
+                Post.builder()
+                        .id(2)
+                        .user(user)
+                        .date(LocalDate.of(2025, 1, 20))
+                        .product(new Product(202, "Laptop", "Electronics", "Dell", "Silver",
+                                "Includes charger and carrying case"))
+                        .category(2)
+                        .price(1200.00)
+                        .hasPromo(true)
+                        .discount(50.00)
+                        .build(),
+
+                Post.builder()
+                        .id(3)
+                        .user(user)
+                        .date(LocalDate.of(2025, 1, 21))
+                        .product(new Product(203, "chair", "Furniture", "Dell", "Silver",
+                                "Includes charger and carrying case"))
+                        .category(2)
+                        .price(1200.00)
+                        .hasPromo(true)
+                        .discount(50.00)
+                        .build()
+        );
+    }
+
+    public static List<Post> createListPostWithPromo() {
+        return List.of(
+                Post.builder()
+                        .id(4)
+                        .user(new User(3, "Ciro Sánchez", true))
+                        .date(LocalDate.of(2025, 1, 25))
+                        .product(new Product(204, "Smartphone", "Electronics", "Apple",
+                                "Black", "128GB storage, unlocked"))
+                        .category(1)
+                        .price(999.99)
+                        .hasPromo(true)
+                        .discount(null)
+                        .build()
+        );
+    }
 }

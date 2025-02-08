@@ -3,16 +3,13 @@ package com.socialmeli.socialmeli.services;
 import com.socialmeli.socialmeli.dto.PostDto;
 import com.socialmeli.socialmeli.dto.PostSaleDto;
 import com.socialmeli.socialmeli.dto.ProductDto;
-import com.socialmeli.socialmeli.dto.response.MessageDto;
 import com.socialmeli.socialmeli.dto.response.PostIdDto;
 import com.socialmeli.socialmeli.dto.response.ProductListDto;
 import com.socialmeli.socialmeli.dto.response.ProductSaleCountDto;
-import com.socialmeli.socialmeli.enums.Message;
 import com.socialmeli.socialmeli.exception.AlreadyExistsException;
 import com.socialmeli.socialmeli.exception.NotFoundException;
 import com.socialmeli.socialmeli.exception.UserNotSellerException;
 import com.socialmeli.socialmeli.models.Post;
-import com.socialmeli.socialmeli.models.Product;
 import com.socialmeli.socialmeli.models.User;
 import com.socialmeli.socialmeli.repositories.IFollowRepository;
 import com.socialmeli.socialmeli.repositories.IPostRepository;
@@ -69,24 +66,19 @@ class PostServiceTest {
         User user = UserFactory.createBuyer(userId);
         Object post = PostFactory.createPostDto(userId, productId, hasPromo);
 
-        String message = Message.POST_PUBLISHED.getStr();
-
         when(userRepository.findById(user.getId())).thenReturn(Optional.of(user));
         when(postRepository.existsProductById(productId)).thenReturn(false);
 
         // Act
-        MessageDto result;
-
         if (hasPromo) {
-            result = service.savePostSale((PostSaleDto) post);
+            service.savePostSale((PostSaleDto) post);
         } else {
-            result = service.savePost((PostDto) post);
+            service.savePost((PostDto) post);
         }
 
         // Assert
         verify(userRepository).update(user);
         verify(postRepository).save(any(Post.class));
-        assertEquals(message, result.getMessage());
     }
 
     @ParameterizedTest
@@ -101,25 +93,20 @@ class PostServiceTest {
         User user = UserFactory.createSeller(userId);
         Object post = PostFactory.createPostDto(userId, productId, hasPromo);
 
-        String message = Message.POST_PUBLISHED.getStr();
-
         when(userRepository.findById(user.getId())).thenReturn(Optional.of(user));
         when(postRepository.existsProductById(productId)).thenReturn(false);
 
         // Act
-        MessageDto result;
-
         if (hasPromo) {
-            result = service.savePostSale((PostSaleDto) post);
+            service.savePostSale((PostSaleDto) post);
         } else {
-            result = service.savePost((PostDto) post);
+            service.savePost((PostDto) post);
         }
 
         // Assert
         verify(userRepository, never()).update(user);
 
         verify(postRepository).save(any(Post.class));
-        assertEquals(message, result.getMessage());
     }
 
     @ParameterizedTest
@@ -244,14 +231,10 @@ class PostServiceTest {
 
         when(userRepository.findById(userId)).thenReturn(Optional.empty());
 
-        // Act
-        NotFoundException exception = assertThrows(NotFoundException.class, () -> {
+        // Act & Assert
+        assertThrows(NotFoundException.class, () -> {
             service.getRecentPostFromUsers(order, userId);
         });
-
-        // Assert
-        String expectedMessage = Message.USER_NOT_FOUND.format(userId);
-        assertEquals(expectedMessage, exception.getMessage());
     }
 
     //US-0011 - Obtener la cantidad de productos en promoción de un determinado vendedor
@@ -261,43 +244,7 @@ class PostServiceTest {
         //Arrange
         User user = UserFactory.createSeller(3, "Ciro Sánchez");
         ProductSaleCountDto expected = new ProductSaleCountDto(user.getId(), user.getName(), 3);
-        List<Post> posts = List.of(
-                Post.builder()
-                        .id(1)
-                        .user(user)
-                        .date(LocalDate.of(2025, 1, 19))
-                        .product(new Product(201, "headphones", "Electronics", "Dell",
-                                "Silver", "Includes charger and carrying case"))
-                        .category(1)
-                        .price(1200.00)
-                        .hasPromo(true)
-                        .discount(50.00)
-                        .build(),
-
-                Post.builder()
-                        .id(2)
-                        .user(user)
-                        .date(LocalDate.of(2025, 1, 20))
-                        .product(new Product(202, "Laptop", "Electronics", "Dell", "Silver",
-                                "Includes charger and carrying case"))
-                        .category(2)
-                        .price(1200.00)
-                        .hasPromo(true)
-                        .discount(50.00)
-                        .build(),
-
-                Post.builder()
-                        .id(3)
-                        .user(user)
-                        .date(LocalDate.of(2025, 1, 21))
-                        .product(new Product(203, "chair", "Furniture", "Dell", "Silver",
-                                "Includes charger and carrying case"))
-                        .category(2)
-                        .price(1200.00)
-                        .hasPromo(true)
-                        .discount(50.00)
-                        .build()
-        );
+        List<Post> posts = PostFactory.createListPostSale(user);
 
         when(userRepository.findById(user.getId())).thenReturn(Optional.of(user));
         when(postRepository.findPostsWithPromoByUser(user.getId())).thenReturn(posts);

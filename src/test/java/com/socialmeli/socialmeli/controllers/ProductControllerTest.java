@@ -9,8 +9,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import java.time.LocalDate;
-
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -23,7 +21,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.socialmeli.socialmeli.enums.Message;
 import com.socialmeli.socialmeli.utils.PostFactory;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
@@ -53,7 +50,7 @@ public class ProductControllerTest {
         // Arrange
         Object post = PostFactory.createPostDto(2, 1, Objects.equals(url, "/products/promo-post"));
 
-        String message = Message.POST_PUBLISHED.getStr();
+        String message = "Post published successfully";
 
         // Act & Assert
         mockMvc.perform(post(url)
@@ -71,7 +68,7 @@ public class ProductControllerTest {
         // Arrange
         Object post = PostFactory.createPostDto(1, 1, Objects.equals(url, "/products/promo-post"));
 
-        String message = Message.POST_PUBLISHED.getStr();
+        String message = "Post published successfully";
 
         // Act & Assert
         mockMvc.perform(post(url)
@@ -88,7 +85,7 @@ public class ProductControllerTest {
         // Arrange
         Object post = PostFactory.createPostDto(1, 201, Objects.equals(url, "/products/promo-post"));
 
-        String message = Message.PRODUCT_ALREADY_EXISTS.getStr();
+        String message = "A post with this product already exists";
 
         // Act & Assert
         mockMvc.perform(post(url)
@@ -126,18 +123,12 @@ public class ProductControllerTest {
     // que un usuario sigue en las últimas dos semanas.
     @ParameterizedTest
     @ValueSource(strings = {"date_desc", "DEFAULT"})
-    @DisplayName("#26 getPostsOfFollowedSellers - successful")
+    @DisplayName("#26 getPostsOfFollowedSellers - successful (date_desc or DEFAULT)")
     public void getPostsOfFollowedSellersTest_whenOrderByDateDescOrDefault_thenReturnAList(String order)
             throws Exception {
         // Arrange
         User user = UserFactory.createBuyer(2);
-        List<PostDto> postsExpected = List.of(
-                PostFactory.createPostDateDto(LocalDate.of(2025, 2, 2)),
-                PostFactory.createPostDateDto(LocalDate.of(2025, 1, 31)),
-                PostFactory.createPostDateDto(LocalDate.of(2025, 1, 30)),
-                PostFactory.createPostDateDto(LocalDate.of(2025, 1, 27)),
-                PostFactory.createPostDateDto(LocalDate.of(2025, 1, 25))
-        );
+        List<PostDto> postsExpected = PostFactory.createListPostDtoForUser2Desc();
 
         // Act & Assert
         ResultActions result = mockMvc.perform(get("/products/followed/{userId}/list", user.getId())
@@ -157,18 +148,12 @@ public class ProductControllerTest {
     // US-0006: Obtener un listado de las publicaciones realizadas por los vendedores
     // que un usuario sigue en las últimas dos semanas.
     @Test
-    @DisplayName("#26 getPostsOfFollowedSellers - successful")
+    @DisplayName("#26 getPostsOfFollowedSellers - successful (date_asc)")
     public void getPostsOfFollowedSellersTest_whenOrderByDateAsc_thenReturnAList() throws Exception {
         // Arrange
         String order = "date_asc";
         User user = UserFactory.createBuyer(2);
-        List<PostDto> postsExpected = List.of(
-                PostFactory.createPostDateDto(LocalDate.of(2025, 1, 25)),
-                PostFactory.createPostDateDto(LocalDate.of(2025, 1, 27)),
-                PostFactory.createPostDateDto(LocalDate.of(2025, 1, 30)),
-                PostFactory.createPostDateDto(LocalDate.of(2025, 1, 31)),
-                PostFactory.createPostDateDto(LocalDate.of(2025, 2, 2))
-        );
+        List<PostDto> postsExpected = PostFactory.createListPostDtoForUser2Asc();
 
         // Act & Assert
         ResultActions result = mockMvc.perform(get("/products/followed/{userId}/list", user.getId())
@@ -191,6 +176,7 @@ public class ProductControllerTest {
     public void getPostsOfFollowedSellersTest_whenUserIdIsNotANumber_thenThrow400(String order) throws Exception {
         // Arrange
         String userId = "numero";
+
         // Act & Assert
         mockMvc.perform(get("/products/followed/{userId}/list", userId)
                         .param("order", "DEFAULT".equals(order) ? "" : order))
@@ -243,47 +229,71 @@ public class ProductControllerTest {
     @Test
     @DisplayName("#39 Get the number of promotional products for a specific seller")
     void getPromoPostCountTest() throws Exception {
+        // Arrange
+        User user = UserFactory.createSeller(5, "Franca Pairetti");
 
+        // Act & Assert
         mockMvc.perform(get("/products/promo-post/count")
-                        .param("user_id", "5"))
+                        .param("user_id", user.getId().toString()))
                 .andExpect(status().isOk()).andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.promo_products_count").value(1))
-                .andExpect(jsonPath("$.user_name").value("Franca Pairetti"));
+                .andExpect(jsonPath("$.user_name").value(user.getName()));
     }
 
     @Test
     @DisplayName("#40 NotFoundException")
     void getPromoPostCountTest_whenUserNotFound_thenThrow404() throws Exception {
+        // Arrange
+        String userId = "999";
+        String message = "User with ID 999 not found";
 
+        // Act & Assert
         mockMvc.perform(get("/products/promo-post/count")
-                        .param("user_id", "203"))
-                .andExpect(status().isNotFound());
+                        .param("user_id", userId))
+                .andExpect(status().isNotFound())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.message").value(message));
     }
 
     @Test
     @DisplayName("#41 UserIsNotSeller")
     void getPromoPostCountTest_whenUserIsNotSeller_thenThrow() throws Exception {
+        // Arrange
+        String userId = "2";
+        String message = "Carolina Comba is not a seller";
 
+        // Act & Assert
         mockMvc.perform(get("/products/promo-post/count")
-                        .param("user_id", "4"))
-                .andExpect(status().isBadRequest());
+                        .param("user_id", userId))
+                .andExpect(status().isBadRequest())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.message").value(message));
     }
 
     @Test
     @DisplayName("#42 Invalid user id")
     void getPromoPostCountTest_when() throws Exception {
+        // Arrange
+        String userId = "-5";
 
+        // Act & Assert
         mockMvc.perform(get("/products/promo-post/count")
-                        .param("user_id", "-5"))
+                        .param("user_id", userId))
                 .andExpect(status().isBadRequest());
     }
 
     @Test
     @DisplayName("#43 Empty List")
-    void getPromoPostCountTest_whenListIsEmpty_thenThrow() throws Exception {
+    void getPromoPostCountTest_whenListIsEmpty_thenThrow400() throws Exception {
+        // Arrange
+        String userId = "7";
+        String message = "No promotional posts found for Martín Marquez";
 
+        // Act & Assert
         mockMvc.perform(get("/products/promo-post/count")
-                        .param("user_id", "7"))
-                .andExpect(status().isNotFound());
+                        .param("user_id", userId))
+                .andExpect(status().isBadRequest())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.message").value(message));
     }
 }

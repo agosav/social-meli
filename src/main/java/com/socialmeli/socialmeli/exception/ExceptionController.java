@@ -30,11 +30,6 @@ public class ExceptionController {
         return ResponseEntity.badRequest().body(new MessageDto(e.getMessage()));
     }
 
-    @ExceptionHandler(BadRequestException.class)
-    public ResponseEntity<MessageDto> handleBadRequestException(BadRequestException e) {
-        return ResponseEntity.badRequest().body(new MessageDto(e.getMessage()));
-    }
-
     @ExceptionHandler(UserNotSellerException.class)
     public ResponseEntity<MessageDto> handleUserNotSellerException(UserNotSellerException e) {
         return ResponseEntity.badRequest().body(new MessageDto(e.getMessage()));
